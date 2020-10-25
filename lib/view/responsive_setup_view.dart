@@ -20,4 +20,11 @@ class Responsive {
       _widgetScaleFactor = _deviceBlockWidth;
     _textScaleFactor = _widgetScaleFactor;
   }
+
+  static double get deviceWidth => _deviceWidth;
+  static double get deviceHeight => _deviceHeight;
+  static double get deviceBlockWidth => _deviceBlockWidth;
+  static double get deviceBlockHeight => _deviceBlockHeight;
+  static double get widgetScaleFactor => _widgetScaleFactor;
+  static double get textScaleFactor => _textScaleFactor;
 }
