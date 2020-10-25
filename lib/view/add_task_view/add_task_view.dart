@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
+import 'package:money_management/view/responsive_setup_view.dart';
 
 class AddTaskView extends StatelessWidget {
   @override
@@ -13,17 +14,24 @@ class AddTaskView extends StatelessWidget {
             children: [
               Container(
                 alignment: Alignment.center,
-                height: 150,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: kDefaultPadding,
+                  vertical: kDefaultPadding,
+                ),
                 decoration: _buildBoxDecoration(),
+                height: Responsive.widgetScaleFactor * 30,
                 child: Text(
                   "Add your amount, you have spent",
                   textAlign: TextAlign.center,
-                  style: textTheme.headline5
-                      .copyWith(fontSize: 22, color: kPureWhite),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: Responsive.textScaleFactor * 8,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               Container(
-                height: 200,
+                padding: const EdgeInsets.symmetric(vertical: kDefaultPadding),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   boxShadow: [
@@ -43,18 +51,27 @@ class AddTaskView extends StatelessWidget {
                     child: Column(
                       children: <Widget>[
                         TextFormField(
-                          style: TextStyle(color: Colors.black),
+                          style:
+                              Style.textStyle1.copyWith(color: Colors.black87),
                           textAlignVertical: TextAlignVertical.center,
                           decoration: InputDecoration(
+                            hintStyle: TextStyle(
+                                color: Colors.black54,
+                                fontSize: Responsive.textScaleFactor * 4.5),
                             hintText: "Enter a title",
                           ),
                         ),
+                        SizedBox(height: Responsive.widgetScaleFactor * 4),
                         TextFormField(
-                          style: TextStyle(color: Colors.black),
+                          style:
+                              Style.textStyle1.copyWith(color: Colors.black87),
                           textAlignVertical: TextAlignVertical.center,
                           keyboardAppearance: Brightness.dark,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
+                            hintStyle: TextStyle(
+                                color: Colors.black54,
+                                fontSize: Responsive.textScaleFactor * 4.5),
                             hintText: "Enter an amount",
                             prefixIconConstraints:
                                 BoxConstraints(minWidth: 23, maxHeight: 20),
@@ -66,6 +83,7 @@ class AddTaskView extends StatelessWidget {
                             ),
                           ),
                         ),
+                        SizedBox(height: Responsive.widgetScaleFactor * 4),
                         RaisedButton(
                             onPressed: () {
                               Navigator.pop(context);
