@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
-import 'package:money_management/view/add_task_view/add_task_view.dart';
+import 'package:money_management/view/responsive_setup_view.dart';
 
 class TaskView extends StatelessWidget {
   final _scrollController = ScrollController();
 
   _navigateToAddTask(BuildContext ctx) {
-    Navigator.push(
+    Navigator.pop(ctx);
+    /*Navigator.push(
       ctx,
       MaterialPageRoute(builder: (_) {
         return AddTaskView();
       }),
-    );
+    );*/
   }
 
   Widget _buildDismissible() {
@@ -50,6 +51,7 @@ class TaskView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Responsive.init(context);
     return Scaffold(
       backgroundColor: const Color(0xffededed),
       floatingActionButton: FloatingActionButton(
@@ -62,7 +64,7 @@ class TaskView extends StatelessWidget {
             Scrollbar(
               //controller: _scrollController,
               child: ListView.builder(
-                itemCount: 100,
+                itemCount: 20,
                 itemBuilder: (_, index) {
                   return _buildDismissible();
                 },
@@ -90,10 +92,17 @@ class RemainingAmountContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-      height: 50,
-      width: 300,
+      height: Responsive.deviceBlockHeight * 8,
+      width: Responsive.deviceBlockWidth * 80,
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(.9),
+        boxShadow: [
+          const BoxShadow(
+            blurRadius: 2,
+            color: Color(0xff7d7d7d),
+            offset: Offset(0, 2),
+          ),
+        ],
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(kDefaultValue / 2.5),
           topRight: Radius.circular(kDefaultValue / 2.5),
@@ -101,7 +110,10 @@ class RemainingAmountContainer extends StatelessWidget {
           bottomRight: Radius.circular(kDefaultValue / 2.5),
         ),
       ),
-      child: const Text("\$300"),
+      child: const Text(
+        "All over used amount\n\$300",
+        textAlign: TextAlign.center,
+      ),
     );
   }
 }
@@ -123,14 +135,14 @@ class DismissibleCustomContainer extends StatelessWidget {
 
   ListTile _buildListTile(TextTheme textTheme) {
     return ListTile(
-      title: Text("Title", style: textTheme.headline6),
-      subtitle: Text("Oct/20/10", style: textTheme.subtitle1),
+      title: Text("Title", style: Style.textStyle1),
+      subtitle: Text("Oct/20/10", style: Style.textStyle2),
       trailing: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Text("\$300", style: textTheme.headline6),
-          Text("Spent", style: textTheme.subtitle1),
+          Text("\$300", style: Style.textStyle1),
+          Text("Spent at: 08:00PM", style: Style.textStyle2),
         ],
       ),
     );

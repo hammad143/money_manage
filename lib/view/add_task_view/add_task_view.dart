@@ -67,19 +67,8 @@ class AddTaskView extends StatelessWidget {
                           ),
                         ),
                         RaisedButton(
-                            onPressed: () async {
-/*                              final x = await showTimePicker(
-                                  context: context,
-                                  initialTime: TimeOfDay.now());
-                              print("${x.hour}");
-                              print("${x.minute}");
-                              print("${x.hourOfPeriod}");*/
-                              await showDatePicker(
-                                context: context,
-                                initialDate: DateTime(2004),
-                                firstDate: DateTime(1997),
-                                lastDate: DateTime(2019),
-                              );
+                            onPressed: () {
+                              Navigator.pop(context);
                             },
                             child: Text("Show Time Picker")),
                       ],
