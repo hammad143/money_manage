@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
+import 'package:money_management/view/add_task_view/add_task_view.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
 
 class TaskView extends StatelessWidget {
   final _scrollController = ScrollController();
 
   _navigateToAddTask(BuildContext ctx) {
-    Navigator.pop(ctx);
-    /*Navigator.push(
+    //Navigator.pop(ctx);
+    Navigator.push(
       ctx,
       MaterialPageRoute(builder: (_) {
         return AddTaskView();
       }),
-    );*/
+    );
   }
 
   Widget _buildDismissible() {
@@ -92,7 +93,8 @@ class RemainingAmountContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.center,
-      height: Responsive.deviceBlockHeight * 8,
+      padding: EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
+      //height: Responsive.deviceBlockHeight * 8,
       width: Responsive.deviceBlockWidth * 80,
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(.9),
@@ -110,9 +112,14 @@ class RemainingAmountContainer extends StatelessWidget {
           bottomRight: Radius.circular(kDefaultValue / 2.5),
         ),
       ),
-      child: const Text(
+      child: Text(
         "All over used amount\n\$300",
         textAlign: TextAlign.center,
+        style: TextStyle(
+          height: 1.5,
+          fontWeight: FontWeight.w600,
+          fontSize: Responsive.textScaleFactor * 5,
+        ),
       ),
     );
   }
