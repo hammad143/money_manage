@@ -7,6 +7,12 @@ class DateTimePickBloc extends Bloc<DateTimePickEvent, DateTimePickState> {
 
   @override
   Stream<DateTimePickState> mapEventToState(DateTimePickEvent event) async* {
-    if (event is DateTimePickEvent) yield DateTimePickedState(event.dateTime);
+    yield DateTimePickedState(event.dateTime);
+  }
+
+  @override
+  void onEvent(DateTimePickEvent event) {
+    super.onEvent(event);
+    print("Event added");
   }
 }

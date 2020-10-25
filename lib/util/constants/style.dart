@@ -8,6 +8,11 @@ class Style {
     fontSize: Responsive.textScaleFactor * 5,
     fontWeight: FontWeight.w500,
   );
+  static final textStyle3 = TextStyle(
+    color: Colors.black87,
+    fontSize: Responsive.textScaleFactor * 5,
+    fontWeight: FontWeight.w500,
+  );
   static final textStyle2 = TextStyle(
     color: Colors.white,
     fontSize: Responsive.textScaleFactor * 3,
