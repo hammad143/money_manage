@@ -15,33 +15,35 @@ class TaskView extends StatelessWidget {
     );
   }
 
-  Dismissible _buildDismissible() {
-    return Dismissible(
-      confirmDismiss: (dismissDir) {
-        print("Confirm Dissmiss");
-        return Future.value(true);
-      },
-      onDismissed: (dissmiss) {
-        print("On Dissmissed");
-      },
-      background: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.restore_from_trash_rounded),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.restore_from_trash_rounded),
-          ),
-        ],
-      ),
-      key: UniqueKey(),
-      child: Stack(
-        children: [
-          DismissibleCustomContainer(),
-        ],
+  Widget _buildDismissible() {
+    return Container(
+      child: Dismissible(
+        confirmDismiss: (dismissDir) {
+          print("Confirm Dissmiss");
+          return Future.value(true);
+        },
+        onDismissed: (dissmiss) {
+          print("On Dissmissed");
+        },
+        background: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.restore_from_trash_rounded),
+            ),
+            IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.restore_from_trash_rounded),
+            ),
+          ],
+        ),
+        key: UniqueKey(),
+        child: Stack(
+          children: [
+            DismissibleCustomContainer(),
+          ],
+        ),
       ),
     );
   }
@@ -67,8 +69,10 @@ class TaskView extends StatelessWidget {
               ),
             ),
             Positioned(
-              bottom: 0,
-              child: RemainingAmountContainer(),
+              bottom: 10,
+              left: 0,
+              right: 0,
+              child: Center(child: RemainingAmountContainer()),
             ),
           ],
         ),
@@ -88,12 +92,14 @@ class RemainingAmountContainer extends StatelessWidget {
       alignment: Alignment.center,
       height: 50,
       width: 300,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(.9),
         borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(kDefaultValue),
-          topRight: Radius.circular(kDefaultValue),
+          topLeft: Radius.circular(kDefaultValue / 2.5),
+          topRight: Radius.circular(kDefaultValue / 2.5),
+          bottomLeft: Radius.circular(kDefaultValue / 2.5),
+          bottomRight: Radius.circular(kDefaultValue / 2.5),
         ),
-        color: Colors.blue,
       ),
       child: const Text("\$300"),
     );
