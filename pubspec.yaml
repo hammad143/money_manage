@@ -32,6 +32,7 @@ dependencies:
   hive_flutter: ^0.3.1
   bloc:
   flutter_bloc:
+  equatable:
 
 dev_dependencies:
   flutter_test:

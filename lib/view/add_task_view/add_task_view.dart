@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
+import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_bloc.dart';
+import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_event.dart';
+import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_state.dart';
 
 class AddTaskView extends StatelessWidget {
   @override
@@ -95,9 +99,22 @@ class AddTaskView extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text("08/10/2020, 08:00PM",
-                                  style: Style.textStyle1
-                                      .copyWith(color: Colors.black54)),
+                              BlocBuilder<DateTimePickBloc, DateTimePickState>(
+                                  builder: (ctx, state) {
+                                String timeToString;
+                                if (state is DateTimePickInitialState) {
+                                  final time = state.date;
+                                  timeToString =
+                                      "${time.month}/${time.day}/${time.year} - ${time.hour}:${time.minute}";
+                                } else if (state is DateTimePickedState) {
+                                  final time = state.dateTime;
+                                  timeToString =
+                                      "${time.month}/${time.day}/${time.year} - ${time.hour}:${time.minute}";
+                                }
+                                return Text(timeToString,
+                                    style: Style.textStyle1
+                                        .copyWith(color: Colors.black54));
+                              }),
                               Material(
                                 shape: CircleBorder(),
                                 type: MaterialType.transparency,
@@ -106,7 +123,65 @@ class AddTaskView extends StatelessWidget {
                                     Icons.date_range,
                                     color: const Color(0xff6324a3),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () async {
+                                    final timeAndDate =
+                                        await showDateAndTimePicker(context);
+                                    final datePicker = timeAndDate[0];
+                                    final timePicker = timeAndDate[1];
+                                    final todayDate = DateTime.now();
+                                    final currentTime = TimeOfDay.now();
+                                    final currentTimeWithDate = DateTime(
+                                        todayDate.year,
+                                        todayDate.month,
+                                        todayDate.day,
+                                        currentTime.hour,
+                                        currentTime.minute);
+                                    DateTime settedTime = currentTimeWithDate;
+                                    final isTimeSet = currentTime == timePicker;
+                                    print(
+                                        "Current Time: $currentTime and TimePicker $timePicker");
+                                    print(
+                                        "DatePicker $datePicker && TimePicker $timePicker");
+                                    if (datePicker == null) {
+                                      if (isTimeSet == false) {
+                                        settedTime = DateTime(
+                                            todayDate.year,
+                                            todayDate.month,
+                                            todayDate.day,
+                                            timePicker.hour,
+                                            timePicker.minute);
+                                        BlocProvider.of<DateTimePickBloc>(
+                                                context)
+                                            .add(DateTimePickEvent(settedTime));
+                                      } else {
+                                        print("time");
+                                        BlocProvider.of<DateTimePickBloc>(
+                                                context)
+                                            .add(DateTimePickEvent(settedTime));
+                                      }
+                                    } else if (isTimeSet) {
+                                      print(
+                                          "Is this Picker Working When time null");
+                                      settedTime = DateTime(
+                                          datePicker.year,
+                                          datePicker.month,
+                                          datePicker.day,
+                                          currentTime.hour,
+                                          currentTime.minute);
+                                      BlocProvider.of<DateTimePickBloc>(context)
+                                          .add(DateTimePickEvent(settedTime));
+                                    } else {
+                                      print("t");
+                                      settedTime = DateTime(
+                                          datePicker.year,
+                                          datePicker.month,
+                                          datePicker.day,
+                                          timePicker.hour,
+                                          timePicker.minute);
+                                      BlocProvider.of<DateTimePickBloc>(context)
+                                          .add(DateTimePickEvent(settedTime));
+                                    }
+                                  },
                                 ),
                               ),
                             ],
@@ -128,6 +203,22 @@ class AddTaskView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<List<dynamic>> showDateAndTimePicker(BuildContext context) async {
+    final datePicker = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1997),
+      lastDate: DateTime.now()..year,
+    );
+    final timePicker = await showTimePicker(
+        initialTime: TimeOfDay.now(),
+        context: context,
+        cancelText: "Close",
+        confirmText: "Set",
+        helpText: "Pick your time");
+    return [datePicker, timePicker];
   }
 
   BoxDecoration _buildBoxDecoration() {
