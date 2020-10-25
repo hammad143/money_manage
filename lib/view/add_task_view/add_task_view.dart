@@ -84,6 +84,35 @@ class AddTaskView extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: Responsive.widgetScaleFactor * 4),
+                        Container(
+                          decoration: const BoxDecoration(
+                              border: Border(
+                            bottom: BorderSide(
+                              width: 1.7,
+                              color: const Color(0xff6324a3),
+                            ),
+                          )),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("08/10/2020, 08:00PM",
+                                  style: Style.textStyle1
+                                      .copyWith(color: Colors.black54)),
+                              Material(
+                                shape: CircleBorder(),
+                                type: MaterialType.transparency,
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.date_range,
+                                    color: const Color(0xff6324a3),
+                                  ),
+                                  onPressed: () {},
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: Responsive.widgetScaleFactor * 4),
                         RaisedButton(
                             onPressed: () {
                               Navigator.pop(context);
