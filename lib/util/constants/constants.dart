@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-const kHiveBoxName = "onboard";
+const kHiveBoxOnBoard = "onboard";
+const kHiveDataName = "user data";
 const kPureWhite = Colors.white;
 const double kDefaultPadding = 20;
 const double kDefaultValue = 20;

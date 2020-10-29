@@ -5,10 +5,12 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/view/tasks_view/tasks.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_bloc.dart';
+import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_bloc.dart';
 
 void main() async {
   await Hive.initFlutter();
-  await Hive.openBox(kHiveBoxName);
+  await Hive.openBox(kHiveBoxOnBoard);
+  await Hive.openBox(kHiveDataName);
   runApp(MyApp());
 }
 
@@ -19,6 +21,9 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (_) => DateTimePickBloc(),
+        ),
+        BlocProvider(
+          create: (_) => DropDownSelectChangeBloc(),
         ),
       ],
       child: MaterialApp(
@@ -44,6 +49,7 @@ class MyApp extends StatelessWidget {
 class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    FocusScope.of(context).unfocus();
     print("Main");
     return TaskView();
   }
