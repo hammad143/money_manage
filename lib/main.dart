@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/view/tasks_view/tasks.dart';
+import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_bloc.dart';
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_bloc.dart';
 
@@ -24,6 +25,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (_) => DropDownSelectChangeBloc(),
+        ),
+        BlocProvider(
+          create: (_) => AddAmountInfoBloc(),
         ),
       ],
       child: MaterialApp(

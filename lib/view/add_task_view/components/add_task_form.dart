@@ -17,6 +17,7 @@ class AddTaskForm extends StatefulWidget {
 
 class _AddTaskFormState extends State<AddTaskForm> {
   final _formKey = GlobalKey<FormState>();
+  String timeToString;
   TextEditingController _titleController, _amountController;
   FocusNode _titleFocusNode, _amountFocusNode;
   FocusScopeNode _focusScope;
@@ -125,8 +126,6 @@ class _AddTaskFormState extends State<AddTaskForm> {
               children: [
                 BlocBuilder<DateTimePickBloc, DateTimePickState>(
                     builder: (ctx, state) {
-                  String timeToString;
-
                   if (state is DateTimePickInitialState)
                     timeToString = _onTimeChangeState(state);
                   else if (state is DateTimePickedState)
@@ -164,7 +163,12 @@ class _AddTaskFormState extends State<AddTaskForm> {
           ),
           SizedBox(height: Responsive.widgetScaleFactor * 4),
           SizedBox(height: Responsive.widgetScaleFactor * 4),
-          CustomAddAmountBtn(formState: _formKey.currentState),
+          CustomAddAmountBtn(
+            formState: _formKey.currentState,
+            title: _titleController.text,
+            amount: _amountController.text,
+            dateInString: timeToString,
+          ),
         ],
       ),
     );

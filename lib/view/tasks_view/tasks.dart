@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/add_task_view/add_task_view.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
+import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
+import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
 
 class TaskView extends StatelessWidget {
   final _scrollController = ScrollController();
@@ -17,7 +20,11 @@ class TaskView extends StatelessWidget {
     );
   }
 
-  Widget _buildDismissible() {
+  Widget _buildDismissible({AddAmountInfoState state}) {
+    print("${state.runtimeType} ");
+    if (state is AddAmountInfoDone) {
+      print("Initial State ${state.hiveBox.get("title")}");
+    }
     return Container(
       child: Dismissible(
         confirmDismiss: (dismissDir) {
@@ -67,7 +74,8 @@ class TaskView extends StatelessWidget {
               child: ListView.builder(
                 itemCount: 20,
                 itemBuilder: (_, index) {
-                  return _buildDismissible();
+                  return BlocBuilder<AddAmountInfoBloc, AddAmountInfoState>(
+                      builder: (ctx, state) => _buildDismissible(state: state));
                 },
               ),
             ),
