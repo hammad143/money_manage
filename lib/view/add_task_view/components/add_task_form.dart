@@ -30,16 +30,6 @@ class _AddTaskFormState extends State<AddTaskForm> {
     _amountController = TextEditingController();
     _titleFocusNode = FocusNode(debugLabel: 'TextField');
     _amountFocusNode = FocusNode();
-    if (_isFocused) {
-      _titleFocusNode.unfocus();
-      _amountFocusNode.unfocus();
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    print("Did DependacyChange");
-    super.didChangeDependencies();
   }
 
   @override
@@ -183,8 +173,6 @@ class _AddTaskFormState extends State<AddTaskForm> {
   }
 
   String _titleValidator(value) {
-    print("values");
-    print(value.length);
     if (value.length == 300)
       return "Title cannot exceeds more than 300 chars";
     else if (value.isEmpty) return "Title is required";

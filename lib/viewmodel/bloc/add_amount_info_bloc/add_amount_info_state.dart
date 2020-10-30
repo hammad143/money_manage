@@ -1,19 +1,25 @@
 import 'package:equatable/equatable.dart';
 import 'package:hive/hive.dart';
-import 'package:money_management/util/constants/constants.dart';
 
 class AddAmountInfoState extends Equatable {
+  final Box box;
+
+  AddAmountInfoState({this.box});
   @override
   // TODO: implement props
   List<Object> get props => [];
 }
 
 class AddAmountInfoInitialState extends AddAmountInfoState {
-  final box = Hive.box(kHiveDataName);
+  final Box box;
+  AddAmountInfoInitialState({this.box}) : super(box: box);
 }
 
 class AddAmountInfoDone extends AddAmountInfoState {
-  final hiveBox;
+  final Box<dynamic> box;
 
-  AddAmountInfoDone({this.hiveBox});
+  AddAmountInfoDone({this.box});
+  @override
+  // TODO: implement props
+  List<Object> get props => [box];
 }

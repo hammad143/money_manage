@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/add_task_view/add_task_view.dart';
@@ -9,7 +10,8 @@ import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_
 
 class TaskView extends StatelessWidget {
   final _scrollController = ScrollController();
-
+  List tileViewModel = [];
+  final storageBox = Hive.box(kHiveStorage);
   _navigateToAddTask(BuildContext ctx) {
     //Navigator.pop(ctx);
     Navigator.push(
@@ -21,10 +23,6 @@ class TaskView extends StatelessWidget {
   }
 
   Widget _buildDismissible({AddAmountInfoState state}) {
-    print("${state.runtimeType} ");
-    if (state is AddAmountInfoDone) {
-      print("Initial State ${state.hiveBox.get("title")}");
-    }
     return Container(
       child: Dismissible(
         confirmDismiss: (dismissDir) {
@@ -59,6 +57,9 @@ class TaskView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (storageBox.get("storage") != null) {
+      tileViewModel = storageBox.get("storage");
+    }
     Responsive.init(context);
     return Scaffold(
       backgroundColor: const Color(0xffededed),
@@ -71,13 +72,29 @@ class TaskView extends StatelessWidget {
           children: [
             Scrollbar(
               //controller: _scrollController,
-              child: ListView.builder(
-                itemCount: 20,
-                itemBuilder: (_, index) {
-                  return BlocBuilder<AddAmountInfoBloc, AddAmountInfoState>(
-                      builder: (ctx, state) => _buildDismissible(state: state));
-                },
-              ),
+
+              child: BlocBuilder<AddAmountInfoBloc, AddAmountInfoState>(
+                  builder: (ctx, state) {
+                print(state.box.get("storage"));
+                return ListView.builder(
+                  itemCount: 2,
+                  itemBuilder: (_, index) {
+                    final _tileViewModel = state.box.get("storage");
+                    if (_tileViewModel != null && _tileViewModel.isNotEmpty) {
+                      print("Amount is ${_tileViewModel[0].title}");
+                      return _buildDismissible();
+                    }
+
+                    print("Is empty");
+
+                    return Center(
+                      child: Container(
+                        child: Text("Nothing found"),
+                      ),
+                    );
+                  },
+                );
+              }),
             ),
             Positioned(
               bottom: 10,

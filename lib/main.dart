@@ -12,10 +12,35 @@ void main() async {
   await Hive.initFlutter();
   await Hive.openBox(kHiveBoxOnBoard);
   await Hive.openBox(kHiveDataName);
+  await Hive.openBox(kHiveStorage);
+
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _box = Hive.box(kHiveStorage);
+  @override
+  void initState() {
+    super.initState();
+
+    final listOfItems = _box.get("storage");
+    if (listOfItems == null) {
+      print("Put");
+      _box.put("storage", []);
+    }
+  }
+
+  @override
+  void dispose() {
+    _box.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
