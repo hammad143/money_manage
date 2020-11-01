@@ -1,6 +1,8 @@
 import 'package:hive/hive.dart';
 
-@HiveType(typeId: 1)
+part 'list_of_tiles_model.g.dart';
+
+@HiveType(typeId: 0)
 class ListOfTilesModel {
   @HiveField(0)
   final String title;
