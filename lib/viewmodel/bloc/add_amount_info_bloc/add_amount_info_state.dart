@@ -16,7 +16,7 @@ class AddAmountInfoInitialState extends AddAmountInfoState {
 }
 
 class AddAmountInfoDone extends AddAmountInfoState {
-  final Box<dynamic> box;
+  final Box<List> box;
 
   AddAmountInfoDone({this.box});
   @override

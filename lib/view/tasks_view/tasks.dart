@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
+import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/add_task_view/add_task_view.dart';
@@ -8,11 +9,23 @@ import 'package:money_management/view/responsive_setup_view.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
 
-class TaskView extends StatelessWidget {
+class TaskView extends StatefulWidget {
+  @override
+  _TaskViewState createState() => _TaskViewState();
+}
+
+class _TaskViewState extends State<TaskView> {
   final _scrollController = ScrollController();
-  List tileViewModel = [];
-  final storageBox = Hive.box(kHiveStorage);
-  _navigateToAddTask(BuildContext ctx) {
+  List<ListOfTilesModel> tileViewModel;
+  Box<List> _box = Hive.box<List>(kHiveStorage);
+  @override
+  void initState() {
+    super.initState();
+    //final list = _box.get("storage").cast<ListOfTilesModel>().toList();
+    tileViewModel = [];
+  }
+
+  void _navigateToAddTask(BuildContext ctx) {
     //Navigator.pop(ctx);
     Navigator.push(
       ctx,
@@ -57,10 +70,8 @@ class TaskView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (storageBox.get("storage") != null) {
-      tileViewModel = storageBox.get("storage");
-    }
     Responsive.init(context);
+
     return Scaffold(
       backgroundColor: const Color(0xffededed),
       floatingActionButton: FloatingActionButton(
@@ -75,17 +86,12 @@ class TaskView extends StatelessWidget {
 
               child: BlocBuilder<AddAmountInfoBloc, AddAmountInfoState>(
                   builder: (ctx, state) {
-                print(state.box.get("storage"));
                 return ListView.builder(
                   itemCount: 2,
                   itemBuilder: (_, index) {
-                    final _tileViewModel = state.box.get("storage");
-                    if (_tileViewModel != null && _tileViewModel.isNotEmpty) {
-                      print("Amount is ${_tileViewModel[0].title}");
+                    if (0 != 1) {
                       return _buildDismissible();
                     }
-
-                    print("Is empty");
 
                     return Center(
                       child: Container(

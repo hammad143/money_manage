@@ -1,5 +1,13 @@
+import 'package:hive/hive.dart';
+
+@HiveType(typeId: 1)
 class ListOfTilesModel {
-  final String title, amount, dateInString;
+  @HiveField(0)
+  final String title;
+  @HiveField(1)
+  String amount;
+  @HiveField(2)
+  String dateInString;
 
   ListOfTilesModel({this.title, this.amount, this.dateInString});
 }

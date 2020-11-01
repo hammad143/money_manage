@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
-import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
@@ -19,10 +17,8 @@ class CustomAddAmountBtn extends StatefulWidget {
 }
 
 class _CustomAddAmountBtnState<E> extends State<CustomAddAmountBtn> {
-  Box<E> _box;
   @override
   void initState() {
-    _box = Hive.box<E>(kHiveDataName);
     super.initState();
   }
 

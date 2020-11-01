@@ -35,8 +35,11 @@ dependencies:
   equatable:
 
 dev_dependencies:
+  analyzer: 0.38.2
   flutter_test:
     sdk: flutter
+  hive_generator: 0.5.2
+  build_runner: ^1.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
