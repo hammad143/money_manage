@@ -6,16 +6,15 @@ import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_state.dart';
 
 class DropDownBtns extends StatelessWidget {
+  final int value;
   const DropDownBtns({
     Key key,
+    this.value,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DropDownSelectChangeBloc, DropDownSelectChangeState>(
-        builder: (ctx, state) {
-      int value = null;
-      if (state is DropDownSelectedValue) value = state.value;
+
 
       return DropdownButton(
         isExpanded: true,
@@ -23,7 +22,7 @@ class DropDownBtns extends StatelessWidget {
         style: Style.textStyle3,
         value: value,
         hint: Text("Amount Received/Spent"),
-        onChanged: (value) => BlocProvider.of<DropDownSelectChangeBloc>(ctx)
+        onChanged: (value) => BlocProvider.of<DropDownSelectChangeBloc>(context)
             .add(DropDownSelectChangeEvent(value)),
         onTap: () {},
         items: [
@@ -44,6 +43,5 @@ class DropDownBtns extends StatelessWidget {
           ),
         ],
       );
-    });
   }
 }

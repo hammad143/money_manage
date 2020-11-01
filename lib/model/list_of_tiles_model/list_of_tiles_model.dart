@@ -10,6 +10,8 @@ class ListOfTilesModel {
   String amount;
   @HiveField(2)
   String dateInString;
+  @HiveField(3)
+  String option;
 
-  ListOfTilesModel({this.title, this.amount, this.dateInString});
+  ListOfTilesModel({this.title, this.amount, this.dateInString, this.option});
 }

@@ -16,13 +16,17 @@ class TaskView extends StatefulWidget {
 
 class _TaskViewState extends State<TaskView> {
   final _scrollController = ScrollController();
+  int index = 0;
   List<ListOfTilesModel> tileViewModel;
-  Box<List> _box = Hive.box<List>(kHiveStorage);
+  final storageBox = Hive.box<ListOfTilesModel>(storageKey);
+  ValueNotifier<Box<ListOfTilesModel>> _notifier;
+
   @override
   void initState() {
     super.initState();
     //final list = _box.get("storage").cast<ListOfTilesModel>().toList();
-    tileViewModel = [];
+    tileViewModel = storageBox.values.toList();
+    _notifier = ValueNotifier<Box<ListOfTilesModel>>(storageBox);
   }
 
   void _navigateToAddTask(BuildContext ctx) {
@@ -61,7 +65,10 @@ class _TaskViewState extends State<TaskView> {
         key: UniqueKey(),
         child: Stack(
           children: [
-            DismissibleCustomContainer(),
+            DismissibleCustomContainer(
+              tilesList: tileViewModel,
+              index: index,
+            ),
           ],
         ),
       ),
@@ -86,20 +93,18 @@ class _TaskViewState extends State<TaskView> {
 
               child: BlocBuilder<AddAmountInfoBloc, AddAmountInfoState>(
                   builder: (ctx, state) {
-                return ListView.builder(
-                  itemCount: 2,
-                  itemBuilder: (_, index) {
-                    if (0 != 1) {
-                      return _buildDismissible();
-                    }
-
+                if (state is AddAmountInfoInitialState) {
+                  if (state.box.isEmpty) {
                     return Center(
                       child: Container(
                         child: Text("Nothing found"),
                       ),
                     );
-                  },
-                );
+                  } else {
+                    return itemBuilder(state);
+                  }
+                }
+                return itemBuilder(state);
               }),
             ),
             Positioned(
@@ -112,6 +117,17 @@ class _TaskViewState extends State<TaskView> {
         ),
       ),
     );
+  }
+
+  Widget itemBuilder(AddAmountInfoState state) {
+    tileViewModel = state.box.values.cast<ListOfTilesModel>().toList();
+    print(tileViewModel[1].title);
+    return ListView.builder(
+        itemCount: tileViewModel.length,
+        itemBuilder: (_, index) {
+          this.index = index;
+          return _buildDismissible(state: state);
+        });
   }
 }
 
@@ -157,6 +173,10 @@ class RemainingAmountContainer extends StatelessWidget {
 }
 
 class DismissibleCustomContainer extends StatelessWidget {
+  final List<ListOfTilesModel> tilesList;
+  final int index;
+  const DismissibleCustomContainer({Key key, this.tilesList, this.index})
+      : super(key: key);
   @override
   build(_) {
     final textTheme = Theme.of(_).textTheme;
@@ -173,14 +193,15 @@ class DismissibleCustomContainer extends StatelessWidget {
 
   ListTile _buildListTile(TextTheme textTheme) {
     return ListTile(
-      title: Text("Title", style: Style.textStyle1),
-      subtitle: Text("Oct/20/10", style: Style.textStyle2),
+      title: Text(tilesList[index].title, style: Style.textStyle1),
+      subtitle: Text(tilesList[index].dateInString, style: Style.textStyle2),
       trailing: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Text("\$300", style: Style.textStyle1),
-          Text("Spent at: 08:00PM", style: Style.textStyle2),
+          Text(tilesList[index].amount, style: Style.textStyle1),
+          Text("${tilesList[index].option} at: 08:00PM",
+              style: Style.textStyle2),
         ],
       ),
     );

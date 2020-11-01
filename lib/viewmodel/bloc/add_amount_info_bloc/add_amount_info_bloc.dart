@@ -5,36 +5,53 @@ import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_event.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
 
-class AddAmountInfoBloc extends Bloc<AddAmountInfoEvent, AddAmountInfoState> {
-  AddAmountInfoBloc() : super(AddAmountInfoInitialState());
+class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
+  AddAmountInfoBloc() : super(AddAmountInfoInitialState<ListOfTilesModel>(box:Hive.box(storageKey)));
   @override
-  Stream<AddAmountInfoState> mapEventToState(AddAmountInfoEvent event) async* {
+  Stream<AddAmountInfoState> mapEventToState(AddDataEvent event) async* {
     final box = Hive.box(kHiveDataName);
-    final listIndexBox = Hive.box(kListIndex);
-    final storageBox = Hive.box<List>(kHiveStorage);
-    if (event.title.isNotEmpty && event.amount.isNotEmpty) {
-      box.putAll({
-        "title": event.title,
-        "amount": event.amount,
-        "date": event.dateInString
-      });
-      final title = box.get("title");
-      final amount = box.get("amount");
-      final date = box.get("date");
-      final index = listIndexBox.get("index");
-      if (index == null) {
-        listIndexBox.put("index", 0);
-      } else {
-        listIndexBox.put(
-            "index", listIndexBox.get("index", defaultValue: 0) + 1);
+    final storageBox = Hive.box<ListOfTilesModel>(storageKey);
+    final counterBox = Hive.box<int>(counterKey);
 
-        final list =
-            storageBox.get("storage").cast<ListOfTilesModel>().toList();
-        //storageBox.putAt(index, "awesome");
-        if (list != null) {
-          print("added successfully");
-          yield AddAmountInfoDone(box: storageBox);
+    if (event is AddAmountInfoEvent) {
+      if (event.title.isNotEmpty && event.amount.isNotEmpty) {
+        box.putAll({
+          "title": event.title,
+          "amount": event.amount,
+          "date": event.dateInString,
+          "option": event.valueSelectedState.selectedValue,
+        });
+        final title = box.get("title");
+        final amount = box.get("amount");
+        final date = box.get("date");
+        final options = box.get("option");
+
+        try {
+          final lastIndex = counterBox.values.last;
+          final incrementByOne = lastIndex + 1;
+          counterBox.add(incrementByOne);
+          storageBox.put(
+            incrementByOne,
+            ListOfTilesModel(
+                title: title,
+                amount: amount,
+                dateInString: date,
+                option: options),
+          );
+          print(
+              "Storage ${storageBox.values.last.option} and Counter ${counterBox.values}");
+        } catch (Exception) {
+          counterBox.add(0);
+          storageBox.put(
+            0,
+            ListOfTilesModel(
+                title: title,
+                amount: amount,
+                dateInString: date,
+                option: options),
+          );
         }
+        yield AddAmountInfoDone<ListOfTilesModel>(box: storageBox);
       }
     }
   }

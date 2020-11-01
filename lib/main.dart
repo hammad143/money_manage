@@ -1,21 +1,24 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
 import 'package:money_management/util/constants/constants.dart';
+import 'package:money_management/view/tasks_view/tasks.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_bloc.dart';
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_bloc.dart';
 
 void main() async {
   await Hive.initFlutter();
-  Hive.registerAdapter(ListOfTilesModelAdapter());
-  /*await Hive.openBox(kHiveBoxOnBoard);
+ Hive.registerAdapter(ListOfTilesModelAdapter());
+  await Hive.openBox(kHiveBoxOnBoard);
   await Hive.openBox(kHiveDataName);
-  await Hive.openBox(kListIndex);
-  await Hive.openBox<List>(kHiveStorage);*/
-  await Hive.openBox<ListOfTilesModel>("myTilesBox");
+  //await Hive.openBox(kListIndex);
+  //await Hive.openBox<List>(kHiveStorage)
+  await Hive.openBox<ListOfTilesModel>(storageKey);
+  await Hive.openBox<int>(counterKey);
   runApp(MyApp());
 }
 
@@ -70,19 +73,22 @@ class _MyAppState extends State<MyApp> {
 
 //Mason is one of the great man
 class MainScreen extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    /*return Scaffold(
       body: Center(
-        child: RaisedButton(
-          onPressed: () {
-            final Box<ListOfTilesModel> box =
-                Hive.box<ListOfTilesModel>("myTilesBox");
-          },
-          child: Text("Hello World"),
-        ),
+        child:
+        RaisedButton(
+            onPressed: () {
+
+
+            },
+            child: Text("Hello World"),
+          ),
+
       ),
-    );
-    //return TaskView();
+    );*/
+    return TaskView();
   }
 }

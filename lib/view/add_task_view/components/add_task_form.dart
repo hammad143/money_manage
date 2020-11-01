@@ -8,6 +8,8 @@ import 'package:money_management/view/responsive_setup_view.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_bloc.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_event.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_state.dart';
+import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_bloc.dart';
+import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_state.dart';
 
 class AddTaskForm extends StatefulWidget {
   const AddTaskForm();
@@ -22,6 +24,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
   FocusNode _titleFocusNode, _amountFocusNode;
   FocusScopeNode _focusScope;
   bool _isFocused = true;
+  DropDownSelectChangeState dropDownState;
 
   @override
   void initState() {
@@ -139,7 +142,12 @@ class _AddTaskFormState extends State<AddTaskForm> {
             ),
           ),
           SizedBox(height: Responsive.widgetScaleFactor * 4),
-          DropDownBtns(),
+        BlocBuilder<DropDownSelectChangeBloc, DropDownSelectChangeState>(
+            builder: (ctx, state) {
+              dropDownState = state;
+              return DropDownBtns(value: state?.value);
+
+            }),
           SizedBox(height: Responsive.widgetScaleFactor * 4),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -155,9 +163,10 @@ class _AddTaskFormState extends State<AddTaskForm> {
           SizedBox(height: Responsive.widgetScaleFactor * 4),
           CustomAddAmountBtn(
             formState: _formKey.currentState,
-            title: _titleController.text,
-            amount: _amountController.text,
+            title: _titleController,
+            amount: _amountController,
             dateInString: timeToString,
+            selectedValueState: dropDownState,
           ),
         ],
       ),
