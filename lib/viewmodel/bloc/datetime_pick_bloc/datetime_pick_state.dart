@@ -20,6 +20,6 @@ class DateTimePickInitialState extends DateTimePickState {
 }
 
 class DateTimePickedState extends DateTimePickState {
-  final DateTime dateTime;
-  DateTimePickedState(this.dateTime) : super(dateTime: dateTime);
+  final DateTime date;
+  DateTimePickedState(this.date) : super(dateTime: date);
 }

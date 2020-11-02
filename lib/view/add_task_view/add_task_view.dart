@@ -14,21 +14,19 @@ class AddTaskView extends StatelessWidget {
           children: [
             Container(
               alignment: Alignment.center,
+              decoration: _buildBoxDecoration(),
+              height: Responsive.widgetScaleFactor * 30,
               padding: const EdgeInsets.symmetric(
                 horizontal: kDefaultPadding,
                 vertical: kDefaultPadding,
               ),
-              decoration: _buildBoxDecoration(),
-              height: Responsive.widgetScaleFactor * 30,
-              child: Text(
-                "Add your amount, you have spent",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: Responsive.textScaleFactor * 8,
-                  color: Colors.white,
-                ),
-              ),
+              child: Text("Add your amount, you have spent",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: Responsive.textScaleFactor * 8,
+                    color: Colors.white,
+                  )),
             ),
             Expanded(
               child: Container(
@@ -42,10 +40,13 @@ class AddTaskView extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: const AddTaskForm(),
+                child: ScrollConfiguration(
+                  behavior: CustomScrollBehavior(),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: const AddTaskForm(),
+                    ),
                   ),
                 ),
               ),
@@ -70,5 +71,13 @@ class AddTaskView extends StatelessWidget {
         topRight: Radius.circular(kDefaultValue),
       ),*/
     );
+  }
+}
+
+class CustomScrollBehavior extends ScrollBehavior {
+  @override
+  Widget buildViewportChrome(
+      BuildContext context, Widget child, AxisDirection axisDirection) {
+    return child;
   }
 }

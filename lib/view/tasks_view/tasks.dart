@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
@@ -18,19 +17,8 @@ class _TaskViewState extends State<TaskView> {
   final _scrollController = ScrollController();
   int index = 0;
   List<ListOfTilesModel> tileViewModel;
-  final storageBox = Hive.box<ListOfTilesModel>(storageKey);
-  ValueNotifier<Box<ListOfTilesModel>> _notifier;
-
-  @override
-  void initState() {
-    super.initState();
-    //final list = _box.get("storage").cast<ListOfTilesModel>().toList();
-    tileViewModel = storageBox.values.toList();
-    _notifier = ValueNotifier<Box<ListOfTilesModel>>(storageBox);
-  }
 
   void _navigateToAddTask(BuildContext ctx) {
-    //Navigator.pop(ctx);
     Navigator.push(
       ctx,
       MaterialPageRoute(builder: (_) {
@@ -75,6 +63,17 @@ class _TaskViewState extends State<TaskView> {
     );
   }
 
+  Widget itemBuilder(AddAmountInfoState state) {
+    tileViewModel = state.box.values.cast<ListOfTilesModel>().toList();
+
+    return ListView.builder(
+        itemCount: tileViewModel.length,
+        itemBuilder: (_, index) {
+          this.index = (tileViewModel.length - 1) - index;
+          return _buildDismissible(state: state);
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     Responsive.init(context);
@@ -82,27 +81,23 @@ class _TaskViewState extends State<TaskView> {
     return Scaffold(
       backgroundColor: const Color(0xffededed),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xff5e10c4),
         onPressed: () => _navigateToAddTask(context),
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
       body: SafeArea(
         child: Stack(
           children: [
             Scrollbar(
-              //controller: _scrollController,
-
               child: BlocBuilder<AddAmountInfoBloc, AddAmountInfoState>(
                   builder: (ctx, state) {
                 if (state is AddAmountInfoInitialState) {
-                  if (state.box.isEmpty) {
-                    return Center(
-                      child: Container(
-                        child: Text("Nothing found"),
-                      ),
-                    );
-                  } else {
-                    return itemBuilder(state);
-                  }
+                  return (state.box.isEmpty)
+                      ? Center(
+                          child: Container(
+                          child: Text("Nothing found"),
+                        ))
+                      : itemBuilder(state);
                 }
                 return itemBuilder(state);
               }),
@@ -118,54 +113,51 @@ class _TaskViewState extends State<TaskView> {
       ),
     );
   }
-
-  Widget itemBuilder(AddAmountInfoState state) {
-    tileViewModel = state.box.values.cast<ListOfTilesModel>().toList();
-    print(tileViewModel[1].title);
-    return ListView.builder(
-        itemCount: tileViewModel.length,
-        itemBuilder: (_, index) {
-          this.index = index;
-          return _buildDismissible(state: state);
-        });
-  }
 }
 
-class RemainingAmountContainer extends StatelessWidget {
-  const RemainingAmountContainer({
-    Key key,
-  }) : super(key: key);
+class RemainingAmountContainer extends StatefulWidget {
+  @override
+  _RemainingAmountContainerState createState() =>
+      _RemainingAmountContainerState();
+}
 
+class _RemainingAmountContainerState extends State<RemainingAmountContainer> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.center,
-      padding: EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
-      //height: Responsive.deviceBlockHeight * 8,
-      width: Responsive.deviceBlockWidth * 80,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.9),
-        boxShadow: [
-          const BoxShadow(
-            blurRadius: 2,
-            color: Color(0xff7d7d7d),
-            offset: Offset(0, 2),
-          ),
-        ],
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(kDefaultValue / 2.5),
-          topRight: Radius.circular(kDefaultValue / 2.5),
-          bottomLeft: Radius.circular(kDefaultValue / 2.5),
-          bottomRight: Radius.circular(kDefaultValue / 2.5),
+    return GestureDetector(
+      onTap: () {},
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+
+        alignment: Alignment.center,
+        padding: EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
+        //height: Responsive.deviceBlockHeight * 8,
+        width: Responsive.deviceBlockWidth * 80,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(.9),
+          shape: BoxShape.circle,
+          boxShadow: [
+            const BoxShadow(
+              blurRadius: 2,
+              color: Color(0xff7d7d7d),
+              offset: Offset(0, 2),
+            ),
+          ],
+          /* borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(kDefaultValue / 2.5),
+            topRight: Radius.circular(kDefaultValue / 2.5),
+            bottomLeft: Radius.circular(kDefaultValue / 2.5),
+            bottomRight: Radius.circular(kDefaultValue / 2.5),
+          ),*/
         ),
-      ),
-      child: Text(
-        "All over used amount\n\$300",
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          height: 1.5,
-          fontWeight: FontWeight.w600,
-          fontSize: Responsive.textScaleFactor * 5,
+        child: Text(
+          "All over used amount\n\$300",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            height: 1.5,
+            fontWeight: FontWeight.w600,
+            fontSize: Responsive.textScaleFactor * 5,
+          ),
         ),
       ),
     );

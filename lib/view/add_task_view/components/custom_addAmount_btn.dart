@@ -13,13 +13,10 @@ import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_state.dart';
 
 class CustomAddAmountBtn extends StatefulWidget {
-  final FormState formState;
-  final String  dateInString;
-  final TextEditingController title, amount;
-  final DropDownSelectChangeState selectedValueState;
+  final VoidCallback onBtnPressed;
 
   const CustomAddAmountBtn(
-      {Key key, this.formState, this.title, this.amount, this.dateInString, this.selectedValueState})
+      {Key key, this.onBtnPressed})
       : super(key: key);
 
   @override
@@ -53,41 +50,10 @@ class _CustomAddAmountBtnState<E> extends State<CustomAddAmountBtn> {
           elevation: 0,
           focusElevation: 0,
           highlightElevation: 0,
-          onPressed: () {
+          onPressed: widget.onBtnPressed
 
-            if (widget.formState.validate()) {
-              widget.formState.save();
-              _bloc.add(AddAmountInfoEvent(
-                  widget.title.text, widget.amount.text, widget.dateInString,  widget.selectedValueState));
 
-              showDialog(context: context, builder: (ctx) {
-                return AlertDialog(
-
-                  content: Align(
-                    heightFactor: .5,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 16.0),
-                          child: CircularProgressIndicator(),
-                        ),
-                        const SizedBox(height: 5),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical:8.0),
-                          child: const Text("Please wait, Adding your result", style: const TextStyle(color: Colors.black87),),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },);
-              Timer(Duration(seconds: 5), () {
-                print("Timer Called");
-                Navigator.pop(context);
-              });
-            }
-          },
+          ,
           child: Text(
             "Add Amount",
             style: Style.textStyle1

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,6 +7,8 @@ import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/add_task_view/components/custom_addAmount_btn.dart';
 import 'package:money_management/view/add_task_view/components/custom_dp_btns.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
+import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
+import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_event.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_bloc.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_event.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_state.dart';
@@ -19,11 +23,11 @@ class AddTaskForm extends StatefulWidget {
 
 class _AddTaskFormState extends State<AddTaskForm> {
   final _formKey = GlobalKey<FormState>();
+  AddAmountInfoBloc _bloc;
   String timeToString;
   TextEditingController _titleController, _amountController;
   FocusNode _titleFocusNode, _amountFocusNode;
   FocusScopeNode _focusScope;
-  bool _isFocused = true;
   DropDownSelectChangeState dropDownState;
 
   @override
@@ -33,18 +37,20 @@ class _AddTaskFormState extends State<AddTaskForm> {
     _amountController = TextEditingController();
     _titleFocusNode = FocusNode(debugLabel: 'TextField');
     _amountFocusNode = FocusNode();
+    _bloc = BlocProvider.of<AddAmountInfoBloc>(context);
   }
 
   @override
   void dispose() {
     _titleController.dispose();
     _amountController.dispose();
-    _focusScope.dispose();
+    //_focusScope.dispose();
     super.dispose();
   }
 
   _onTextFieldDone([String text, FocusNode node, VoidCallback onDoneCallback]) {
     if (text.isEmpty) {
+      print("I'm On TextField Done");
       _focusScope.requestFocus(node);
     } else
       onDoneCallback();
@@ -57,6 +63,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
       key: _formKey,
       child: Column(
         children: <Widget>[
+          //Title TextField
           TextFormField(
             focusNode: _titleFocusNode,
             onFieldSubmitted: (value) {
@@ -67,7 +74,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
             controller: _titleController,
             style: Style.textStyle1.copyWith(color: Colors.black87),
             textAlignVertical: TextAlignVertical.center,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
+            //autovalidateMode: AutovalidateMode.onUserInteraction,
             autofocus: true,
             decoration: InputDecoration(
               hintStyle: TextStyle(
@@ -76,20 +83,22 @@ class _AddTaskFormState extends State<AddTaskForm> {
               hintText: "Enter a title",
             ),
           ),
+          //Spacer
           SizedBox(height: Responsive.widgetScaleFactor * 4),
+          //Amount TextField
           TextFormField(
             validator: _amountValidator,
             maxLength: 20,
             focusNode: _amountFocusNode,
             controller: _amountController,
-            onFieldSubmitted: (value) {
-              _onTextFieldDone(_titleController.text, _titleFocusNode);
-            },
             style: Style.textStyle1.copyWith(color: Colors.black87),
             textAlignVertical: TextAlignVertical.center,
             keyboardAppearance: Brightness.dark,
             keyboardType: TextInputType.number,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
+            //autovalidateMode: AutovalidateMode.onUserInteraction,
+            onFieldSubmitted: (value) {
+              _onTextFieldDone(_titleController.text, _titleFocusNode);
+            },
             decoration: InputDecoration(
               hintStyle: TextStyle(
                   color: Colors.black54,
@@ -105,7 +114,9 @@ class _AddTaskFormState extends State<AddTaskForm> {
               ),
             ),
           ),
+          //Spacer
           SizedBox(height: Responsive.widgetScaleFactor * 4),
+          //Date Container
           Container(
             decoration: const BoxDecoration(
                 border: Border(
@@ -141,32 +152,75 @@ class _AddTaskFormState extends State<AddTaskForm> {
               ],
             ),
           ),
+          //Spacer
           SizedBox(height: Responsive.widgetScaleFactor * 4),
-        BlocBuilder<DropDownSelectChangeBloc, DropDownSelectChangeState>(
-            builder: (ctx, state) {
-              dropDownState = state;
-              return DropDownBtns(value: state?.value);
-
-            }),
+          BlocBuilder<DropDownSelectChangeBloc, DropDownSelectChangeState>(
+              builder: (ctx, state) {
+            dropDownState = state;
+            return DropDownBtns(value: state?.value);
+          }),
           SizedBox(height: Responsive.widgetScaleFactor * 4),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 "I would like to share my location",
-                style: Style.textStyle3.copyWith(color: Colors.black54),
+                style: Style.textStyle3.copyWith(
+                  color: Colors.black54,
+                ),
               ),
-              Switch(value: true, onChanged: (value) {})
+              Switch(
+                  activeColor: const Color(0xff5e10c4),
+                  value: true,
+                  onChanged: (value) {})
             ],
           ),
           SizedBox(height: Responsive.widgetScaleFactor * 4),
           SizedBox(height: Responsive.widgetScaleFactor * 4),
           CustomAddAmountBtn(
-            formState: _formKey.currentState,
-            title: _titleController,
-            amount: _amountController,
-            dateInString: timeToString,
-            selectedValueState: dropDownState,
+            onBtnPressed: () {
+              if (_formKey.currentState.validate()) {
+                _formKey.currentState.save();
+                _bloc.add(AddAmountInfoEvent(_titleController.text,
+                    _amountController.text, timeToString, dropDownState));
+
+                showDialog(
+                  context: context,
+                  builder: (ctx) {
+                    return AlertDialog(
+                      content: Align(
+                        heightFactor: .5,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 16.0),
+                              child: CircularProgressIndicator(),
+                            ),
+                            const SizedBox(height: 5),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: const Text(
+                                "Please wait, Adding your result",
+                                style: const TextStyle(color: Colors.black87),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+                Timer(Duration(seconds: 5), () {
+                  print("Timer Called");
+                  _titleController.value = TextEditingValue.empty;
+                  _amountController.value = TextEditingValue.empty;
+                  Navigator.pop(context);
+                });
+              }
+            },
           ),
         ],
       ),
