@@ -87,6 +87,7 @@ class _TaskViewState extends State<TaskView> {
       ),
       body: SafeArea(
         child: Stack(
+
           children: [
             Scrollbar(
               child: BlocBuilder<AddAmountInfoBloc, AddAmountInfoState>(
@@ -102,12 +103,9 @@ class _TaskViewState extends State<TaskView> {
                 return itemBuilder(state);
               }),
             ),
-            Positioned(
-              bottom: 10,
-              left: 0,
-              right: 0,
-              child: Center(child: RemainingAmountContainer()),
-            ),
+
+             RemainingAmountContainer()
+
           ],
         ),
       ),
@@ -122,27 +120,116 @@ class RemainingAmountContainer extends StatefulWidget {
 }
 
 class _RemainingAmountContainerState extends State<RemainingAmountContainer> {
+  bool isTapped = false;
+  double dx,dy;
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {},
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
+
+    return   Positioned(
+
+        top: dy,
+
+        left: dx,
+        
+        child: Align(
 
         alignment: Alignment.center,
-        padding: EdgeInsets.symmetric(vertical: kDefaultPadding / 2),
-        //height: Responsive.deviceBlockHeight * 8,
-        width: Responsive.deviceBlockWidth * 80,
+        child: Draggable(
+          feedback:  Material(child:  CustomAnimatedContainer(isTapped: isTapped, onPressed: onGestureTapped,),),
+          child: CustomAnimatedContainer(isTapped: isTapped, onPressed: onGestureTapped),
+          feedbackOffset: Offset(Responsive.deviceBlockWidth* 80, Responsive.deviceBlockHeight* 80),
+          onDragStarted: () {print("Dragging");},
+          onDragEnd: (draggableDetails) {
+            dx = draggableDetails.offset.dx;
+            dy = draggableDetails.offset.dy;
+            if(dx < 0)
+              dx = 0;
+            if(dx > Responsive.deviceWidth-Responsive.deviceBlockWidth * 10)
+              dx = Responsive.deviceWidth-Responsive.deviceBlockWidth * 10;
+            if(dy < 0)
+              dy= 0;
+            if(dy > Responsive.deviceHeight-Responsive.deviceBlockHeight*10)
+              dy = Responsive.deviceHeight-Responsive.deviceBlockHeight*10;
+
+
+           setState(() {
+
+             print("$dx and $dy and ${Responsive.deviceWidth} and ${Responsive.deviceHeight}");
+           });
+          },
+
+
+        ),
+    ),
+    );
+  }
+  onGestureTapped() {
+  setState(() {
+  print("Tapped");
+  isTapped = !isTapped;
+  });
+  }
+}
+
+class CustomAnimatedContainer extends StatelessWidget {
+
+  const CustomAnimatedContainer({
+    Key key,
+    @required this.isTapped,
+    this.onPressed
+  }) : super(key: key);
+
+  final bool isTapped;
+  final VoidCallback onPressed;
+  @override
+  Widget build(BuildContext context) {
+    return  GestureDetector(
+        onTap: onPressed,
+    child:  AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+
+        //alignment: Alignment.centerLeft,
+        padding: isTapped ? EdgeInsets.symmetric(vertical: kDefaultPadding/2) :  EdgeInsets.symmetric(vertical: 0 , horizontal: 0),
+
+
+        width: isTapped ? Responsive.deviceBlockWidth * 80 : Responsive.deviceBlockWidth * 8 ,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(.9),
-          shape: BoxShape.circle,
-          boxShadow: [
-            const BoxShadow(
-              blurRadius: 2,
-              color: Color(0xff7d7d7d),
-              offset: Offset(0, 2),
-            ),
-          ],
+          //color: Colors.white.withOpacity(.9),
+          color: isTapped ? const Color(0xff5d28b8) : Colors.transparent,
+        shape: isTapped ? BoxShape.rectangle  : BoxShape.circle,
+          boxShadow: !isTapped ? [
+
+              const BoxShadow(
+                blurRadius: 10,
+                color: Color(0xff3f30b3),
+                offset: Offset(0, 2),
+                spreadRadius: 7,
+              ), const BoxShadow(
+                blurRadius: 10,
+                color: Color(0xff373ccc),
+                offset: Offset(0, 2),
+                spreadRadius: 6,
+              ),
+              const BoxShadow(
+                blurRadius: 10,
+                color: Color(0xffb32957),
+                offset: Offset(0, 2),
+                spreadRadius: 5,
+              ),
+              const BoxShadow(
+                blurRadius: 10,
+                color: Color(0xff373ccc),
+                offset: Offset(0, 2),
+                spreadRadius: 3,
+              ),
+            ] : [    const BoxShadow(blurRadius: 2,
+          color: Color(0xff373ccc),
+          offset: Offset(0, 2),
+          spreadRadius: 0,
+        ),]
+
+
+
           /* borderRadius: BorderRadius.only(
             topLeft: Radius.circular(kDefaultValue / 2.5),
             topRight: Radius.circular(kDefaultValue / 2.5),
@@ -151,15 +238,16 @@ class _RemainingAmountContainerState extends State<RemainingAmountContainer> {
           ),*/
         ),
         child: Text(
-          "All over used amount\n\$300",
+          isTapped ?"All over used amount\n\$300" : "\$",
           textAlign: TextAlign.center,
           style: TextStyle(
-            height: 1.5,
+            //height: 1.5,
+            color: Colors.white ,
             fontWeight: FontWeight.w600,
-            fontSize: Responsive.textScaleFactor * 5,
+            fontSize: isTapped ?  Responsive.textScaleFactor * 4.5: Responsive.textScaleFactor * 8,
           ),
         ),
-      ),
+    ),
     );
   }
 }
