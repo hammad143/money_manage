@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 
 part 'list_of_tiles_model.g.dart';
 
-@HiveType(typeId: 0)
+@HiveType(typeId: 1, adapterName: "ListTilesModelNewAdapter")
 class ListOfTilesModel {
   @HiveField(0)
   final String title;

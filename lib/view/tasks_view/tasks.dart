@@ -127,9 +127,9 @@ class _RemainingAmountContainerState extends State<RemainingAmountContainer> {
 
     return   Positioned(
 
-        top: dy,
-
-        left: dx,
+        //top: dy ?? ,
+        top: dy ?? Responsive.deviceHeight - Responsive.deviceBlockHeight * 12,
+        left: dx ?? Responsive.deviceBlockWidth * 45,
         
         child: Align(
 
@@ -142,14 +142,20 @@ class _RemainingAmountContainerState extends State<RemainingAmountContainer> {
           onDragEnd: (draggableDetails) {
             dx = draggableDetails.offset.dx;
             dy = draggableDetails.offset.dy;
+            //Dx Tapped Or/Not Tapped
+            final whenDxTapped = Responsive.deviceWidth-Responsive.deviceBlockWidth * 80;
+            final whenDxNotTapped =  Responsive.deviceWidth-Responsive.deviceBlockWidth * 10;
+            //Dy Tapped Or/Not Tapped
+            final whenDyTapped = Responsive.deviceHeight-Responsive.deviceBlockHeight*15;
+            final whenDyNotTapped = Responsive.deviceHeight-Responsive.deviceBlockHeight*10;
             if(dx < 0)
               dx = 0;
-            if(dx > Responsive.deviceWidth-Responsive.deviceBlockWidth * 10)
-              dx = Responsive.deviceWidth-Responsive.deviceBlockWidth * 10;
+            if(dx > (isTapped ? whenDxTapped : whenDxNotTapped))
+              dx = isTapped ? whenDxTapped : whenDxNotTapped;
             if(dy < 0)
               dy= 0;
-            if(dy > Responsive.deviceHeight-Responsive.deviceBlockHeight*10)
-              dy = Responsive.deviceHeight-Responsive.deviceBlockHeight*10;
+            if(dy > (isTapped ? whenDyTapped : whenDyNotTapped))
+              dy = isTapped ? whenDyTapped : whenDyNotTapped;
 
 
            setState(() {

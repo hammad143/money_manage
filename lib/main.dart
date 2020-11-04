@@ -12,7 +12,7 @@ import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown
 
 void main() async {
   await Hive.initFlutter();
- Hive.registerAdapter(ListOfTilesModelAdapter());
+ Hive.registerAdapter(ListTilesModelNewAdapter());
   await Hive.openBox(kHiveBoxOnBoard);
   await Hive.openBox(kHiveDataName);
   //await Hive.openBox(kListIndex);
@@ -31,6 +31,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
   }
 
   @override
@@ -89,6 +90,7 @@ class MainScreen extends StatelessWidget {
 
       ),
     );*/
+    //return Container();
     return TaskView();
   }
 }
