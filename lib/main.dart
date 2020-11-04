@@ -8,6 +8,7 @@ import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/view/tasks_view/tasks.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_bloc.dart';
+import 'package:money_management/viewmodel/bloc/form_submitted_bloc/form_submitted_bloc.dart';
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_bloc.dart';
 
 void main() async {
@@ -44,13 +45,16 @@ class _MyAppState extends State<MyApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => DateTimePickBloc(),
+          create: (_) => DateTimePickBloc()
         ),
         BlocProvider(
-          create: (_) => DropDownSelectChangeBloc(),
+          create: (_) => DropDownSelectChangeBloc()
         ),
         BlocProvider(
-          create: (_) => AddAmountInfoBloc(),
+          create: (_) => AddAmountInfoBloc()
+        ),
+        BlocProvider(
+            create: (_) => CheckFormSubmitBloc()
         ),
       ],
       child: MaterialApp(

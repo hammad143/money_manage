@@ -12,6 +12,9 @@ import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_bloc.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_event.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_state.dart';
+import 'package:money_management/viewmodel/bloc/form_submitted_bloc/check_form_submit_event.dart';
+import 'package:money_management/viewmodel/bloc/form_submitted_bloc/check_form_submit_state.dart';
+import 'package:money_management/viewmodel/bloc/form_submitted_bloc/form_submitted_bloc.dart';
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_bloc.dart';
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_state.dart';
 
@@ -23,6 +26,7 @@ class AddTaskForm extends StatefulWidget {
 
 class _AddTaskFormState extends State<AddTaskForm> {
   final _formKey = GlobalKey<FormState>();
+  bool isItemSelected;
   AddAmountInfoBloc _bloc;
   String timeToString;
   TextEditingController _titleController, _amountController;
@@ -38,6 +42,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
     _titleFocusNode = FocusNode(debugLabel: 'TextField');
     _amountFocusNode = FocusNode();
     _bloc = BlocProvider.of<AddAmountInfoBloc>(context);
+
   }
 
   @override
@@ -59,170 +64,179 @@ class _AddTaskFormState extends State<AddTaskForm> {
   @override
   Widget build(BuildContext context) {
     _focusScope = FocusScope.of(context);
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          //Title TextField
-          TextFormField(
-            focusNode: _titleFocusNode,
-            onFieldSubmitted: (value) {
-              _onTextFieldDone(_amountController.text, _amountFocusNode);
-            },
-            maxLength: 300,
-            validator: _titleValidator,
-            controller: _titleController,
-            style: Style.textStyle1.copyWith(color: Colors.black87),
-            textAlignVertical: TextAlignVertical.center,
-            //autovalidateMode: AutovalidateMode.onUserInteraction,
-            autofocus: true,
-            decoration: InputDecoration(
-              hintStyle: TextStyle(
-                  color: Colors.black54,
-                  fontSize: Responsive.textScaleFactor * 4.5),
-              hintText: "Enter a title",
-            ),
-          ),
-          //Spacer
-          SizedBox(height: Responsive.widgetScaleFactor * 4),
-          //Amount TextField
-          TextFormField(
-            validator: _amountValidator,
-            maxLength: 20,
-            focusNode: _amountFocusNode,
-            controller: _amountController,
-            style: Style.textStyle1.copyWith(color: Colors.black87),
-            textAlignVertical: TextAlignVertical.center,
-            keyboardAppearance: Brightness.dark,
-            keyboardType: TextInputType.number,
-            //autovalidateMode: AutovalidateMode.onUserInteraction,
-            onFieldSubmitted: (value) {
-              _onTextFieldDone(_titleController.text, _titleFocusNode);
-            },
-            decoration: InputDecoration(
-              hintStyle: TextStyle(
-                  color: Colors.black54,
-                  fontSize: Responsive.textScaleFactor * 4.5),
-              hintText: "Enter an amount",
-              prefixIconConstraints:
-                  BoxConstraints(minWidth: 23, maxHeight: 20),
-              prefixIcon: Padding(
-                padding: const EdgeInsets.only(right: 20),
-                child: Icon(
-                  Icons.attach_money_outlined,
-                ),
+    print("Build");
+    return BlocBuilder<CheckFormSubmitBloc, CheckFormSubmitState>(
+      builder:(ctx, formCheckstate) => Form(
+        key: _formKey,
+        child: Column(
+          children: <Widget>[
+            //Title TextField
+            TextFormField(
+              focusNode: _titleFocusNode,
+              onFieldSubmitted: (value) {
+                _onTextFieldDone(_amountController.text, _amountFocusNode);
+              },
+              maxLength: 300,
+              validator: _titleValidator,
+              controller: _titleController,
+              style: Style.textStyle1.copyWith(color: Colors.black87),
+              textAlignVertical: TextAlignVertical.center,
+              //autovalidateMode: AutovalidateMode.onUserInteraction,
+              autofocus: true,
+              decoration: InputDecoration(
+                hintStyle: TextStyle(
+                    color: Colors.black54,
+                    fontSize: Responsive.textScaleFactor * 4.5),
+                hintText: "Enter a title",
               ),
             ),
-          ),
-          //Spacer
-          SizedBox(height: Responsive.widgetScaleFactor * 4),
-          //Date Container
-          Container(
-            decoration: const BoxDecoration(
-                border: Border(
-              bottom: BorderSide(
-                width: 1.7,
-                color: const Color(0xff6324a3),
-              ),
-            )),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                BlocBuilder<DateTimePickBloc, DateTimePickState>(
-                    builder: (ctx, state) {
-                  if (state is DateTimePickInitialState)
-                    timeToString = _onTimeChangeState(state);
-                  else if (state is DateTimePickedState)
-                    timeToString = _onTimeChangeState(state);
-
-                  return Text(timeToString,
-                      style: Style.textStyle1.copyWith(color: Colors.black54));
-                }),
-                Material(
-                  shape: CircleBorder(),
-                  type: MaterialType.transparency,
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.date_range,
-                      color: const Color(0xff6324a3),
-                    ),
-                    onPressed: () => _onTimeAndDatePickerPressed(context),
+            //Spacer
+            SizedBox(height: Responsive.widgetScaleFactor * 4),
+            //Amount TextField
+            TextFormField(
+              validator: _amountValidator,
+              maxLength: 20,
+              focusNode: _amountFocusNode,
+              controller: _amountController,
+              style: Style.textStyle1.copyWith(color: Colors.black87),
+              textAlignVertical: TextAlignVertical.center,
+              keyboardAppearance: Brightness.dark,
+              keyboardType: TextInputType.number,
+              //autovalidateMode: AutovalidateMode.onUserInteraction,
+              onFieldSubmitted: (value) {
+                _onTextFieldDone(_titleController.text, _titleFocusNode);
+              },
+              decoration: InputDecoration(
+                hintStyle: TextStyle(
+                    color: Colors.black54,
+                    fontSize: Responsive.textScaleFactor * 4.5),
+                hintText: "Enter an amount",
+                prefixIconConstraints:
+                    BoxConstraints(minWidth: 23, maxHeight: 20),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: Icon(
+                    Icons.attach_money_outlined,
                   ),
                 ),
+              ),
+            ),
+            //Spacer
+            SizedBox(height: Responsive.widgetScaleFactor * 4),
+            //Date Container
+            Container(
+              decoration: const BoxDecoration(
+                  border: Border(
+                bottom: BorderSide(
+                  width: 1.7,
+                  color: const Color(0xff6324a3),
+                ),
+              )),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  BlocBuilder<DateTimePickBloc, DateTimePickState>(
+                      builder: (ctx, state) {
+                    if (state is DateTimePickInitialState)
+                      timeToString = _onTimeChangeState(state);
+                    else if (state is DateTimePickedState)
+                      timeToString = _onTimeChangeState(state);
+
+                    return Text(timeToString,
+                        style: Style.textStyle1.copyWith(color: Colors.black54));
+                  }),
+                  Material(
+                    shape: CircleBorder(),
+                    type: MaterialType.transparency,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.date_range,
+                        color: const Color(0xff6324a3),
+                      ),
+                      onPressed: () => _onTimeAndDatePickerPressed(context),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            //Spacer
+            SizedBox(height: Responsive.widgetScaleFactor * 4),
+            BlocBuilder<DropDownSelectChangeBloc, DropDownSelectChangeState>(
+                builder: (ctx, state) {
+                  print("DropDownCalled");
+              dropDownState = state;
+              print("Check State ${formCheckstate.isFormSubmit}");
+              return DropDownBtns(value: formCheckstate.isFormSubmit? dropDownState?.value : null);
+            }),
+            SizedBox(height: Responsive.widgetScaleFactor * 4),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "I would like to share my location",
+                  style: Style.textStyle3.copyWith(
+                    color: Colors.black54,
+                  ),
+                ),
+                Switch(
+                    activeColor: const Color(0xff5e10c4),
+                    value: true,
+                    onChanged: (value) {})
               ],
             ),
-          ),
-          //Spacer
-          SizedBox(height: Responsive.widgetScaleFactor * 4),
-          BlocBuilder<DropDownSelectChangeBloc, DropDownSelectChangeState>(
-              builder: (ctx, state) {
-            dropDownState = state;
-            return DropDownBtns(value: state?.value);
-          }),
-          SizedBox(height: Responsive.widgetScaleFactor * 4),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "I would like to share my location",
-                style: Style.textStyle3.copyWith(
-                  color: Colors.black54,
-                ),
-              ),
-              Switch(
-                  activeColor: const Color(0xff5e10c4),
-                  value: true,
-                  onChanged: (value) {})
-            ],
-          ),
-          SizedBox(height: Responsive.widgetScaleFactor * 4),
-          SizedBox(height: Responsive.widgetScaleFactor * 4),
-          CustomAddAmountBtn(
-            onBtnPressed: () {
-              if (_formKey.currentState.validate()) {
-                _formKey.currentState.save();
-                _bloc.add(AddAmountInfoEvent(_titleController.text,
-                    _amountController.text, timeToString, dropDownState));
+            SizedBox(height: Responsive.widgetScaleFactor * 4),
+            SizedBox(height: Responsive.widgetScaleFactor * 4),
+            CustomAddAmountBtn(
+              onBtnPressed: () {
+                if (_formKey.currentState.validate()) {
+                  _formKey.currentState.save();
+                  _bloc.add(AddAmountInfoEvent(_titleController.text,
+                      _amountController.text, timeToString, dropDownState));
 
-                showDialog(
-                  context: context,
-                  builder: (ctx) {
-                    return AlertDialog(
-                      content: Align(
-                        heightFactor: .5,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 16.0),
-                              child: CircularProgressIndicator(),
-                            ),
-                            const SizedBox(height: 5),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: const Text(
-                                "Please wait, Adding your result",
-                                style: const TextStyle(color: Colors.black87),
+                  showDialog(
+                    context: context,
+                    builder: (ctx) {
+                      return AlertDialog(
+                        content: Align(
+                          heightFactor: .5,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16.0),
+                                child: CircularProgressIndicator(),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 5),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8.0),
+                                child: const Text(
+                                  "Please wait, Adding your result",
+                                  style: const TextStyle(color: Colors.black87),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                );
-                Timer(Duration(seconds: 5), () {
-                  print("Timer Called");
-                  _titleController.value = TextEditingValue.empty;
-                  _amountController.value = TextEditingValue.empty;
-                  Navigator.pop(context);
-                });
-              }
-            },
-          ),
-        ],
+                      );
+                    },
+                  );
+
+                  Timer(Duration(seconds: 5), () {
+                    print("Timer Called");
+                    _titleController.value = TextEditingValue.empty;
+                    _amountController.value = TextEditingValue.empty;
+                    BlocProvider.of<CheckFormSubmitBloc>(context)
+                        .add(CheckFormSubmitEvent(false));
+
+                    Navigator.pop(context);
+                  });
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
