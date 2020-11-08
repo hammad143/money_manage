@@ -36,6 +36,5 @@ class GoogleUserModelAdapter extends TypeAdapter<GoogleUserModel> {
   }
 
   @override
-  // TODO: implement typeId
   int get typeId => 3;
 }

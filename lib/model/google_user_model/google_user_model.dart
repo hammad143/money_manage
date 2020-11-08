@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 
 part 'google_user_model.g.dart';
 
-@HiveType(typeId: 3)
+@HiveType(typeId: 3, adapterName: "GoogleUserModelAdapter")
 class GoogleUserModel {
   @HiveField(0)
   final String email;
