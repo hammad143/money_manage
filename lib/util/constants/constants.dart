@@ -5,6 +5,7 @@ const String kHiveDataName = "user data";
 const String kHiveStorage = "storage of tiles";
 const String kListIndex = "list item index";
 const String storageKey = "myTilesBox";
+const String kgenerateKey = "generate key";
 const String counterKey = "counter box";
 const kPureWhite = Colors.white;
 const double kDefaultPadding = 20;

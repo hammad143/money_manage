@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "643996497696",
+    "firebase_url": "https://money-management-18f49.firebaseio.com",
+    "project_id": "money-management-18f49",
+    "storage_bucket": "money-management-18f49.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:643996497696:android:cf96c403bc73123a868945",
+        "android_client_info": {
+          "package_name": "com.example.money_management"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "643996497696-qgsqhq36gqcpnt2p8kdf21eeslvnn6jh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.money_management",
+            "certificate_hash": "6a5ffc28e6cd01993330956999407fa4c9e41dfd"
+          }
+        },
+        {
+          "client_id": "643996497696-6nl4lhmk30ooe7dsrhmfr332rou8sfu5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQvj6-PaHcQnHhTb9xQ85SjA60QpS7zIQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "643996497696-6nl4lhmk30ooe7dsrhmfr332rou8sfu5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
