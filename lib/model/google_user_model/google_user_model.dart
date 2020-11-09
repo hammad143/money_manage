@@ -12,11 +12,14 @@ class GoogleUserModel {
   final String photoUrl;
   @HiveField(3)
   final BigInt id;
+  @HiveField(4)
+  final String appUserKey;
 
-  GoogleUserModel({this.email, this.displayName, this.photoUrl, this.id});
+  GoogleUserModel(
+      {this.email, this.displayName, this.photoUrl, this.id, this.appUserKey});
 
   @override
   String toString() {
-    return "$displayName $email $photoUrl";
+    return "$displayName $email $photoUrl $appUserKey";
   }
 }

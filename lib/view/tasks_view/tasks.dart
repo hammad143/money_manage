@@ -151,12 +151,19 @@ class _TaskViewState extends State<TaskView> {
                       final _authUserBloc =
                           context.bloc<AuthenticateUserBloc>();
                       _authUserBloc.add(AuthenticateUserSignOuttEvent());
-                      setState(() {});
+                      /*final route =
+                          MaterialPageRoute(builder: (ctx) => SyncView());
+                      Navigator.push(context, route);*/
+                      //setState(() {});
                     },
                     icon: Icon(Icons.login),
                     title: "Sign Out"),
                 CustomListTileDrawer(
-                    onTap: ()async  {await SystemNavigator.pop(animated: true);}, icon: Icon(Icons.close), title: "Quit"),
+                    onTap: () async {
+                      await SystemNavigator.pop(animated: true);
+                    },
+                    icon: Icon(Icons.close),
+                    title: "Quit"),
               ],
             ),
           ),
