@@ -7,8 +7,6 @@ import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_user
 
 class AuthenticateUserBloc
     extends Bloc<AuthenticateUserEvent, AuthenticateUserState> {
-  static final String clientID =
-      "7425334217-eckkm2ram44cjnokt0hd7n1tv2e63msc.apps.googleusercontent.com";
   GoogleSignIn googleSignIn = GoogleSignIn();
   final OauthBox = Hive.box<bool>(kGoogleAuthKey);
   AuthenticateUserBloc() : super(UserNotLoggedInState());

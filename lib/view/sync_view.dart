@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
+import 'package:money_management/model/google_user_model/google_user_model.dart';
+import 'package:money_management/services/firebase_services/firebase_service.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/tasks_view/tasks.dart';
@@ -45,9 +47,7 @@ class _SyncViewState extends State<SyncView> {
                   RaisedButton(
                     color: const Color(0xfff25454),
                     onPressed: () {
-                      setState(() {
-                        _authUserbloc.add(AuthenticateUserRequestEvent());
-                      });
+                      _authUserbloc.add(AuthenticateUserRequestEvent());
                     },
                     child: Text("Synchronize with Google",
                         style: Style.textStyle1),
@@ -55,8 +55,8 @@ class _SyncViewState extends State<SyncView> {
                   RaisedButton(
                     color: const Color(0xfff25454),
                     onPressed: () async {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (ctx) => TaskView()));
+                      FirebaseService()
+                          .isUserExists(GoogleUserModel(id: BigInt.one));
                     },
                     child: Text("Goto Tasks", style: Style.textStyle1),
                   ),
