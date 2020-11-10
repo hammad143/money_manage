@@ -17,6 +17,7 @@ import 'package:money_management/view/tasks_view/components/remain_amount_cont.d
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_bloc.dart';
+import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize.dart';
 
 class TaskView extends StatefulWidget {
   final GoogleSignIn signIn;
@@ -56,6 +57,7 @@ class _TaskViewState extends State<TaskView> {
   }
 
   void _makeAuthorizePopup() {
+    final _keyTextController = TextEditingController();
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -66,10 +68,18 @@ class _TaskViewState extends State<TaskView> {
           ),
           FlatButton(
             child: Text("Authorize"),
-            onPressed: () {},
+            onPressed: () {
+              final _authorizeKeyBloc =
+                  BlocProvider.of<MakeAuthorizeBloc>(context);
+              _authorizeKeyBloc
+                  .add(MakeAuthorizeEvent(_keyTextController.text));
+              print("Key ${_keyTextController.text}");
+            },
           ),
         ],
-        content: KeyInsertAlterBox(),
+        content: KeyInsertAlterBox(
+          keyTextController: _keyTextController,
+        ),
       ),
     );
   }
@@ -205,7 +215,8 @@ class _CustomKeyAlertBoxState extends State<CustomKeyAlertBox> {
   @override
   void initState() {
     super.initState();
-    if (keyBox.get("unique key") == null) {
+    if (keyBox.get("unique key") == null ||
+        keyBox.get("unique key") != StoreUniqueKey().uniqueID) {
       keyBox.put("unique key", StoreUniqueKey().uniqueID);
       uniqueID = keyBox.get("unique key");
     } else
@@ -293,3 +304,10 @@ class CustomDismissibleTile extends StatelessWidget {
     );
   }
 }
+
+/*
+* step 1: Put another user Key
+*  Look into the Firebase data  if Key matches to the InsertedKey
+*  Get the last added item from firebase
+*
+* */

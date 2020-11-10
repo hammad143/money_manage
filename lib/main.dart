@@ -6,7 +6,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:money_management/model/google_user_model/google_user_model.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
 import 'package:money_management/util/constants/constants.dart';
-import 'package:money_management/util/unique_key.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
 import 'package:money_management/view/sync_view.dart';
 import 'package:money_management/view/tasks_view/tasks.dart';
@@ -14,8 +13,8 @@ import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_bloc.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_bloc.dart';
 import 'package:money_management/viewmodel/bloc/form_submitted_bloc/form_submitted_bloc.dart';
+import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize.dart';
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_bloc.dart';
-import 'package:uuid/uuid.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -30,8 +29,6 @@ void main() async {
   await Hive.openBox<bool>(kGoogleAuthKey);
   await Hive.openBox<GoogleUserModelAdapter>(kGoogleUserKey);
   await Firebase.initializeApp();
-  final String id = Uuid().v1();
-  StoreUniqueKey.set(id);
   runApp(MyApp());
 }
 
@@ -59,7 +56,8 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (_) => DropDownSelectChangeBloc()),
         BlocProvider(create: (_) => AddAmountInfoBloc()),
         BlocProvider(create: (_) => CheckFormSubmitBloc()),
-        BlocProvider(create: (_) => AuthenticateUserBloc())
+        BlocProvider(create: (_) => AuthenticateUserBloc()),
+        BlocProvider(create: (_) => MakeAuthorizeBloc()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
