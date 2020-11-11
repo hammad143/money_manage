@@ -14,6 +14,7 @@ const String counterKey = "counter box";
 const String kGooglerUserCounterKey = "google user counter box";
 const String kGoogleUserKey = "Google User Key";
 const String kGoogleAuthKey = "Google user authentication key";
+const String kGoogleUserId = "my google id";
 const kPureWhite = Colors.white;
 const double kDefaultPadding = 20;
 const double kDefaultValue = 20;

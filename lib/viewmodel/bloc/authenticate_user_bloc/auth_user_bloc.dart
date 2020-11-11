@@ -23,6 +23,7 @@ class AuthenticateUserBloc
 
       if (OauthBox.get("isLoggedIn") == null) {
         final isLoggedIn = await googleSignIn.signIn();
+        final googleIdBox = Hive.box(kGoogleUserId);
 
         if (isLoggedIn != null) {
           final firebaseDB = FirebaseService();
@@ -42,6 +43,7 @@ class AuthenticateUserBloc
                 appUserKey: key);
 
             generateUniqueKeyBox.put("unique key", key);
+            googleIdBox.put("userID", isLoggedIn.id);
             final docRef =
                 await firebaseDB.addUser(googleUserModel: googleModel);
             if (docRef != null) await docRef.collection("items").add({});

@@ -28,6 +28,8 @@ void main() async {
   await Hive.openBox<int>(counterKey);
   await Hive.openBox<int>(kGooglerUserCounterKey);
   await Hive.openBox<bool>(kGoogleAuthKey);
+
+  await Hive.openBox(kGoogleUserId);
   await Hive.openBox<GoogleUserModelAdapter>(kGoogleUserKey);
   await Firebase.initializeApp();
   runApp(MyApp());

@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
+import 'package:money_management/services/firebase_services/firebase_service.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_event.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
@@ -14,7 +16,7 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
     final box = Hive.box(kHiveDataName);
     final storageBox = Hive.box<ListOfTilesModel>(storageKey);
     final counterBox = Hive.box<int>(counterKey);
-
+    final googleIdBox = Hive.box(kGoogleUserId);
     if (event is AddAmountInfoEvent) {
       if (event.title.isNotEmpty && event.amount.isNotEmpty) {
         box.putAll({
@@ -40,6 +42,26 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
                 dateInString: date,
                 option: options),
           );
+          final id = googleIdBox.get("userID");
+          final querySnapshot = await FirebaseService().collection.get();
+          final docs = querySnapshot.docs;
+          QueryDocumentSnapshot item;
+          try {
+            item = docs.firstWhere((element) {
+              final data = element.data();
+              print("${id}");
+              return data['id'] == id;
+            });
+            final i = await item.reference.collection("items").add({
+              "title": title,
+              "amount": amount,
+              "option": options,
+              "date": date,
+            });
+            print("This is my $i");
+          } catch (err) {
+            print("error");
+          }
         } catch (Exception) {
           counterBox.add(0);
           storageBox.put(
