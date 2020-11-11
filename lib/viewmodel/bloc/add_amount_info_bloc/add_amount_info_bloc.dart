@@ -49,20 +49,16 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
           try {
             item = docs.firstWhere((element) {
               final data = element.data();
-              print("${id}");
               return data['id'] == id;
             });
-            final i = await item.reference.collection("items").add({
+            await item.reference.collection("items").add({
               "title": title,
               "amount": amount,
               "option": options,
               "date": date,
             });
-            print("This is my $i");
-          } catch (err) {
-            print("error");
-          }
-        } catch (Exception) {
+          } catch (err) {}
+        } catch (error) {
           counterBox.add(0);
           storageBox.put(
             0,

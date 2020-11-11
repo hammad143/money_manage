@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
+import 'package:money_management/services/firebase_services/firebase_service.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/add_task_view/add_task_view.dart';
@@ -29,6 +30,7 @@ class TaskView extends StatefulWidget {
 class _TaskViewState extends State<TaskView> {
   final _scrollController = ScrollController();
   final _authGoogleUserBox = Hive.box<bool>(kGoogleAuthKey);
+  final _googleIDBox = Hive.box(kGoogleUserId);
   final _key = GlobalKey<ScaffoldState>();
 
   int index = 0;
@@ -68,10 +70,24 @@ class _TaskViewState extends State<TaskView> {
           FlatButton(
             child: Text("Authorize"),
             onPressed: () async {
-              final doc = await FirebaseFirestore.instance.collection("users");
-              final docs = await doc.get();
-
-
+              final snapshotDoc = await FirebaseService().collection.get();
+              final documents = snapshotDoc.docs;
+              print(documents.length);
+              QueryDocumentSnapshot t;
+              final document = documents.firstWhere((element) {
+                print(_googleIDBox.get("userID"));
+                print("${_keyTextController.text} My Text");
+                return (element.data()['appKey'] == _keyTextController.text);
+              });
+              print("Lets see $document");
+              if (document != null) {
+                print("Doc is not null");
+                final collection = document.reference.collection("items");
+                print("collection ${collection.path}");
+                final itemSnap = await collection.get();
+                final lastAddedDoc = itemSnap.docs.last;
+                print(itemSnap.docs.last.data());
+              }
               /*final _authorizeKeyBloc = BlocProvider.of<MakeAuthorizeBloc>(ctx);
               _authorizeKeyBloc
                   .add(MakeAuthorizeEvent(_keyTextController.text));

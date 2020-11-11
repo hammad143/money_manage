@@ -46,7 +46,10 @@ class AuthenticateUserBloc
             googleIdBox.put("userID", isLoggedIn.id);
             final docRef =
                 await firebaseDB.addUser(googleUserModel: googleModel);
-            if (docRef != null) await docRef.collection("items").add({});
+            if (docRef != null) {
+              await docRef.collection("items").add({});
+              await docRef.collection("authorized_users").add({});
+            }
           }
 
           OauthBox.put("isLoggedIn", true);
