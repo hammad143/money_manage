@@ -5,18 +5,26 @@ part 'google_user_model.g.dart';
 @HiveType(typeId: 3, adapterName: "GoogleUserModelAdapter")
 class GoogleUserModel {
   @HiveField(0)
-  final String email;
+  String email;
   @HiveField(1)
-  final String displayName;
+  String displayName;
   @HiveField(2)
-  final String photoUrl;
+  String photoUrl;
   @HiveField(3)
-  final BigInt id;
+  BigInt id;
   @HiveField(4)
-  final String appUserKey;
+  String appUserKey;
 
   GoogleUserModel(
       {this.email, this.displayName, this.photoUrl, this.id, this.appUserKey});
+
+  GoogleUserModel.fromJson(Map<String, dynamic> data) {
+    this.id = BigInt.parse(data['id']);
+    this.email = data['email'];
+    this.photoUrl = data['photo_url'];
+    this.displayName = data['displayName'];
+    this.appUserKey = data['appKey'];
+  }
 
   @override
   String toString() {

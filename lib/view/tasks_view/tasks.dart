@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,7 +7,6 @@ import 'package:hive/hive.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
-import 'package:money_management/util/unique_key.dart';
 import 'package:money_management/view/add_task_view/add_task_view.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
 import 'package:money_management/view/sync_view.dart';
@@ -17,7 +17,6 @@ import 'package:money_management/view/tasks_view/components/remain_amount_cont.d
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_bloc.dart';
-import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize.dart';
 
 class TaskView extends StatefulWidget {
   final GoogleSignIn signIn;
@@ -68,12 +67,15 @@ class _TaskViewState extends State<TaskView> {
           ),
           FlatButton(
             child: Text("Authorize"),
-            onPressed: () {
-              final _authorizeKeyBloc =
-                  BlocProvider.of<MakeAuthorizeBloc>(context);
+            onPressed: () async {
+              final doc = await FirebaseFirestore.instance.collection("users");
+              final docs = await doc.get();
+
+
+              /*final _authorizeKeyBloc = BlocProvider.of<MakeAuthorizeBloc>(ctx);
               _authorizeKeyBloc
                   .add(MakeAuthorizeEvent(_keyTextController.text));
-              print("Key ${_keyTextController.text}");
+              print("Key ${_keyTextController.text}");*/
             },
           ),
         ],
@@ -215,12 +217,7 @@ class _CustomKeyAlertBoxState extends State<CustomKeyAlertBox> {
   @override
   void initState() {
     super.initState();
-    if (keyBox.get("unique key") == null ||
-        keyBox.get("unique key") != StoreUniqueKey().uniqueID) {
-      keyBox.put("unique key", StoreUniqueKey().uniqueID);
-      uniqueID = keyBox.get("unique key");
-    } else
-      uniqueID = keyBox.get("unique key");
+    uniqueID = keyBox.get("unique key", defaultValue: "null");
   }
 
   @override
@@ -253,8 +250,6 @@ class _CustomKeyAlertBoxState extends State<CustomKeyAlertBox> {
       ),
     );
   }
-
-  Future<String> uniqueIdGenerate() {}
 }
 
 class CustomDismissibleTile extends StatelessWidget {

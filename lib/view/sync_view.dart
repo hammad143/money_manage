@@ -9,6 +9,7 @@ import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/tasks_view/tasks.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_bloc.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_user_bloc.dart';
+import 'package:money_management/viewmodel/bloc/curd_bloc/curd_bloc.dart';
 
 class SyncView extends StatefulWidget {
   final GoogleSignIn signIn;
@@ -29,6 +30,7 @@ class _SyncViewState extends State<SyncView> {
   @override
   Widget build(BuildContext context) {
     final _authUserbloc = BlocProvider.of<AuthenticateUserBloc>(context);
+    final curdFirebase = BlocProvider.of<CurdFireBaseBloc>(context);
     print("Call  ${_authGoogleUserBox.get("isLoggedIn")}");
     return BlocBuilder<AuthenticateUserBloc, AuthenticateUserState>(
         builder: (ctx, state) {

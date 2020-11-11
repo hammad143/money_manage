@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 import 'package:money_management/model/google_user_model/google_user_model.dart';
 import 'package:money_management/util/constants/constants.dart';
@@ -7,19 +8,20 @@ import 'package:money_management/util/unique_key.dart';
 class FirebaseService {
   final collection = FirebaseFirestore.instance.collection("users");
 
-  Future<bool> addUser({GoogleUserModel googleUserModel}) async {
+  Future<DocumentReference> addUser({GoogleUserModel googleUserModel}) async {
+    DocumentReference docRef;
     if (await isUserExists(googleUserModel) == null) {
-      await collection.add({
+      docRef = await collection.add({
         "id": googleUserModel.id.toString(),
         "displayName": googleUserModel.displayName,
         "email": googleUserModel.email,
         "photo_url": googleUserModel.photoUrl,
         "appKey": googleUserModel.appUserKey,
       });
-      print("User Added");
-      return true;
+
+      return docRef;
     } else
-      return false;
+      return null;
   }
 
   Future<QueryDocumentSnapshot> isUserExists(
@@ -64,22 +66,42 @@ class FirebaseService {
     }
   }
 
-  /*
-  Future<String> fetchUserKey() async{
-    final collectionDocs = await eachCollectionDoc;
-    final documents = collectionDocs.docs;
+  Future<bool> get isUserLoggedIn async {
+    final GoogleSignIn googleSignIn = await GoogleSignIn();
+
+    final bool isLoggedIn = await googleSignIn.isSignedIn();
+    return isLoggedIn ? true : false;
+  }
+
+  Future<GoogleUserModel> doesUserExists(GoogleUserModel model) async {
+    final collection = FirebaseFirestore.instance.collection("users");
+    final getDocs = await collection.get();
+    final docs = getDocs.docs;
+    print(docs.length);
+    GoogleUserModel userModel;
+    QueryDocumentSnapshot snapshot;
     try {
-      documents.firstWhere((element) {
-      final data = element.data();
-      data['id'] ==
+      snapshot = docs.firstWhere((element) {
+        final data = element.data();
+
+        return data['id'] == model.id.toString() ||
+            data['appKey'] == model.appUserKey;
       });
-    }catch(error) {
-
+    } catch (error) {
+      print("Error Caught ${error}");
     }
+    if (snapshot != null) {
+      final data = snapshot.data();
+      print("This is Snapshot");
+      userModel = GoogleUserModel.fromJson(data);
+      return userModel;
+    } else
+      return null;
   }
-  isUserKeyExists() {
 
+  createCollection(String collectionName) {
+    FirebaseFirestore.instance.collection("users items");
   }
-*/
+
   Future<QuerySnapshot> get eachCollectionDoc => collection.get();
 }

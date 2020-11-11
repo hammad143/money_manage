@@ -6,7 +6,9 @@ import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
 
 class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
-  AddAmountInfoBloc() : super(AddAmountInfoInitialState<ListOfTilesModel>(box:Hive.box(storageKey)));
+  AddAmountInfoBloc()
+      : super(AddAmountInfoInitialState<ListOfTilesModel>(
+            box: Hive.box(storageKey)));
   @override
   Stream<AddAmountInfoState> mapEventToState(AddDataEvent event) async* {
     final box = Hive.box(kHiveDataName);
@@ -38,8 +40,6 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
                 dateInString: date,
                 option: options),
           );
-          print(
-              "Storage ${storageBox.values.last.option} and Counter ${counterBox.values}");
         } catch (Exception) {
           counterBox.add(0);
           storageBox.put(
