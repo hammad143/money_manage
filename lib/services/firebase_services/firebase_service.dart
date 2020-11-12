@@ -8,7 +8,8 @@ import 'package:money_management/util/unique_key.dart';
 class FirebaseService {
   final collection = FirebaseFirestore.instance.collection("users");
 
-  Future<DocumentReference> addUser({GoogleUserModel googleUserModel}) async {
+  Future<DocumentReference> addUser(
+      {GoogleUserModel googleUserModel, int num}) async {
     DocumentReference docRef;
     if (await isUserExists(googleUserModel) == null) {
       docRef = await collection.add({
@@ -17,6 +18,7 @@ class FirebaseService {
         "email": googleUserModel.email,
         "photo_url": googleUserModel.photoUrl,
         "appKey": googleUserModel.appUserKey,
+        'auto_id': num,
       });
 
       return docRef;

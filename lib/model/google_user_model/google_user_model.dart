@@ -14,6 +14,8 @@ class GoogleUserModel {
   BigInt id;
   @HiveField(4)
   String appUserKey;
+  @HiveField(5)
+  int autoInc;
 
   GoogleUserModel(
       {this.email, this.displayName, this.photoUrl, this.id, this.appUserKey});
@@ -24,6 +26,7 @@ class GoogleUserModel {
     this.photoUrl = data['photo_url'];
     this.displayName = data['displayName'];
     this.appUserKey = data['appKey'];
+    this.autoInc = data['autoInc'];
   }
 
   @override

@@ -24,6 +24,7 @@ class AuthenticateUserBloc
       if (OauthBox.get("isLoggedIn") == null) {
         final isLoggedIn = await googleSignIn.signIn();
         final googleIdBox = Hive.box(kGoogleUserId);
+        final autoIncrementIDbox = Hive.box(kAutoIncrementKey);
 
         if (isLoggedIn != null) {
           final firebaseDB = FirebaseService();
@@ -32,20 +33,34 @@ class AuthenticateUserBloc
               .doesUserExists(GoogleUserModel(id: BigInt.parse(isLoggedIn.id)));
           if (user != null) {
             print("My User $user");
+            autoIncrementIDbox.put("number", user.autoInc);
             generateUniqueKeyBox.put("unique key", user.appUserKey);
           } else {
             final key = Uuid().v4();
             final googleModel = GoogleUserModel(
-                id: BigInt.parse(isLoggedIn.id),
-                displayName: isLoggedIn.displayName,
-                photoUrl: isLoggedIn.photoUrl,
-                email: isLoggedIn.email,
-                appUserKey: key);
+              id: BigInt.parse(isLoggedIn.id),
+              displayName: isLoggedIn.displayName,
+              photoUrl: isLoggedIn.photoUrl,
+              email: isLoggedIn.email,
+              appUserKey: key,
+            );
 
             generateUniqueKeyBox.put("unique key", key);
             googleIdBox.put("userID", isLoggedIn.id);
-            final docRef =
-                await firebaseDB.addUser(googleUserModel: googleModel);
+            final autoNum = autoIncrementIDbox.get("number");
+            final listOfSnapshots = await firebaseDB.collection.get();
+            num autoIncNum = 1;
+            try {
+              autoIncNum = (listOfSnapshots.docs.last).data()['auto_id'];
+              if (autoNum != null)
+                autoIncrementIDbox.put("number", autoIncNum + 1);
+            } catch (e) {
+              autoIncrementIDbox.put("number", autoIncNum ?? 0);
+            }
+
+            final docRef = await firebaseDB.addUser(
+                googleUserModel: googleModel,
+                num: autoIncrementIDbox.get("number", defaultValue: 0));
             if (docRef != null) {
               await docRef.collection("items").add({});
               await docRef.collection("authorized_users").add({});

@@ -19,13 +19,13 @@ class GoogleUserModelAdapter extends TypeAdapter<GoogleUserModel> {
       photoUrl: fields[2] as String,
       id: fields[3] as BigInt,
       appUserKey: fields[4] as String,
-    );
+    )..autoInc = fields[5] as int;
   }
 
   @override
   void write(BinaryWriter writer, GoogleUserModel obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.email)
       ..writeByte(1)
@@ -35,7 +35,9 @@ class GoogleUserModelAdapter extends TypeAdapter<GoogleUserModel> {
       ..writeByte(3)
       ..write(obj.id)
       ..writeByte(4)
-      ..write(obj.appUserKey);
+      ..write(obj.appUserKey)
+      ..writeByte(5)
+      ..write(obj.autoInc);
   }
 
   @override

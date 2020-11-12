@@ -17,6 +17,7 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
     final storageBox = Hive.box<ListOfTilesModel>(storageKey);
     final counterBox = Hive.box<int>(counterKey);
     final googleIdBox = Hive.box(kGoogleUserId);
+    final itemAutoIncBox = Hive.box(kNestedIncrementKey);
     if (event is AddAmountInfoEvent) {
       if (event.title.isNotEmpty && event.amount.isNotEmpty) {
         box.putAll({
@@ -33,6 +34,7 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
         try {
           final lastIndex = counterBox.values.last;
           final incrementByOne = lastIndex + 1;
+
           counterBox.add(incrementByOne);
           storageBox.put(
             incrementByOne,
@@ -46,18 +48,45 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
           final querySnapshot = await FirebaseService().collection.get();
           final docs = querySnapshot.docs;
           QueryDocumentSnapshot item;
+          num lastItemNum = 1;
           try {
             item = docs.firstWhere((element) {
               final data = element.data();
               return data['id'] == id;
             });
-            await item.reference.collection("items").add({
-              "title": title,
-              "amount": amount,
-              "option": options,
-              "date": date,
+            final allDocs = await item.reference.collection("items").get();
+            final lastDocumentOfItem = allDocs.docs.firstWhere((items) {
+              final data = items.data();
+              num counter = data['auto_item_inc'];
+              try {
+                allDocs.docs.firstWhere((e) {
+                  final storeStuff = e.data();
+                  final isGreater = storeStuff['auto_item_inc'] > counter;
+                  counter = storeStuff['auto_item_inc'];
+                  return isGreater;
+                });
+                return true;
+              } catch (x) {
+                print("Some not found inside");
+                return false;
+              }
             });
-          } catch (err) {}
+
+            final data = lastDocumentOfItem.data();
+            lastItemNum = data['auto_item_inc'];
+            print("===================");
+            print("Yes documet exists ${data}");
+            itemAutoIncBox.put("item_number", lastItemNum + 1);
+          } catch (err) {
+            itemAutoIncBox.put("item_number", 1);
+          }
+          await item.reference.collection("items").add({
+            "title": title,
+            "amount": amount,
+            "option": options,
+            "date": date,
+            'auto_item_inc': itemAutoIncBox.get("item_number"),
+          });
         } catch (error) {
           counterBox.add(0);
           storageBox.put(
