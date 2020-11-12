@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
 import 'package:money_management/services/firebase_services/firebase_service.dart';
@@ -47,46 +46,21 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
           final id = googleIdBox.get("userID");
           final querySnapshot = await FirebaseService().collection.get();
           final docs = querySnapshot.docs;
-          QueryDocumentSnapshot item;
-          num lastItemNum = 1;
-          try {
-            item = docs.firstWhere((element) {
-              final data = element.data();
-              return data['id'] == id;
-            });
-            final allDocs = await item.reference.collection("items").get();
-            final lastDocumentOfItem = allDocs.docs.firstWhere((items) {
-              final data = items.data();
-              num counter = data['auto_item_inc'];
-              try {
-                allDocs.docs.firstWhere((e) {
-                  final storeStuff = e.data();
-                  final isGreater = storeStuff['auto_item_inc'] > counter;
-                  counter = storeStuff['auto_item_inc'];
-                  return isGreater;
-                });
-                return true;
-              } catch (x) {
-                print("Some not found inside");
-                return false;
-              }
-            });
-
-            final data = lastDocumentOfItem.data();
-            lastItemNum = data['auto_item_inc'];
-            print("===================");
-            print("Yes documet exists ${data}");
-            itemAutoIncBox.put("item_number", lastItemNum + 1);
-          } catch (err) {
-            itemAutoIncBox.put("item_number", 1);
-          }
-          await item.reference.collection("items").add({
+          final currentUser = docs.firstWhere((element) {
+            final data = element.data();
+            return data['id'] == id;
+          });
+          await currentUser.reference.collection("items").add({
             "title": title,
             "amount": amount,
             "option": options,
             "date": date,
-            'auto_item_inc': itemAutoIncBox.get("item_number"),
+            'auto_item_inc': incrementByOne,
           });
+          print("${counterBox.values.last} This is the number");
+
+          //docs.
+
         } catch (error) {
           counterBox.add(0);
           storageBox.put(

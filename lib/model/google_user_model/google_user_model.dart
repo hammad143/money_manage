@@ -1,9 +1,10 @@
 import 'package:hive/hive.dart';
+import 'package:money_management/model/model.dart';
 
 part 'google_user_model.g.dart';
 
 @HiveType(typeId: 3, adapterName: "GoogleUserModelAdapter")
-class GoogleUserModel {
+class GoogleUserModel extends Model {
   @HiveField(0)
   String email;
   @HiveField(1)
@@ -22,6 +23,7 @@ class GoogleUserModel {
 
   GoogleUserModel.fromJson(Map<String, dynamic> data) {
     this.id = BigInt.parse(data['id']);
+
     this.email = data['email'];
     this.photoUrl = data['photo_url'];
     this.displayName = data['displayName'];

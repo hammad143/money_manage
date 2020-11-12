@@ -34,9 +34,7 @@ class _RemainingAmountContainerState extends State<RemainingAmountContainer> {
               isTapped: isTapped, onPressed: onGestureTapped),
           feedbackOffset: Offset(Responsive.deviceBlockWidth * 80,
               Responsive.deviceBlockHeight * 80),
-          onDragStarted: () {
-            print("Dragging");
-          },
+          onDragStarted: () {},
           onDragEnd: (draggableDetails) {
             dx = draggableDetails.offset.dx;
             dy = draggableDetails.offset.dy;
@@ -57,10 +55,7 @@ class _RemainingAmountContainerState extends State<RemainingAmountContainer> {
             if (dy > (isTapped ? whenDyTapped : whenDyNotTapped))
               dy = isTapped ? whenDyTapped : whenDyNotTapped;
 
-            setState(() {
-              print(
-                  "$dx and $dy and ${Responsive.deviceWidth} and ${Responsive.deviceHeight}");
-            });
+            setState(() {});
           },
         ),
       ),
@@ -69,7 +64,6 @@ class _RemainingAmountContainerState extends State<RemainingAmountContainer> {
 
   onGestureTapped() {
     setState(() {
-      print("Tapped");
       isTapped = !isTapped;
     });
   }

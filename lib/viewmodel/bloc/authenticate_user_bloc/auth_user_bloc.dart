@@ -24,6 +24,7 @@ class AuthenticateUserBloc
       if (OauthBox.get("isLoggedIn") == null) {
         final isLoggedIn = await googleSignIn.signIn();
         final googleIdBox = Hive.box(kGoogleUserId);
+        final counterBox = Hive.box<int>(counterKey);
         final autoIncrementIDbox = Hive.box(kAutoIncrementKey);
 
         if (isLoggedIn != null) {
@@ -34,6 +35,9 @@ class AuthenticateUserBloc
           if (user != null) {
             print("My User $user");
             autoIncrementIDbox.put("number", user.autoInc);
+
+            await counterBox.clear();
+            counterBox.add(0);
             generateUniqueKeyBox.put("unique key", user.appUserKey);
           } else {
             final key = Uuid().v4();
@@ -44,9 +48,8 @@ class AuthenticateUserBloc
               email: isLoggedIn.email,
               appUserKey: key,
             );
+            print(googleModel.toString());
 
-            generateUniqueKeyBox.put("unique key", key);
-            googleIdBox.put("userID", isLoggedIn.id);
             final autoNum = autoIncrementIDbox.get("number");
             final listOfSnapshots = await firebaseDB.collection.get();
             num autoIncNum = 1;
@@ -57,10 +60,14 @@ class AuthenticateUserBloc
             } catch (e) {
               autoIncrementIDbox.put("number", autoIncNum ?? 0);
             }
-
+            counterBox.clear();
+            counterBox.add(0);
+            generateUniqueKeyBox.put("unique key", key);
             final docRef = await firebaseDB.addUser(
                 googleUserModel: googleModel,
                 num: autoIncrementIDbox.get("number", defaultValue: 0));
+
+            googleIdBox.put("userID", isLoggedIn.id);
             if (docRef != null) {
               await docRef.collection("items").add({});
               await docRef.collection("authorized_users").add({});

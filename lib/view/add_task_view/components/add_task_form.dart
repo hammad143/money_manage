@@ -55,7 +55,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
 
   _onTextFieldDone([String text, FocusNode node, VoidCallback onDoneCallback]) {
     if (text.isEmpty) {
-      print("I'm On TextField Done");
+
       _focusScope.requestFocus(node);
     } else
       onDoneCallback();
@@ -64,7 +64,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
   @override
   Widget build(BuildContext context) {
     _focusScope = FocusScope.of(context);
-    print("Build");
+
     return BlocBuilder<CheckFormSubmitBloc, CheckFormSubmitState>(
       builder:(ctx, formCheckstate) => Form(
         key: _formKey,
@@ -163,7 +163,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
             SizedBox(height: Responsive.widgetScaleFactor * 4),
             BlocBuilder<DropDownSelectChangeBloc, DropDownSelectChangeState>(
                 builder: (ctx, state) {
-                  print("DropDownCalled");
+
               dropDownState = state;
               print("Check State ${formCheckstate.isFormSubmit}");
               return DropDownBtns(value: formCheckstate.isFormSubmit? dropDownState?.value : null);
@@ -224,7 +224,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
                   );
 
                   Timer(Duration(seconds: 5), () {
-                    print("Timer Called");
+
                     _titleController.value = TextEditingValue.empty;
                     _amountController.value = TextEditingValue.empty;
                     BlocProvider.of<CheckFormSubmitBloc>(context)
