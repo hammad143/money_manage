@@ -15,6 +15,7 @@ import 'package:money_management/viewmodel/bloc/curd_bloc/curd_bloc.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_bloc.dart';
 import 'package:money_management/viewmodel/bloc/form_submitted_bloc/form_submitted_bloc.dart';
 import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize.dart';
+import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_bloc.dart';
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_bloc.dart';
 
 void main() async {
@@ -63,6 +64,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (_) => AuthenticateUserBloc()),
         BlocProvider(create: (_) => MakeAuthorizeBloc()),
         BlocProvider(create: (_) => CurdFireBaseBloc()),
+        BlocProvider(create: (_) => NotifierItemAddedBloc()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

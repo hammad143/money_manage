@@ -38,7 +38,7 @@ class FirebaseService {
       print("User Exists $document");
       return document;
     } catch (e) {
-      print("Error Docuement doesn't exists");
+      print("Error Document doesn't exists");
       return null;
     }
   }

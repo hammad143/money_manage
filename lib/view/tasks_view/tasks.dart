@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
-import 'package:money_management/services/firebase_services/firebase_service.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/add_task_view/add_task_view.dart';
@@ -18,6 +17,9 @@ import 'package:money_management/view/tasks_view/components/remain_amount_cont.d
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_bloc.dart';
+import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize.dart';
+import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_bloc.dart';
+import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_event.dart';
 
 class TaskView extends StatefulWidget {
   final GoogleSignIn signIn;
@@ -32,7 +34,7 @@ class _TaskViewState extends State<TaskView> {
   final _authGoogleUserBox = Hive.box<bool>(kGoogleAuthKey);
   final _googleIDBox = Hive.box(kGoogleUserId);
   final _key = GlobalKey<ScaffoldState>();
-
+  Stream<QuerySnapshot> snapshot;
   int index = 0;
   List<ListOfTilesModel> tileViewModel;
 
@@ -70,7 +72,8 @@ class _TaskViewState extends State<TaskView> {
           FlatButton(
             child: Text("Authorize"),
             onPressed: () async {
-
+              final bloc = BlocProvider.of<MakeAuthorizeBloc>(context);
+              bloc.add(MakeAuthorizeEvent(_keyTextController.text));
             },
           ),
         ],
@@ -145,10 +148,35 @@ class _TaskViewState extends State<TaskView> {
                     onTap: () {},
                     icon: Icon(Icons.verified_user),
                     title: "Authorized By"),
-                CustomListTileDrawer(
-                    onTap: () {},
-                    icon: Icon(Icons.person_search),
-                    title: "Your Authorized"),
+                BlocListener<MakeAuthorizeBloc, MakeAuthorizeState>(
+                  listener: (ctx, state) async {
+                    print("I'm the listener");
+                    if (state is MakeAuthorizeSuccessState) {
+                      snapshot = state.snapshot;
+                      /*  final x = await state.snapshot.firstWhere((element) {
+                        final index = element.docs.length-1;
+                        final documentFound =  element.docs.firstWhere((element) => element.data()['auto_increment'] == index);
+                        return documentFound != null ? true : false;
+                      });*/
+
+                    }
+                  },
+                  child: StreamBuilder<QuerySnapshot>(
+                      stream: snapshot,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          final bloc = BlocProvider.of<NotifierItemAddedBloc>(context);
+                          bloc.add(NotifierItemAddedEvent(snapshot.data));
+
+                        }
+                        return CustomListTileDrawer(
+                            onTap: () {
+
+                            },
+                            icon: Icon(Icons.person_search),
+                            title: "Your Authorized");
+                      }),
+                ),
                 CustomListTileDrawer(
                     onTap: () {},
                     icon: Icon(Icons.settings),
@@ -212,7 +240,7 @@ class _CustomKeyAlertBoxState extends State<CustomKeyAlertBox> {
   @override
   void initState() {
     super.initState();
-    uniqueID = keyBox.get("unique key", defaultValue: "null");
+    uniqueID = keyBox.get("appKey", defaultValue: "null");
   }
 
   @override
