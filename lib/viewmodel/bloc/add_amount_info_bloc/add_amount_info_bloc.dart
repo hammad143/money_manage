@@ -14,64 +14,30 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
   Stream<AddAmountInfoState> mapEventToState(AddDataEvent event) async* {
     final box = Hive.box(kHiveDataName);
     final storageBox = Hive.box<ListOfTilesModel>(storageKey);
-    final counterBox = Hive.box<int>(counterKey);
-    final googleIdBox = Hive.box(kGoogleUserId);
-    final itemAutoIncBox = Hive.box(kNestedIncrementKey);
+    final googleUserIdBox = Hive.box(kGoogleUserId);
+    final userID = googleUserIdBox.get("userID");
+    final firebaseDB = FirebaseService();
     if (event is AddAmountInfoEvent) {
       if (event.title.isNotEmpty && event.amount.isNotEmpty) {
-        box.putAll({
-          "title": event.title,
-          "amount": event.amount,
-          "date": event.dateInString,
-          "option": event.valueSelectedState.selectedValue,
+        final title = event.title,
+            amount = event.amount,
+            option = event.valueSelectedState.selectedValue,
+            date = event.dateInString;
+        final document = await firebaseDB.findDocumentExistsByField(
+            collectionName: "users",
+            dataToMatch: {"id": userID},
+            key1: "id",
+            key2: "id");
+        final collectionOfItems = await document.reference.collection("items");
+        final snapshot = await collectionOfItems.get();
+        final numOfItems = snapshot.docs.length + 1;
+        collectionOfItems.add({
+          "auto_increment": numOfItems,
+          "title": title,
+          "amount": amount,
+          "date": date,
+          "option": option,
         });
-        final title = box.get("title");
-        final amount = box.get("amount");
-        final date = box.get("date");
-        final options = box.get("option");
-
-        try {
-          final lastIndex = counterBox.values.last;
-          final incrementByOne = lastIndex + 1;
-
-          counterBox.add(incrementByOne);
-          storageBox.put(
-            incrementByOne,
-            ListOfTilesModel(
-                title: title,
-                amount: amount,
-                dateInString: date,
-                option: options),
-          );
-          final id = googleIdBox.get("userID");
-          final querySnapshot = await FirebaseService().collection.get();
-          final docs = querySnapshot.docs;
-          final currentUser = docs.firstWhere((element) {
-            final data = element.data();
-            return data['id'] == id;
-          });
-          await currentUser.reference.collection("items").add({
-            "title": title,
-            "amount": amount,
-            "option": options,
-            "date": date,
-            'auto_item_inc': incrementByOne,
-          });
-          print("${counterBox.values.last} This is the number");
-
-          //docs.
-
-        } catch (error) {
-          counterBox.add(0);
-          storageBox.put(
-            0,
-            ListOfTilesModel(
-                title: title,
-                amount: amount,
-                dateInString: date,
-                option: options),
-          );
-        }
         yield AddAmountInfoDone<ListOfTilesModel>(box: storageBox);
       }
     }

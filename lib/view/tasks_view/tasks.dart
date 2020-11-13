@@ -70,28 +70,7 @@ class _TaskViewState extends State<TaskView> {
           FlatButton(
             child: Text("Authorize"),
             onPressed: () async {
-              final snapshotDoc = await FirebaseService().collection.get();
-              final documents = snapshotDoc.docs;
-              print(documents.length);
-              QueryDocumentSnapshot t;
-              final document = documents.firstWhere((element) {
-                print(_googleIDBox.get("userID"));
-                print("${_keyTextController.text} My Text");
-                return (element.data()['appKey'] == _keyTextController.text);
-              });
-              print("Lets see $document");
-              if (document != null) {
-                print("Doc is not null");
-                final collection = document.reference.collection("items");
-                print("collection ${collection.path}");
-                final itemSnap = await collection.get();
-                final lastAddedDoc = itemSnap.docs.last;
-                print(itemSnap.docs.last.data());
-              }
-              /*final _authorizeKeyBloc = BlocProvider.of<MakeAuthorizeBloc>(ctx);
-              _authorizeKeyBloc
-                  .add(MakeAuthorizeEvent(_keyTextController.text));
-              print("Key ${_keyTextController.text}");*/
+
             },
           ),
         ],

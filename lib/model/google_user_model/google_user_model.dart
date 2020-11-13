@@ -17,18 +17,26 @@ class GoogleUserModel extends Model {
   String appUserKey;
   @HiveField(5)
   int autoInc;
+  @HiveField(6)
+  Map<String, dynamic> fields;
 
   GoogleUserModel(
-      {this.email, this.displayName, this.photoUrl, this.id, this.appUserKey});
+      {this.fields,
+      this.email,
+      this.displayName,
+      this.photoUrl,
+      this.id,
+      this.appUserKey})
+      : super(fields);
 
-  GoogleUserModel.fromJson(Map<String, dynamic> data) {
-    this.id = BigInt.parse(data['id']);
+  GoogleUserModel.fromJson(this.fields) : super(fields) {
+    this.id = BigInt.parse(fields['id']);
 
-    this.email = data['email'];
-    this.photoUrl = data['photo_url'];
-    this.displayName = data['displayName'];
-    this.appUserKey = data['appKey'];
-    this.autoInc = data['autoInc'];
+    this.email = fields['email'];
+    this.photoUrl = fields['photo_url'];
+    this.displayName = fields['displayName'];
+    this.appUserKey = fields['appKey'];
+    this.autoInc = fields['autoInc'];
   }
 
   @override

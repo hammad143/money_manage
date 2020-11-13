@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 import 'package:money_management/model/google_user_model/google_user_model.dart';
@@ -18,69 +19,56 @@ class AuthenticateUserBloc
   @override
   Stream<AuthenticateUserState> mapEventToState(
       AuthenticateUserEvent event) async* {
+    final userLogIn = await googleSignIn.signIn();
+    final googleIdBox = Hive.box(kGoogleUserId);
+    final isUserLoggedInBox = Hive.box<bool>(kGoogleAuthKey);
+    final counterBox = Hive.box<int>(counterKey);
+    final autoIncrementIDbox = Hive.box(kAutoIncrementKey);
+    final firebaseDB = FirebaseService();
+    final numOfUsers = await firebaseDB.getNumberOfDocs("users");
+
     if (event is AuthenticateUserRequestEvent) {
-      print("Is called");
+      if (isUserLoggedInBox.get("isLoggedIn") == null) {
+        if (userLogIn != null) {
+          print("Adding user");
 
-      if (OauthBox.get("isLoggedIn") == null) {
-        final isLoggedIn = await googleSignIn.signIn();
-        final googleIdBox = Hive.box(kGoogleUserId);
-        final counterBox = Hive.box<int>(counterKey);
-        final autoIncrementIDbox = Hive.box(kAutoIncrementKey);
-
-        if (isLoggedIn != null) {
-          final firebaseDB = FirebaseService();
-
-          final user = await firebaseDB
-              .doesUserExists(GoogleUserModel(id: BigInt.parse(isLoggedIn.id)));
-          if (user != null) {
-            print("My User $user");
-            autoIncrementIDbox.put("number", user.autoInc);
-
-            await counterBox.clear();
-            counterBox.add(0);
-            generateUniqueKeyBox.put("unique key", user.appUserKey);
+          final foundUser = await firebaseDB.findDocumentExistsByField(
+              collectionName: "users",
+              key1: "id",
+              key2: "userID",
+              dataToMatch: {"userID": userLogIn.id});
+          if (foundUser != null) {
+            print("My User $foundUser");
+            final user = GoogleUserModel.fromJson(foundUser.data());
+            generateUniqueKeyBox.put("appKey", user.appUserKey);
           } else {
             final key = Uuid().v4();
-            final googleModel = GoogleUserModel(
-              id: BigInt.parse(isLoggedIn.id),
-              displayName: isLoggedIn.displayName,
-              photoUrl: isLoggedIn.photoUrl,
-              email: isLoggedIn.email,
-              appUserKey: key,
-            );
-            print(googleModel.toString());
-
-            final autoNum = autoIncrementIDbox.get("number");
-            final listOfSnapshots = await firebaseDB.collection.get();
-            num autoIncNum = 1;
-            try {
-              autoIncNum = (listOfSnapshots.docs.last).data()['auto_id'];
-              if (autoNum != null)
-                autoIncrementIDbox.put("number", autoIncNum + 1);
-            } catch (e) {
-              autoIncrementIDbox.put("number", autoIncNum ?? 0);
-            }
-            counterBox.clear();
-            counterBox.add(0);
-            generateUniqueKeyBox.put("unique key", key);
-            final docRef = await firebaseDB.addUser(
-                googleUserModel: googleModel,
-                num: autoIncrementIDbox.get("number", defaultValue: 0));
-
-            googleIdBox.put("userID", isLoggedIn.id);
-            if (docRef != null) {
-              await docRef.collection("items").add({});
-              await docRef.collection("authorized_users").add({});
-            }
+            autoIncrementIDbox.put("auto_increment", numOfUsers);
+            await generateUniqueKeyBox.put("unique key", key);
+            print("Number of Users $numOfUsers");
+            final DocumentReference currentDocumentReference =
+                await firebaseDB.addUser(collectionName: "users", data: {
+              "id": userLogIn.id,
+              "name": userLogIn.displayName,
+              "email": userLogIn.email,
+              "photoUrl": userLogIn.photoUrl,
+              'auto_increment': numOfUsers,
+              "appKey": key,
+            });
+            await currentDocumentReference.collection("items").add({});
+            await currentDocumentReference
+                .collection("authorized_users")
+                .add({});
           }
 
-          OauthBox.put("isLoggedIn", true);
+          googleIdBox.put("userID", userLogIn.id);
+          isUserLoggedInBox.put("isLoggedIn", true);
           yield UserLoggedInState();
         }
       }
     } //if(event is Authenticate)
     else if (event is AuthenticateUserSignOuttEvent) {
-      OauthBox.delete("isLoggedIn");
+      isUserLoggedInBox.delete("isLoggedIn");
       final x = await googleSignIn.signOut();
       print("User Signout ${x}");
       yield UserNotLoggedInState();

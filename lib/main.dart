@@ -103,6 +103,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     Responsive.init(context);
+
     if (authGoogleUserBox.get("isLoggedIn") != null) {
       return TaskView();
     } else {

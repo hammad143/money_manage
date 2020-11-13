@@ -42,4 +42,9 @@ class FirebaseService {
       return null;
     }
   }
+
+  Future<int> getNumberOfDocs(String collectionName) async {
+    final querySnapshot = await getCollectionIfExists(collectionName).get();
+    return querySnapshot.docs.length;
+  }
 }
