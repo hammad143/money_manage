@@ -11,6 +11,7 @@ import 'package:money_management/view/sync_view.dart';
 import 'package:money_management/view/tasks_view/tasks.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_bloc.dart';
+import 'package:money_management/viewmodel/bloc/authorized_users_bloc/authorized_users_bloc.dart';
 import 'package:money_management/viewmodel/bloc/curd_bloc/curd_bloc.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_bloc.dart';
 import 'package:money_management/viewmodel/bloc/form_submitted_bloc/form_submitted_bloc.dart';
@@ -33,6 +34,7 @@ void main() async {
   await Hive.openBox(kNestedIncrementKey);
   await Hive.openBox(kGoogleUserId);
   await Hive.openBox<GoogleUserModelAdapter>(kGoogleUserKey);
+  await Hive.openBox(kauthorizedUserKey);
   await Firebase.initializeApp();
   runApp(MyApp());
 }
@@ -65,6 +67,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (_) => MakeAuthorizeBloc()),
         BlocProvider(create: (_) => CurdFireBaseBloc()),
         BlocProvider(create: (_) => NotifierItemAddedBloc()),
+        BlocProvider(create: (_) => AuthorizedUsersBloc()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

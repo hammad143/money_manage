@@ -17,6 +17,7 @@ const String kGoogleAuthKey = "Google user authentication key";
 const String kGoogleUserId = "my google id";
 const String kAutoIncrementKey = "auto increment key";
 const String kNestedIncrementKey = "nested increment key";
+const String kauthorizedUserKey = "list of authorized users";
 const kPureWhite = Colors.white;
 const double kDefaultPadding = 20;
 const double kDefaultValue = 20;

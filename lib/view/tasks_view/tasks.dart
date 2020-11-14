@@ -8,6 +8,7 @@ import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.d
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/add_task_view/add_task_view.dart';
+import 'package:money_management/view/authorized_view/authorized_view.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
 import 'package:money_management/view/sync_view.dart';
 import 'package:money_management/view/tasks_view/components/custom_listile_drawer.dart';
@@ -72,7 +73,9 @@ class _TaskViewState extends State<TaskView> {
           FlatButton(
             child: Text("Authorize"),
             onPressed: () async {
+              final authorizedUserKeyBox = Hive.box(kauthorizedUserKey);
               final bloc = BlocProvider.of<MakeAuthorizeBloc>(context);
+              authorizedUserKeyBox.put("author_key", _keyTextController.text);
               bloc.add(MakeAuthorizeEvent(_keyTextController.text));
             },
           ),
@@ -165,13 +168,15 @@ class _TaskViewState extends State<TaskView> {
                       stream: snapshot,
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
-                          final bloc = BlocProvider.of<NotifierItemAddedBloc>(context);
+                          final bloc =
+                              BlocProvider.of<NotifierItemAddedBloc>(context);
                           bloc.add(NotifierItemAddedEvent(snapshot.data));
-
                         }
                         return CustomListTileDrawer(
                             onTap: () {
-
+                              final route = MaterialPageRoute(
+                                  builder: (ctx) => AuthorizedView());
+                              Navigator.push(context, route);
                             },
                             icon: Icon(Icons.person_search),
                             title: "Your Authorized");
