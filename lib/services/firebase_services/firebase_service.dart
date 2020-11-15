@@ -33,14 +33,37 @@ class FirebaseService {
     try {
       final document = documents.firstWhere((element) {
         final data = element.data();
+
         return data[key1] == dataToMatch[key2];
       });
-      print("User Exists $document");
+
       return document;
     } catch (e) {
       print("Error Document doesn't exists");
       return null;
     }
+  }
+
+  Future<QueryDocumentSnapshot> findDocumentFromCollectionByField(
+      {CollectionReference collectionReference, keyToFind, value}) async {
+    final snapshot = await collectionReference.get();
+    final documents = snapshot.docs;
+    try {
+      return documents.firstWhere((element) {
+        final data = element.data();
+        return data[keyToFind] == value;
+      });
+    } catch (error) {
+      print("${error}");
+      return null;
+    }
+  }
+
+  Future<List<QueryDocumentSnapshot>> fetchDocumentsByCollection(
+      {CollectionReference collection}) async {
+    final snapshot = await collection.get();
+    final documents = snapshot.docs;
+    return documents;
   }
 
   Future<int> getNumberOfDocs(String collectionName) async {

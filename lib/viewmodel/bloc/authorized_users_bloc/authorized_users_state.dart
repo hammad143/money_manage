@@ -7,4 +7,12 @@ class AuthorizedUsersState extends Equatable {
 
 class AuthorizedUsersInitState extends AuthorizedUsersState {}
 
-class AuthorizedUsersSuccessState extends AuthorizedUsersState {}
+class AuthorizedUsersSuccessState extends AuthorizedUsersState {
+  final Map<String, dynamic> data;
+
+  AuthorizedUsersSuccessState({this.data});
+
+  @override
+  // TODO: implement props
+  List<Object> get props => [data];
+}

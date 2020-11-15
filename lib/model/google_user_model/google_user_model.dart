@@ -31,12 +31,11 @@ class GoogleUserModel extends Model {
 
   GoogleUserModel.fromJson(this.fields) : super(fields) {
     this.id = BigInt.parse(fields['id']);
-
     this.email = fields['email'];
-    this.photoUrl = fields['photo_url'];
-    this.displayName = fields['displayName'];
+    this.photoUrl = fields['photoUrl'];
+    this.displayName = fields['name'];
     this.appUserKey = fields['appKey'];
-    this.autoInc = fields['autoInc'];
+    this.autoInc = fields['auto_increment'];
   }
 
   @override

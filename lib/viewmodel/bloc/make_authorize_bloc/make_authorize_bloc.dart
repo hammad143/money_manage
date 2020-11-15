@@ -13,7 +13,7 @@ class MakeAuthorizeBloc extends Bloc<MakeAuthorizeEvent, MakeAuthorizeState> {
     final String authorizeKey = event.authorizedKey;
     final keyBox = Hive.box(kgenerateKey);
     final firebaseService = FirebaseService();
-
+    print("$authorizeKey");
     final document = await firebaseService.findDocumentExistsByField(
       collectionName: "users",
       key1: "appKey",

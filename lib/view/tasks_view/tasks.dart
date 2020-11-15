@@ -21,6 +21,7 @@ import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_bloc
 import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize.dart';
 import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_bloc.dart';
 import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_event.dart';
+import 'package:money_management/viewmodel/components/list_of_authorized_users.dart';
 
 class TaskView extends StatefulWidget {
   final GoogleSignIn signIn;
@@ -74,7 +75,7 @@ class _TaskViewState extends State<TaskView> {
             child: Text("Authorize"),
             onPressed: () async {
               final authorizedUserKeyBox = Hive.box(kauthorizedUserKey);
-              final bloc = BlocProvider.of<MakeAuthorizeBloc>(context);
+              final bloc = BlocProvider.of<MakeAuthorizeBloc>(ctx);
               authorizedUserKeyBox.put("author_key", _keyTextController.text);
               bloc.add(MakeAuthorizeEvent(_keyTextController.text));
             },
@@ -99,6 +100,7 @@ class _TaskViewState extends State<TaskView> {
   @override
   Widget build(BuildContext context) {
     Responsive.init(context);
+
     if (_authGoogleUserBox.get("isLoggedIn") == null)
       return SyncView();
     else
