@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:money_management/model/google_user_model/google_user_model.dart';
 
 class AuthorizedUsersState extends Equatable {
   @override
@@ -8,7 +9,7 @@ class AuthorizedUsersState extends Equatable {
 class AuthorizedUsersInitState extends AuthorizedUsersState {}
 
 class AuthorizedUsersSuccessState extends AuthorizedUsersState {
-  final Map<String, dynamic> data;
+  final List<GoogleUserModel> data;
 
   AuthorizedUsersSuccessState({this.data});
 

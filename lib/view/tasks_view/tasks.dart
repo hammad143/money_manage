@@ -1,27 +1,18 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
 import 'package:money_management/util/constants/constants.dart';
-import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/add_task_view/add_task_view.dart';
-import 'package:money_management/view/authorized_view/authorized_view.dart';
+import 'package:money_management/view/component/custom_drawer/custom_drawer.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
 import 'package:money_management/view/sync_view.dart';
-import 'package:money_management/view/tasks_view/components/custom_listile_drawer.dart';
-import 'package:money_management/view/tasks_view/components/dismissile_cont.dart';
-import 'package:money_management/view/tasks_view/components/key_insert_alert_box.dart';
+import 'package:money_management/view/tasks_view/components/custom_dismissible_tile.dart';
 import 'package:money_management/view/tasks_view/components/remain_amount_cont.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
-import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_bloc.dart';
 import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize.dart';
-import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_bloc.dart';
-import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_event.dart';
-import 'package:money_management/viewmodel/components/list_of_authorized_users.dart';
 
 class TaskView extends StatefulWidget {
   final GoogleSignIn signIn;
@@ -36,9 +27,22 @@ class _TaskViewState extends State<TaskView> {
   final _authGoogleUserBox = Hive.box<bool>(kGoogleAuthKey);
   final _googleIDBox = Hive.box(kGoogleUserId);
   final _key = GlobalKey<ScaffoldState>();
-  Stream<QuerySnapshot> snapshot;
+  MakeAuthorizeBloc makeAuthorbloc;
+
   int index = 0;
   List<ListOfTilesModel> tileViewModel;
+
+  @override
+  void initState() {
+    super.initState();
+
+    print("Make Authorize Bloc ${makeAuthorbloc}");
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   void _navigateToAddTask(BuildContext ctx) {
     Navigator.push(
@@ -61,42 +65,6 @@ class _TaskViewState extends State<TaskView> {
         });
   }
 
-  void _makeAuthorizePopup() {
-    final _keyTextController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        actions: [
-          FlatButton(
-            child: Text("Close"),
-            onPressed: () => Navigator.pop(context),
-          ),
-          FlatButton(
-            child: Text("Authorize"),
-            onPressed: () async {
-              final authorizedUserKeyBox = Hive.box(kauthorizedUserKey);
-              final bloc = BlocProvider.of<MakeAuthorizeBloc>(ctx);
-              authorizedUserKeyBox.put("author_key", _keyTextController.text);
-              bloc.add(MakeAuthorizeEvent(_keyTextController.text));
-            },
-          ),
-        ],
-        content: KeyInsertAlterBox(
-          keyTextController: _keyTextController,
-        ),
-      ),
-    );
-  }
-
-  void _keyGeneratePopup() {
-    showDialog(
-        context: context,
-        builder: (ctx) {
-          return CustomKeyAlertBox();
-          ;
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     Responsive.init(context);
@@ -112,104 +80,7 @@ class _TaskViewState extends State<TaskView> {
           child: const Icon(Icons.add),
         ),
         appBar: AppBar(),
-        drawer: SingleChildScrollView(
-          child: Container(
-            width: Responsive.widgetScaleFactor * 70,
-            height: Responsive.deviceHeight,
-            color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                DrawerHeader(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Your Profile",
-                          style: Style.textStyle1.copyWith(
-                              fontSize: Responsive.textScaleFactor * 6,
-                              fontWeight: FontWeight.w600)),
-                      Text("Get the list of people you are authorized by",
-                          textAlign: TextAlign.center,
-                          style:
-                              Style.textStyle1.copyWith(color: Colors.white70)),
-                      CustomListTileDrawer(
-                        onTap: _keyGeneratePopup,
-                        icon: Icon(Icons.vpn_key_outlined, color: Colors.white),
-                        title: "Generate Key",
-                        textStyle: Style.textStyle1,
-                      ),
-                    ],
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: Style.linearGradient,
-                  ),
-                  curve: Curves.bounceOut,
-                ),
-                CustomListTileDrawer(
-                    onTap: _makeAuthorizePopup,
-                    icon: Icon(Icons.edit),
-                    title: "Make Authorize"),
-                CustomListTileDrawer(
-                    onTap: () {},
-                    icon: Icon(Icons.verified_user),
-                    title: "Authorized By"),
-                BlocListener<MakeAuthorizeBloc, MakeAuthorizeState>(
-                  listener: (ctx, state) async {
-                    print("I'm the listener");
-                    if (state is MakeAuthorizeSuccessState) {
-                      snapshot = state.snapshot;
-                      /*  final x = await state.snapshot.firstWhere((element) {
-                        final index = element.docs.length-1;
-                        final documentFound =  element.docs.firstWhere((element) => element.data()['auto_increment'] == index);
-                        return documentFound != null ? true : false;
-                      });*/
-
-                    }
-                  },
-                  child: StreamBuilder<QuerySnapshot>(
-                      stream: snapshot,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          final bloc =
-                              BlocProvider.of<NotifierItemAddedBloc>(context);
-                          bloc.add(NotifierItemAddedEvent(snapshot.data));
-                        }
-                        return CustomListTileDrawer(
-                            onTap: () {
-                              final route = MaterialPageRoute(
-                                  builder: (ctx) => AuthorizedView());
-                              Navigator.push(context, route);
-                            },
-                            icon: Icon(Icons.person_search),
-                            title: "Your Authorized");
-                      }),
-                ),
-                CustomListTileDrawer(
-                    onTap: () {},
-                    icon: Icon(Icons.settings),
-                    title: "Settings"),
-                CustomListTileDrawer(
-                    onTap: () async {
-                      final _authUserBloc =
-                          context.bloc<AuthenticateUserBloc>();
-                      _authUserBloc.add(AuthenticateUserSignOuttEvent());
-                      /*final route =
-                          MaterialPageRoute(builder: (ctx) => SyncView());
-                      Navigator.push(context, route);*/
-                      //setState(() {});
-                    },
-                    icon: Icon(Icons.login),
-                    title: "Sign Out"),
-                CustomListTileDrawer(
-                    onTap: () async {
-                      await SystemNavigator.pop(animated: true);
-                    },
-                    icon: Icon(Icons.close),
-                    title: "Quit"),
-              ],
-            ),
-          ),
-        ),
+        drawer: CustomDrawer(),
         body: SafeArea(
           child: Stack(
             children: [
@@ -232,101 +103,6 @@ class _TaskViewState extends State<TaskView> {
           ),
         ),
       );
-  }
-}
-
-class CustomKeyAlertBox extends StatefulWidget {
-  @override
-  _CustomKeyAlertBoxState createState() => _CustomKeyAlertBoxState();
-}
-
-class _CustomKeyAlertBoxState extends State<CustomKeyAlertBox> {
-  final keyBox = Hive.box(kgenerateKey);
-  String uniqueID;
-
-  @override
-  void initState() {
-    super.initState();
-    uniqueID = keyBox.get("appKey", defaultValue: "null");
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      contentPadding: EdgeInsets.only(bottom: kDefaultPadding / 1.5),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: FlatButton(
-              minWidth: Responsive.widgetScaleFactor * 13,
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              onPressed: () => Navigator.pop(context),
-              child: Icon(Icons.close),
-            ),
-          ),
-          Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: kDefaultPadding, vertical: kDefaultPadding / 2),
-              child: FlatButton(
-                  padding: EdgeInsets.all(5),
-                  onLongPress: () async {
-                    await Clipboard.setData(ClipboardData(text: uniqueID));
-                  },
-                  child: Text(uniqueID, style: Style.textStyle3))),
-          Text("Key is Generated", style: Style.textStyle5),
-        ],
-      ),
-    );
-  }
-}
-
-class CustomDismissibleTile extends StatelessWidget {
-  const CustomDismissibleTile({
-    Key key,
-    @required this.tileViewModel,
-    @required this.index,
-  }) : super(key: key);
-
-  final List<ListOfTilesModel> tileViewModel;
-  final int index;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Dismissible(
-        confirmDismiss: (dismissDir) {
-          print("Confirm Dissmiss");
-          return Future.value(true);
-        },
-        onDismissed: (dissmiss) {
-          print("On Dissmissed");
-        },
-        background: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.restore_from_trash_rounded),
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.restore_from_trash_rounded),
-            ),
-          ],
-        ),
-        key: UniqueKey(),
-        child: Stack(
-          children: [
-            DismissibleCustomContainer(
-              tilesList: tileViewModel,
-              index: index,
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
 

@@ -20,11 +20,15 @@ class MakeAuthorizeBloc extends Bloc<MakeAuthorizeEvent, MakeAuthorizeState> {
       key2: "appKey",
       dataToMatch: {"appKey": authorizeKey},
     );
-    final collectionOfItems = document.reference.collection("items");
-    final snapshotOfItems = await collectionOfItems.get();
-    final documentsLength = snapshotOfItems.docs.length;
-    print("${documentsLength}");
-    final snapshot = collectionOfItems.snapshots();
-    yield MakeAuthorizeSuccessState(snapshot: snapshot);
+    if (document != null) {
+      final collectionOfItems = document.reference.collection("items");
+      final snapshotOfItems = await collectionOfItems.get();
+      final documentsLength = snapshotOfItems.docs.length;
+      print("${documentsLength}");
+      yield MakeAuthorizeSuccessState(snapshot: null);
+    } else {
+      print("Document Key not found");
+    }
+    //final snapshot = collectionOfItems.snapshots();
   }
 }

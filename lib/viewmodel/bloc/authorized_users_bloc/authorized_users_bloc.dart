@@ -5,7 +5,6 @@ import 'package:money_management/services/firebase_services/firebase_service.dar
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/viewmodel/bloc/authorized_users_bloc/authorized_users_event.dart';
 import 'package:money_management/viewmodel/bloc/authorized_users_bloc/authorized_users_state.dart';
-import 'package:money_management/viewmodel/components/list_of_authorized_users.dart';
 
 class AuthorizedUsersBloc
     extends Bloc<AuthorizedUsersEvent, AuthorizedUsersState> {
@@ -53,19 +52,16 @@ class AuthorizedUsersBloc
       } else {
         print("Document Exists of Authorized users");
       }
-      yield AuthorizedUsersSuccessState(data: document.data());
+
       final List<GoogleUserModel> list = [];
-      authorizedItemCollection.get().then((documents) {
-        final listOfDocs = documents.docs;
-        listOfDocs.forEach((element) {
-          final data = element.data();
-          list.add(GoogleUserModel.fromJson(data));
-        });
-        ListOfAuthorizedUsersWidget().listOfAuthorizedUsers.addAll(list);
-        print("List is added $list");
-      }).catchError((err) {
-        print("Maybe not completed");
+      final snaphots = await authorizedItemCollection.get();
+      final docs = snaphots.docs;
+      docs.forEach((element) {
+        final data = element.data();
+        list.add(GoogleUserModel.fromJson(data));
       });
+      //ListOfAuthorizedUsersWidget(listOfAuthorizedUsers: list);
+      yield AuthorizedUsersSuccessState(data: list);
     } else
       throw AssertionError("UserID not included into database");
   }

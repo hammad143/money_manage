@@ -31,13 +31,16 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
         final collectionOfItems = await document.reference.collection("items");
         final snapshot = await collectionOfItems.get();
         final numOfItems = snapshot.docs.length + 1;
-        collectionOfItems.add({
+        final itemAddedDocument = await collectionOfItems.add({
           "auto_increment": numOfItems,
           "title": title,
           "amount": amount,
           "date": date,
           "option": option,
         });
+        final data = (await itemAddedDocument.get()).data();
+
+        storageBox.add(ListOfTilesModel.fromJSON(data));
         yield AddAmountInfoDone<ListOfTilesModel>(box: storageBox);
       }
     }

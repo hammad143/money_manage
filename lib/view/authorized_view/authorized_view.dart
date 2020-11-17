@@ -1,12 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
-import 'package:money_management/model/google_user_model/google_user_model.dart';
 import 'package:money_management/util/constants/constants.dart';
+import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/viewmodel/bloc/authorized_users_bloc/authorized_users_bloc.dart';
-import 'package:money_management/viewmodel/bloc/authorized_users_bloc/authorized_users_event.dart';
 import 'package:money_management/viewmodel/bloc/authorized_users_bloc/authorized_users_state.dart';
-import 'package:money_management/viewmodel/components/list_of_authorized_users.dart';
 
 class AuthorizedView extends StatefulWidget {
   @override
@@ -15,15 +15,13 @@ class AuthorizedView extends StatefulWidget {
 
 class _AuthorizedViewState extends State<AuthorizedView> {
   final authorizedUserKeyBox = Hive.box(kauthorizedUserKey);
+  final StreamController streamController = StreamController();
   AuthorizedUsersBloc bloc;
   String authorizeUserKey;
   @override
   void initState() {
     super.initState();
     print("Init Authorized");
-    authorizeUserKey = authorizedUserKeyBox.get("author_key");
-    bloc = BlocProvider.of<AuthorizedUsersBloc>(context);
-    bloc.add(AuthorizedUsersEvent(authorizeUserKey));
   }
 
   @override
@@ -33,23 +31,39 @@ class _AuthorizedViewState extends State<AuthorizedView> {
   }
 
   @override
+  void dispose() {
+    streamController.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final listOfAuthorizedUsers = context
-        .findAncestorWidgetOfExactType<ListOfAuthorizedUsersWidget>()
-        .listOfAuthorizedUsers;
+    ;
+
     return Scaffold(
       appBar: AppBar(),
       body: BlocBuilder<AuthorizedUsersBloc, AuthorizedUsersState>(
           builder: (ctx, state) {
         if (state is AuthorizedUsersSuccessState) {
-          final model = GoogleUserModel.fromJson(state.data);
-          return ListView.builder(
-              itemCount: listOfAuthorizedUsers.length,
+          print("Direct State is Success");
+          final listOfUsers = state.data;
+          return ListView.separated(
+              separatorBuilder: (ctx, index) => SizedBox(height: 5),
+              itemCount: listOfUsers.length,
               itemBuilder: (ctx, index) {
-                return ListTile(
-                  title: Text(
-                    "${listOfAuthorizedUsers[index]}",
-                    style: TextStyle(color: const Color(0xff000000)),
+                return Container(
+                  decoration: BoxDecoration(
+                    gradient: Style.linearGradient,
+                  ),
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: ListTile(
+                      onTap: () {},
+                      title: Text(listOfUsers[index].displayName,
+                          style: Style.textStyle1),
+                      subtitle: Text(listOfUsers[index].email,
+                          style: Style.textStyle2),
+                    ),
                   ),
                 );
               });
