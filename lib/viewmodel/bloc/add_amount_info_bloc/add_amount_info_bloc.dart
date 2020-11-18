@@ -28,7 +28,8 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
             dataToMatch: {"id": userID},
             key1: "id",
             key2: "id");
-        final collectionOfItems = await document.reference.collection("items");
+        final collectionOfItems = await document.reference.collection("items")
+          ..orderBy('auto_increment');
         final snapshot = await collectionOfItems.get();
         final numOfItems = snapshot.docs.length + 1;
         final itemAddedDocument = await collectionOfItems.add({

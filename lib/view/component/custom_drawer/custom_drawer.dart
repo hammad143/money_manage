@@ -78,9 +78,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       });*/
                   Navigator.pop(context);
                   final bloc = BlocProvider.of<AuthorizedUsersBloc>(context);
-                  final notifierBloc = BlocProvider.of<NotifierItemAddedBloc>(context);
+                  final notifierBloc =
+                      BlocProvider.of<NotifierItemAddedBloc>(context);
                   bloc.add(AuthorizedUsersEvent(_keyTextController.text));
-                  notifierBloc.add(NotifierItemAddedEvent(_keyTextController.text));
+                  notifierBloc
+                      .add(NotifierItemAddedEvent(_keyTextController.text));
                 }
               },
               child: CustomListTileDrawer(
@@ -133,15 +135,16 @@ class _CustomDrawerState extends State<CustomDrawer> {
         actions: [
           FlatButton(
             child: Text("Close"),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(ctx),
           ),
           FlatButton(
             child: Text("Authorize"),
             onPressed: () async {
               final authorizedUserKeyBox = Hive.box(kauthorizedUserKey);
+              final notifierBloc = BlocProvider.of<NotifierItemAddedBloc>(ctx);
               authorizedUserKeyBox.put("author_key", _keyTextController.text);
               makeAuthorbloc.add(MakeAuthorizeEvent(_keyTextController.text));
-
+              notifierBloc.add(NotifierItemAddedEvent(_keyTextController.text));
             },
           ),
         ],

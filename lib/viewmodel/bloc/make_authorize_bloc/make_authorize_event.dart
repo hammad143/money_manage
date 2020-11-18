@@ -5,5 +5,5 @@ class MakeAuthorizeEvent extends Equatable {
 
   MakeAuthorizeEvent(this.authorizedKey);
   @override
-  List<Object> get props => [];
+  List<Object> get props => [authorizedKey];
 }

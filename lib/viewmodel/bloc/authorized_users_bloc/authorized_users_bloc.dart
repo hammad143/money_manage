@@ -58,7 +58,7 @@ class AuthorizedUsersBloc
       final docs = snaphots.docs;
       docs.forEach((element) {
         final data = element.data();
-        list.add(GoogleUserModel.fromJson(data));
+        if (data['id'] != null) list.add(GoogleUserModel.fromJson(data));
       });
       //ListOfAuthorizedUsersWidget(listOfAuthorizedUsers: list);
       yield AuthorizedUsersSuccessState(data: list);

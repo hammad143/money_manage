@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     as notification;
+import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
 import 'package:money_management/services/firebase_services/firebase_service.dart';
 import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_event.dart';
 import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_state.dart';
@@ -23,30 +23,35 @@ class NotifierItemAddedBloc
       key2: "appKey",
     );
     if (document != null) {
-      final snapshot = await document.reference.collection("items");
+      final snapshot =
+          document.reference.collection("items").orderBy('auto_increment');
       snapshot.snapshots().listen((event) async {
         print("I'm the listener on Stream when data is added");
         print("check if my listner working");
-        DocumentSnapshot lastAddedDocument;
-        lastAddedDocument = event.docs.firstWhere((element) {
-          print("check if my listner working 2");
-          final data = element.data();
-          int lastAddedIndex;
-          final doc = event.docs.firstWhere((element) {
-            final items = element.data();
-            final item1 = data['auto_increment'] ?? 0;
-            final item2 = items['auto_increment'] ?? 0;
-            return item1 > item2;
-          });
-          lastAddedIndex = doc.data()['auto_increment'];
-          print("Thhis is the index ${lastAddedIndex}");
-          if (lastAddedIndex != null)
-            return true;
-          else
-            return false;
-        });
+        final documents = event.docs;
+        int greatestNumber = 0;
+        List<int> mySortList = [];
+        /*  documents.forEach((element) {
+          bool isGreater;
+          int item1 = element.data()['auto_increment'] ?? 1;
+          int temp = item1;
+          documents.forEach((element) {
+            int item2 = element.data()['auto_increment'] ?? 1;
+            if (temp > item2) {
+              temp = item1;
+              item2 = item1;
 
-        final data = lastAddedDocument.data();
+            } else {
+              temp = item2;
+              item1 = item2;
+
+            }
+          });
+          return greatestNumber = temp;
+        });*/
+
+        final itemData = documents.last.data();
+        final lastItem = ListOfTilesModel.fromJSON(itemData);
         final androidInitSetting =
             notification.AndroidInitializationSettings('app_icon');
         final initSettings =
@@ -66,8 +71,8 @@ class NotifierItemAddedBloc
             android: notificationChannelDetails);
         plugin.show(
             0,
-            "${data['title']}",
-            "Amount ${data['amount']}, Option: ${data['option']} added at: ${data['date']}",
+            "${lastItem.title} By ${document.data()['name']}",
+            "Amt ${lastItem.amount} , Opt ${lastItem.option}: T: ${lastItem.dateInString}",
             platformNotification);
       });
     }

@@ -44,7 +44,7 @@ class AuthenticateUserBloc
           } else {
             final key = Uuid().v4();
             autoIncrementIDbox.put("auto_increment", numOfUsers);
-            await generateUniqueKeyBox.put("unique key", key);
+            await generateUniqueKeyBox.put("appKey", key);
             print("Number of Users $numOfUsers");
             final DocumentReference currentDocumentReference =
                 await firebaseDB.addUser(collectionName: "users", data: {
