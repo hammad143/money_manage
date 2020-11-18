@@ -42,7 +42,6 @@ class _AddTaskFormState extends State<AddTaskForm> {
     _titleFocusNode = FocusNode(debugLabel: 'TextField');
     _amountFocusNode = FocusNode();
     _bloc = BlocProvider.of<AddAmountInfoBloc>(context);
-
   }
 
   @override
@@ -55,7 +54,6 @@ class _AddTaskFormState extends State<AddTaskForm> {
 
   _onTextFieldDone([String text, FocusNode node, VoidCallback onDoneCallback]) {
     if (text.isEmpty) {
-
       _focusScope.requestFocus(node);
     } else
       onDoneCallback();
@@ -66,7 +64,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
     _focusScope = FocusScope.of(context);
 
     return BlocBuilder<CheckFormSubmitBloc, CheckFormSubmitState>(
-      builder:(ctx, formCheckstate) => Form(
+      builder: (ctx, formCheckstate) => Form(
         key: _formKey,
         child: Column(
           children: <Widget>[
@@ -132,41 +130,44 @@ class _AddTaskFormState extends State<AddTaskForm> {
                   color: const Color(0xff6324a3),
                 ),
               )),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  BlocBuilder<DateTimePickBloc, DateTimePickState>(
-                      builder: (ctx, state) {
-                    if (state is DateTimePickInitialState)
-                      timeToString = _onTimeChangeState(state);
-                    else if (state is DateTimePickedState)
-                      timeToString = _onTimeChangeState(state);
+              child: InkWell(
+                onTap: () => _onTimeAndDatePickerPressed(context),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    BlocBuilder<DateTimePickBloc, DateTimePickState>(
+                        builder: (ctx, state) {
+                      if (state is DateTimePickInitialState)
+                        timeToString = _onTimeChangeState(state);
+                      else if (state is DateTimePickedState)
+                        timeToString = _onTimeChangeState(state);
 
-                    return Text(timeToString,
-                        style: Style.textStyle1.copyWith(color: Colors.black54));
-                  }),
-                  Material(
-                    shape: CircleBorder(),
-                    type: MaterialType.transparency,
-                    child: IconButton(
-                      icon: Icon(
+                      return Text(timeToString,
+                          style:
+                              Style.textStyle1.copyWith(color: Colors.black54));
+                    }),
+                    Material(
+                      shape: CircleBorder(),
+                      type: MaterialType.transparency,
+                      child: Icon(
                         Icons.date_range,
                         color: const Color(0xff6324a3),
                       ),
-                      onPressed: () => _onTimeAndDatePickerPressed(context),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             //Spacer
             SizedBox(height: Responsive.widgetScaleFactor * 4),
             BlocBuilder<DropDownSelectChangeBloc, DropDownSelectChangeState>(
                 builder: (ctx, state) {
-
               dropDownState = state;
               print("Check State ${formCheckstate.isFormSubmit}");
-              return DropDownBtns(value: formCheckstate.isFormSubmit? dropDownState?.value : null);
+              return DropDownBtns(
+                  value: formCheckstate.isFormSubmit
+                      ? dropDownState?.value
+                      : null);
             }),
             SizedBox(height: Responsive.widgetScaleFactor * 4),
             Row(
@@ -224,7 +225,6 @@ class _AddTaskFormState extends State<AddTaskForm> {
                   );
 
                   Timer(Duration(seconds: 5), () {
-
                     _titleController.value = TextEditingValue.empty;
                     _amountController.value = TextEditingValue.empty;
                     BlocProvider.of<CheckFormSubmitBloc>(context)

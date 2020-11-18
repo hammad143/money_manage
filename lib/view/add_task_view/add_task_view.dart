@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
@@ -7,7 +9,9 @@ import 'package:money_management/view/responsive_setup_view.dart';
 class AddTaskView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final windowPadding = MediaQuery.of(context).padding;
     final textTheme = Theme.of(context).textTheme;
+    Responsive.init(context);
     return Scaffold(
       body: Center(
         child: Column(
@@ -15,18 +19,27 @@ class AddTaskView extends StatelessWidget {
             Container(
               alignment: Alignment.center,
               decoration: _buildBoxDecoration(),
-              height: Responsive.widgetScaleFactor * 30,
-              padding: const EdgeInsets.symmetric(
-                horizontal: kDefaultPadding,
-                vertical: kDefaultPadding,
+              //height: Responsive.widgetScaleFactor * 30,
+              padding: EdgeInsets.only(
+                right: kDefaultPadding,
+                //left: kDefaultPadding,
+                top: windowPadding.top,
+                bottom: windowPadding.top,
               ),
-              child: Text("Add your amount, you have spent",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: Responsive.textScaleFactor * 8,
-                    color: Colors.white,
-                  )),
+              child: Row(
+                children: [
+                  Material(
+                    type: MaterialType.transparency,
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.arrow_back),
+                    ),
+                  ),
+                  Align(
+                      alignment: Alignment.center,
+                      child: Text("Add an item here")),
+                ],
+              ),
             ),
             Expanded(
               child: Container(
