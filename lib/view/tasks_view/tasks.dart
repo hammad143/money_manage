@@ -12,10 +12,10 @@ import 'package:money_management/view/responsive_setup_view.dart';
 import 'package:money_management/view/sync_view.dart';
 import 'package:money_management/view/tasks_view/components/custom_dismissible_tile.dart';
 import 'package:money_management/view/tasks_view/components/remain_amount_cont.dart';
-import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
 import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_bloc.dart';
 import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_event.dart';
+import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_state.dart';
 import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize.dart';
 
 class TaskView extends StatefulWidget {
@@ -41,12 +41,15 @@ class _TaskViewState extends State<TaskView> {
   @override
   void initState() {
     super.initState();
-
-    print("Make Authorize Bloc ${makeAuthorbloc}");
     listScrollController.addListener(() {
-      final _fetchdataBloc = BlocProvider.of<FetchAddedAmountBloc>(context);
-      _fetchdataBloc.add(FetchAddedItemsEvent());
+      final scrollExtent = listScrollController.position.pixels;
+      final maxScrollPosition = listScrollController.position.maxScrollExtent;
+      if (scrollExtent == maxScrollPosition) {
+        final fetchBloc = BlocProvider.of<FetchAddedAmountBloc>(context);
+        fetchBloc.add(FetchAddedItemsEvent());
+      }
     });
+    print("Make Authorize Bloc ${makeAuthorbloc}");
   }
 
   @override
@@ -68,7 +71,7 @@ class _TaskViewState extends State<TaskView> {
     tileViewModel = state.box.values.cast<ListOfTilesModel>().toList();
 
     return ListView.builder(
-      controller: listScrollController,
+        controller: listScrollController,
         physics: BouncingScrollPhysics(),
         itemCount: tileViewModel.length,
         itemBuilder: (_, index) {
@@ -136,17 +139,13 @@ class _TaskViewState extends State<TaskView> {
               child: Stack(
                 children: [
                   Scrollbar(
-                    child: BlocBuilder<AddAmountInfoBloc, AddAmountInfoState>(
-                        builder: (ctx, state) {
-                      if (state is AddAmountInfoInitialState) {
-                        return (state.box.isEmpty)
-                            ? Center(
-                                child: Container(
-                                child: Text("Nothing found"),
-                              ))
-                            : itemBuilder(state);
-                      }
-                      return itemBuilder(state);
+                    child:
+                        BlocBuilder<FetchAddedAmountBloc, FetchAddedItemsState>(
+                            builder: (ctx, state) {
+                      return Center(
+                          child: Container(
+                        child: Text("Nothing found"),
+                      ));
                     }),
                   ),
                   RemainingAmountContainer()

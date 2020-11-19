@@ -33,6 +33,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
   FocusNode _titleFocusNode, _amountFocusNode;
   FocusScopeNode _focusScope;
   DropDownSelectChangeState dropDownState;
+  bool isOptionSelected;
 
   @override
   void initState() {
@@ -162,13 +163,34 @@ class _AddTaskFormState extends State<AddTaskForm> {
             SizedBox(height: Responsive.widgetScaleFactor * 4),
             BlocBuilder<DropDownSelectChangeBloc, DropDownSelectChangeState>(
                 builder: (ctx, state) {
+              bool option;
               dropDownState = state;
               print("Check State ${formCheckstate.isFormSubmit}");
-              return DropDownBtns(
-                  value: formCheckstate.isFormSubmit
-                      ? dropDownState?.value
-                      : null);
+              if (dropDownState != null) isOptionSelected = true;
+              /*else
+                isOptionSelected = false;*/
+
+              return Column(
+                children: [
+                  DropDownBtns(
+                      value: formCheckstate.isFormSubmit
+                          ? dropDownState?.value
+                          : null),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: AnimatedContainer(
+                      height: (isOptionSelected == null || isOptionSelected)
+                          ? 0
+                          : null,
+                      duration: Duration(milliseconds: 500),
+                      child: Text("Option is to be selected",
+                          style: TextStyle(color: Colors.red)),
+                    ),
+                  ),
+                ],
+              );
             }),
+
             SizedBox(height: Responsive.widgetScaleFactor * 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -189,50 +211,55 @@ class _AddTaskFormState extends State<AddTaskForm> {
             SizedBox(height: Responsive.widgetScaleFactor * 4),
             CustomAddAmountBtn(
               onBtnPressed: () {
-                if (_formKey.currentState.validate()) {
-                  _formKey.currentState.save();
-                  _bloc.add(AddAmountInfoEvent(_titleController.text,
-                      _amountController.text, timeToString, dropDownState));
+                setState(() {
+                  isOptionSelected = false;
 
-                  showDialog(
-                    context: context,
-                    builder: (ctx) {
-                      return AlertDialog(
-                        content: Align(
-                          heightFactor: .5,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16.0),
-                                child: CircularProgressIndicator(),
-                              ),
-                              const SizedBox(height: 5),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                child: const Text(
-                                  "Please wait, Adding your result",
-                                  style: const TextStyle(color: Colors.black87),
+                  if (_formKey.currentState.validate() && isOptionSelected) {
+                    _formKey.currentState.save();
+                    _bloc.add(AddAmountInfoEvent(_titleController.text,
+                        _amountController.text, timeToString, dropDownState));
+
+                    showDialog(
+                      context: context,
+                      builder: (ctx) {
+                        return AlertDialog(
+                          content: Align(
+                            heightFactor: .5,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 16.0),
+                                  child: CircularProgressIndicator(),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 5),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: const Text(
+                                    "Please wait, Adding your result",
+                                    style:
+                                        const TextStyle(color: Colors.black87),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  );
+                        );
+                      },
+                    );
 
-                  Timer(Duration(seconds: 5), () {
-                    _titleController.value = TextEditingValue.empty;
-                    _amountController.value = TextEditingValue.empty;
-                    BlocProvider.of<CheckFormSubmitBloc>(context)
-                        .add(CheckFormSubmitEvent(false));
+                    Timer(Duration(seconds: 5), () {
+                      _titleController.value = TextEditingValue.empty;
+                      _amountController.value = TextEditingValue.empty;
+                      BlocProvider.of<CheckFormSubmitBloc>(context)
+                          .add(CheckFormSubmitEvent(false));
 
-                    Navigator.pop(context);
-                  });
-                }
+                      Navigator.pop(context);
+                    });
+                  }
+                });
               },
             ),
           ],

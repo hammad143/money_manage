@@ -18,7 +18,9 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
     final userID = googleUserIdBox.get("userID");
     final firebaseDB = FirebaseService();
     if (event is AddAmountInfoEvent) {
-      if (event.title.isNotEmpty && event.amount.isNotEmpty) {
+      if (event.title.isNotEmpty &&
+          event.amount.isNotEmpty &&
+          event.valueSelectedState.selectedValue != null) {
         final title = event.title,
             amount = event.amount,
             option = event.valueSelectedState.selectedValue,
