@@ -14,6 +14,7 @@ import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_bloc
 import 'package:money_management/viewmodel/bloc/authorized_users_bloc/authorized_users_bloc.dart';
 import 'package:money_management/viewmodel/bloc/curd_bloc/curd_bloc.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_bloc.dart';
+import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_bloc.dart';
 import 'package:money_management/viewmodel/bloc/form_submitted_bloc/form_submitted_bloc.dart';
 import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize.dart';
 import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_bloc.dart';
@@ -34,6 +35,8 @@ void main() async {
   await Hive.openBox(kNestedIncrementKey);
   await Hive.openBox(kGoogleUserId);
   await Hive.openBox<GoogleUserModelAdapter>(kGoogleUserKey);
+  await Hive.openBox(kLastAddedItemOfAuthorizedUserKey);
+  await Hive.openBox(kUserDisplayname);
   await Hive.openBox(kauthorizedUserKey);
   await Firebase.initializeApp();
   runApp(MyApp());
@@ -48,6 +51,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     //Hive.deleteFromDisk();
+
     super.initState();
   }
 
@@ -69,6 +73,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (_) => CurdFireBaseBloc()),
         BlocProvider(create: (_) => NotifierItemAddedBloc()),
         BlocProvider(create: (_) => AuthorizedUsersBloc()),
+        BlocProvider(create: (_) => FetchAddedAmountBloc()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

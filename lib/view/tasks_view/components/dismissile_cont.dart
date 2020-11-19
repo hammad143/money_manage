@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
@@ -24,15 +23,16 @@ class DismissibleCustomContainer extends StatelessWidget {
   }
 
   ListTile _buildListTile(TextTheme textTheme) {
+    final List<String> times = tilesList[index].dateInString.split(RegExp("-"));
     return ListTile(
       title: Text(tilesList[index].title, style: Style.textStyle1),
-      subtitle: Text(tilesList[index].dateInString, style: Style.textStyle2),
+      subtitle: Text("Date: ${times[0]}", style: Style.textStyle2),
       trailing: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Text(tilesList[index].amount, style: Style.textStyle1),
-          Text("${tilesList[index].option} at: 08:00PM",
+          Text("Option: ${tilesList[index].option}, Time: ${times[1]} ",
               style: Style.textStyle2),
         ],
       ),

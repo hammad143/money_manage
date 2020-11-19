@@ -15,36 +15,13 @@ class CustomDismissibleTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Dismissible(
-        confirmDismiss: (dismissDir) {
-          print("Confirm Dissmiss");
-          return Future.value(true);
-        },
-        onDismissed: (dissmiss) {
-          print("On Dissmissed");
-        },
-        background: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.restore_from_trash_rounded),
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.restore_from_trash_rounded),
-            ),
-          ],
-        ),
-        key: UniqueKey(),
-        child: Stack(
-          children: [
-            DismissibleCustomContainer(
-              tilesList: tileViewModel,
-              index: index,
-            ),
-          ],
-        ),
+      child: Stack(
+        children: [
+          DismissibleCustomContainer(
+            tilesList: tileViewModel,
+            index: index,
+          ),
+        ],
       ),
     );
   }

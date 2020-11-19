@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/add_task_view/components/add_task_form.dart';
+import 'package:money_management/view/component/custom_appbar/custom_appbar_gradient.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
 
 class AddTaskView extends StatelessWidget {
@@ -16,28 +17,20 @@ class AddTaskView extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
-            Container(
-              alignment: Alignment.center,
-              decoration: _buildBoxDecoration(),
-              //height: Responsive.widgetScaleFactor * 30,
-              padding: EdgeInsets.only(
-                right: kDefaultPadding,
-                //left: kDefaultPadding,
-                top: windowPadding.top,
-                bottom: windowPadding.top,
-              ),
+            CustomAppBarGradient(
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Material(
                     type: MaterialType.transparency,
                     child: IconButton(
-                      onPressed: () {},
-                      icon: Icon(Icons.arrow_back),
-                    ),
+                        icon: Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () => Navigator.pop(context)),
                   ),
-                  Align(
-                      alignment: Alignment.center,
-                      child: Text("Add an item here")),
+                  Expanded(
+                      child: Center(
+                          child: Text("Add Your Items Here",
+                              style: Style.textStyle6))),
                 ],
               ),
             ),

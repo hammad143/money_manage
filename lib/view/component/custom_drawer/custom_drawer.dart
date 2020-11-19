@@ -24,49 +24,70 @@ class CustomDrawer extends StatefulWidget {
 class _CustomDrawerState extends State<CustomDrawer> {
   MakeAuthorizeBloc makeAuthorbloc;
   final _keyTextController = TextEditingController();
+  final userDisplayNameBox = Hive.box(kUserDisplayname);
   @override
   Widget build(BuildContext context) {
     makeAuthorbloc = BlocProvider.of<MakeAuthorizeBloc>(context);
-    return SingleChildScrollView(
-      child: Container(
-        width: Responsive.widgetScaleFactor * 70,
-        height: Responsive.deviceHeight,
-        color: Colors.white,
+    return Container(
+      width: Responsive.widgetScaleFactor * 70,
+      height: Responsive.deviceHeight,
+      color: Colors.white,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            DrawerHeader(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Your Profile",
-                      style: Style.textStyle1.copyWith(
-                          fontSize: Responsive.textScaleFactor * 6,
-                          fontWeight: FontWeight.w600)),
-                  Text("Get the list of people you are authorized by",
-                      textAlign: TextAlign.center,
-                      style: Style.textStyle1.copyWith(color: Colors.white70)),
-                  CustomListTileDrawer(
-                    onTap: _keyGeneratePopup,
-                    icon: Icon(Icons.vpn_key_outlined, color: Colors.white),
-                    title: "Generate Key",
-                    textStyle: Style.textStyle1,
-                  ),
-                ],
-              ),
+            Container(
+              padding: EdgeInsets.only(top: Responsive.windowTopPadding * 2),
+              height: Responsive.deviceBlockHeight * 20,
               decoration: BoxDecoration(
                 gradient: Style.linearGradient,
               ),
-              curve: Curves.bounceOut,
+              child: Column(
+                children: [
+                  Text("Hi! ${userDisplayNameBox.get("displayName")}",
+                      style: Style.textStyle1.copyWith(
+                          fontSize: Responsive.textScaleFactor * 6,
+                          fontWeight: FontWeight.w600)),
+                  SizedBox(height: Responsive.widgetScaleFactor * 5),
+                  Text("Get yourself notified about authorized users",
+                      textAlign: TextAlign.center,
+                      style: Style.textStyle1.copyWith(color: Colors.white70)),
+                ],
+              ),
+            ),
+            Material(
+              type: MaterialType.transparency,
+              child: InkWell(
+                onTap: () => _keyGeneratePopup(),
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                        vertical: kDefaultPadding / 1.2,
+                        horizontal: kDefaultPadding),
+                    decoration: BoxDecoration(
+                      gradient: Style.linearGradient,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.vpn_key_outlined, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text("Generate Key", style: Style.textStyle1),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
             CustomListTileDrawer(
                 onTap: _makeAuthorizePopup,
                 icon: Icon(Icons.edit),
                 title: "Make Authorize"),
-            CustomListTileDrawer(
+            /*CustomListTileDrawer(
                 onTap: () {},
                 icon: Icon(Icons.verified_user),
-                title: "Authorized By"),
+                title: "Authorized By"),*/
             BlocListener<MakeAuthorizeBloc, MakeAuthorizeState>(
               listener: (ctx, state) async {
                 print("I'm the listener");
@@ -94,8 +115,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   icon: Icon(Icons.person_search),
                   title: "Your Authorized"),
             ),
-            CustomListTileDrawer(
-                onTap: () {}, icon: Icon(Icons.settings), title: "Settings"),
+            /*CustomListTileDrawer(
+                onTap: () {}, icon: Icon(Icons.person_search), title: "Hide"),*/
             CustomListTileDrawer(
                 onTap: () async {
                   final _authUserBloc = context.bloc<AuthenticateUserBloc>();

@@ -26,8 +26,15 @@ class Style {
     color: Colors.black87,
     fontSize: Responsive.textScaleFactor * 3,
   );
+
+  static final textStyle6 = TextStyle(
+      fontSize: Responsive.textScaleFactor * 8,
+      color: Colors.white,
+      fontWeight: FontWeight.bold);
   static const linearGradient = LinearGradient(colors: [
     const Color(0xff3912db),
     const Color(0xff7a6dad),
   ]);
+
+
 }

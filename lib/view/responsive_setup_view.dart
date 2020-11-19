@@ -6,10 +6,18 @@ class Responsive {
       _deviceBlockWidth,
       _deviceBlockHeight,
       _widgetScaleFactor,
-      _textScaleFactor;
+      _textScaleFactor,
+      _windowTopPadding,
+      _windowBottomPadding,
+      _windowLeftPadding,
+      _windowRightPadding;
 
   static void init(BuildContext context) {
     final data = MediaQuery.of(context);
+    _windowTopPadding = data.padding.top;
+    _windowBottomPadding = data.padding.bottom;
+    _windowLeftPadding = data.padding.left;
+    _windowRightPadding = data.padding.right;
     _deviceWidth = data.size.width;
     _deviceHeight = data.size.height;
     _deviceBlockWidth = _deviceWidth / 100;
@@ -27,4 +35,8 @@ class Responsive {
   static double get deviceBlockHeight => _deviceBlockHeight;
   static double get widgetScaleFactor => _widgetScaleFactor;
   static double get textScaleFactor => _textScaleFactor;
+  static double get windowTopPadding => _windowTopPadding;
+  static double get windowBottomPadding => _windowBottomPadding;
+  static double get windowLeftPadding => _windowLeftPadding;
+  static double get windowRightPadding => _windowRightPadding;
 }

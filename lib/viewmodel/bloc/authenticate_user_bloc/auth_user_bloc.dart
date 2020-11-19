@@ -22,6 +22,7 @@ class AuthenticateUserBloc
     final userLogIn = await googleSignIn.signIn();
     final googleIdBox = Hive.box(kGoogleUserId);
     final isUserLoggedInBox = Hive.box<bool>(kGoogleAuthKey);
+    final userDisplayNameBox = Hive.box(kUserDisplayname);
     final counterBox = Hive.box<int>(counterKey);
     final autoIncrementIDbox = Hive.box(kAutoIncrementKey);
     final firebaseDB = FirebaseService();
@@ -30,6 +31,7 @@ class AuthenticateUserBloc
     if (event is AuthenticateUserRequestEvent) {
       if (isUserLoggedInBox.get("isLoggedIn") == null) {
         if (userLogIn != null) {
+          userDisplayNameBox.put("displayName", "${userLogIn.displayName}");
           print("Adding user");
 
           final foundUser = await firebaseDB.findDocumentExistsByField(
