@@ -16,4 +16,7 @@ class FetchAddedItemSuccessState extends FetchAddedItemsState {
   final Future<List<ListOfTilesModel>> data;
 
   FetchAddedItemSuccessState(this.data);
+  @override
+  // TODO: implement props
+  List<Object> get props => [data];
 }

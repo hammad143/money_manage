@@ -18,6 +18,7 @@ import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_add
 import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_event.dart';
 import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_state.dart';
 import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize.dart';
+import 'package:money_management/viewmodel/components/scroll_notifier.dart';
 
 class TaskView extends StatefulWidget {
   final GoogleSignIn signIn;
@@ -43,13 +44,19 @@ class _TaskViewState extends State<TaskView> {
   void initState() {
     super.initState();
     listScrollController.addListener(() {
-      final scrollExtent = listScrollController.position.pixels;
-      final maxScrollPosition = listScrollController.position.maxScrollExtent;
-      print("Scroll Positioned ${scrollExtent}");
-      if (scrollExtent == maxScrollPosition) {
+      if (listScrollController.positions.isNotEmpty) {
+        final scrollExtent = listScrollController.position.pixels;
+        final maxScrollPosition = listScrollController.position.maxScrollExtent;
+        print("Scroll Edge ${listScrollController.position.atEdge}");
+        if (listScrollController.position.atEdge) {
+          final fetchBloc = BlocProvider.of<FetchAddedAmountBloc>(context);
+          fetchBloc.add(FetchAddedItemsEvent());
+          print("Im the listner on scroll");
+        }
+      } else {
         final fetchBloc = BlocProvider.of<FetchAddedAmountBloc>(context);
         fetchBloc.add(FetchAddedItemsEvent());
-        print("Im the listner on scroll");
+        print("Im the listner on scroll Outside of that");
       }
     });
     print("Make Authorize Bloc ${makeAuthorbloc}");
@@ -138,11 +145,13 @@ class _TaskViewState extends State<TaskView> {
               child: Stack(
                 children: [
                   Scrollbar(
-                    child: BlocListener<AddAmountInfoBloc, AddAmountInfoState>(
-                      listener: (ctx, state) {
-                        listScrollController.notifyListeners();
-                      },
-                      child: BlocBuilder<FetchAddedAmountBloc,
+                    child: BlocBuilder<AddAmountInfoBloc, AddAmountInfoState>(
+                        builder: (ctx, state) {
+                      if (state is AddAmountInfoInitialState ||
+                          state is AddAmountInfoDone)
+                        ScrollNotifier(listScrollController).scrollNotifier();
+
+                      return BlocBuilder<FetchAddedAmountBloc,
                           FetchAddedItemsState>(builder: (ctx, state) {
                         return Center(
                           child: FutureBuilder<List<ListOfTilesModel>>(
@@ -150,27 +159,21 @@ class _TaskViewState extends State<TaskView> {
                                   ? state.data
                                   : null,
                               builder: (context, snapshot) {
-                                if (snapshot.hasData)
-                                  return itemBuilder(snapshot.data);
-                                else
-                                  return Container(
-                                      child: Text("Data doesn't exists"));
+                                if (snapshot.hasData) {
+                                  /*listScrollController.animateTo(-20,
+                                      duration: Duration(milliseconds: 300),
+                                      curve: Curves.bounceInOut);*/
+                                  if (snapshot.data.isNotEmpty)
+                                    return itemBuilder(snapshot.data);
+                                  else
+                                    return Container(
+                                        child: Text("Nothing Found"));
+                                } else
+                                  return CircularProgressIndicator();
                               }),
                         );
-                        /*return Center(
-    child: Container(
-    child: RaisedButton(
-    child: Text("Click to fetch"),
-    onPressed: () {
-    print("Clicked");
-    final fetchBloc =
-    BlocProvider.of<FetchAddedAmountBloc>(
-    context);
-    fetchBloc.add(FetchAddedItemsEvent());
-    }),
-    ));*/
-                      }),
-                    ),
+                      });
+                    }),
                   ),
                   RemainingAmountContainer()
                 ],
