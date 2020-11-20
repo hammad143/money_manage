@@ -12,6 +12,7 @@ import 'package:money_management/view/responsive_setup_view.dart';
 import 'package:money_management/view/sync_view.dart';
 import 'package:money_management/view/tasks_view/components/custom_dismissible_tile.dart';
 import 'package:money_management/view/tasks_view/components/remain_amount_cont.dart';
+import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
 import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_bloc.dart';
 import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_event.dart';
@@ -44,9 +45,11 @@ class _TaskViewState extends State<TaskView> {
     listScrollController.addListener(() {
       final scrollExtent = listScrollController.position.pixels;
       final maxScrollPosition = listScrollController.position.maxScrollExtent;
+      print("Scroll Positioned ${scrollExtent}");
       if (scrollExtent == maxScrollPosition) {
         final fetchBloc = BlocProvider.of<FetchAddedAmountBloc>(context);
         fetchBloc.add(FetchAddedItemsEvent());
+        print("Im the listner on scroll");
       }
     });
     print("Make Authorize Bloc ${makeAuthorbloc}");
@@ -67,17 +70,13 @@ class _TaskViewState extends State<TaskView> {
     );
   }
 
-  Widget itemBuilder(AddAmountInfoState state) {
-    tileViewModel = state.box.values.cast<ListOfTilesModel>().toList();
-
+  Widget itemBuilder(List<ListOfTilesModel> data) {
     return ListView.builder(
         controller: listScrollController,
         physics: BouncingScrollPhysics(),
-        itemCount: tileViewModel.length,
+        itemCount: data.length,
         itemBuilder: (_, index) {
-          this.index = (tileViewModel.length - 1) - index;
-          return CustomDismissibleTile(
-              tileViewModel: tileViewModel, index: index);
+          return CustomDismissibleTile(tileViewModel: data, index: index);
         });
   }
 
@@ -139,14 +138,39 @@ class _TaskViewState extends State<TaskView> {
               child: Stack(
                 children: [
                   Scrollbar(
-                    child:
-                        BlocBuilder<FetchAddedAmountBloc, FetchAddedItemsState>(
-                            builder: (ctx, state) {
-                      return Center(
-                          child: Container(
-                        child: Text("Nothing found"),
-                      ));
-                    }),
+                    child: BlocListener<AddAmountInfoBloc, AddAmountInfoState>(
+                      listener: (ctx, state) {
+                        listScrollController.notifyListeners();
+                      },
+                      child: BlocBuilder<FetchAddedAmountBloc,
+                          FetchAddedItemsState>(builder: (ctx, state) {
+                        return Center(
+                          child: FutureBuilder<List<ListOfTilesModel>>(
+                              future: (state is FetchAddedItemSuccessState)
+                                  ? state.data
+                                  : null,
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData)
+                                  return itemBuilder(snapshot.data);
+                                else
+                                  return Container(
+                                      child: Text("Data doesn't exists"));
+                              }),
+                        );
+                        /*return Center(
+    child: Container(
+    child: RaisedButton(
+    child: Text("Click to fetch"),
+    onPressed: () {
+    print("Clicked");
+    final fetchBloc =
+    BlocProvider.of<FetchAddedAmountBloc>(
+    context);
+    fetchBloc.add(FetchAddedItemsEvent());
+    }),
+    ));*/
+                      }),
+                    ),
                   ),
                   RemainingAmountContainer()
                 ],

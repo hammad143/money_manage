@@ -212,9 +212,9 @@ class _AddTaskFormState extends State<AddTaskForm> {
             CustomAddAmountBtn(
               onBtnPressed: () {
                 setState(() {
-                  isOptionSelected = false;
-
+                  if (isOptionSelected == null) isOptionSelected = false;
                   if (_formKey.currentState.validate() && isOptionSelected) {
+                    print("Let me check");
                     _formKey.currentState.save();
                     _bloc.add(AddAmountInfoEvent(_titleController.text,
                         _amountController.text, timeToString, dropDownState));
