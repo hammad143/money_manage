@@ -43,6 +43,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
     _titleFocusNode = FocusNode(debugLabel: 'TextField');
     _amountFocusNode = FocusNode();
     _bloc = BlocProvider.of<AddAmountInfoBloc>(context);
+    loadCurrenciesFile();
   }
 
   @override
@@ -51,6 +52,12 @@ class _AddTaskFormState extends State<AddTaskForm> {
     _amountController.dispose();
     //_focusScope.dispose();
     super.dispose();
+  }
+
+  loadCurrenciesFile() async {
+    final file = await DefaultAssetBundle.of(context)
+        .loadString("assets/currency/currency.json");
+    print("This is file ${file}");
   }
 
   _onTextFieldDone([String text, FocusNode node, VoidCallback onDoneCallback]) {

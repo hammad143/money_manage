@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:money_management/model/google_user_model/google_user_model.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
 import 'package:money_management/util/constants/constants.dart';
+import 'package:money_management/util/notifier.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
 import 'package:money_management/view/sync_view.dart';
 import 'package:money_management/view/tasks_view/tasks.dart';
@@ -39,6 +40,9 @@ void main() async {
   await Hive.openBox(kUserDisplayname);
   await Hive.openBox(kauthorizedUserKey);
   await Firebase.initializeApp();
+  // Notification Init
+  await FlutterLocalNotifier.init();
+  //Run App
   runApp(MyApp());
 }
 

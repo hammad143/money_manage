@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
 import 'package:money_management/services/firebase_services/firebase_service.dart';
 import 'package:money_management/util/constants/constants.dart';
+import 'package:money_management/util/notifier.dart';
 import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_event.dart';
 import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_state.dart';
 
@@ -17,8 +18,10 @@ class NotifierItemAddedBloc
   Stream<NotifierItemAddedState> mapEventToState(
       NotifierItemAddedEvent event) async* {
     final lastItemAddedBox = Hive.box(kLastAddedItemOfAuthorizedUserKey);
+
     final firebaseService = FirebaseService();
     final appKey = event.key;
+
     final document = await firebaseService.findDocumentExistsByField(
       collectionName: "users",
       dataToMatch: {"appKey": appKey},
@@ -41,23 +44,21 @@ class NotifierItemAddedBloc
             lastItemAddedBox.get("lastItem") != itemData['auto_increment']) {
           final lastItem = ListOfTilesModel.fromJSON(itemData);
           lastItemAddedBox.put("lastItem", itemData['auto_increment']);
-          final androidInitSetting =
-              notification.AndroidInitializationSettings('logo_icon');
-          final initSettings =
-              notification.InitializationSettings(android: androidInitSetting);
-          final plugin = notification.FlutterLocalNotificationsPlugin();
-          await plugin.initialize(initSettings);
           final notificationChannelDetails =
-              notification.AndroidNotificationDetails("my_channel_id",
-                  "Channel Name", "Here is the channel description",
-                  priority: notification.Priority.min,
-                  importance: notification.Importance.low,
-                  enableVibration: true,
-                  fullScreenIntent: true,
-                  indeterminate: true,
-                  maxProgress: 70);
+              notification.AndroidNotificationDetails(
+            "my_channel_id",
+            "Channel Name",
+            "Here is the channel description",
+            priority: notification.Priority.max,
+            importance: notification.Importance.max,
+            enableVibration: true,
+            fullScreenIntent: true,
+            indeterminate: true,
+          );
+
           final platformNotification = notification.NotificationDetails(
               android: notificationChannelDetails);
+          final plugin = FlutterLocalNotifier().plugin;
           plugin.show(
               0,
               "${lastItem.title} By ${document.data()['name']}",

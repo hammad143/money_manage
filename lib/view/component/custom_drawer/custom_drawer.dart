@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'
+    as notification;
 import 'package:hive/hive.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
@@ -25,6 +27,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
   MakeAuthorizeBloc makeAuthorbloc;
   final _keyTextController = TextEditingController();
   final userDisplayNameBox = Hive.box(kUserDisplayname);
+  notification.FlutterLocalNotificationsPlugin plugin;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     makeAuthorbloc = BlocProvider.of<MakeAuthorizeBloc>(context);
@@ -92,18 +101,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
               listener: (ctx, state) async {
                 print("I'm the listener");
                 if (state is MakeAuthorizeSuccessState) {
-                  /*  final x = await state.snapshot.firstWhere((element) {
-                        final index = element.docs.length-1;
-                        final documentFound =  element.docs.firstWhere((element) => element.data()['auto_increment'] == index);
-                        return documentFound != null ? true : false;
-                      });*/
                   Navigator.pop(context);
                   final bloc = BlocProvider.of<AuthorizedUsersBloc>(context);
                   final notifierBloc =
                       BlocProvider.of<NotifierItemAddedBloc>(context);
                   bloc.add(AuthorizedUsersEvent(_keyTextController.text));
-                  notifierBloc
-                      .add(NotifierItemAddedEvent(_keyTextController.text));
+                  notifierBloc.add(NotifierItemAddedEvent(
+                      _keyTextController.text,
+                      flutterLocalNotificationPlugin: plugin));
                 }
               },
               child: CustomListTileDrawer(
