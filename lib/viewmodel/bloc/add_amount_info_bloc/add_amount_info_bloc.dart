@@ -20,11 +20,16 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
     if (event is AddAmountInfoEvent) {
       if (event.title.isNotEmpty &&
           event.amount.isNotEmpty &&
-          event.valueSelectedState.selectedValue != null) {
+          event.valueSelectedState.selectedValue != null &&
+          event.currencyValue != null && event.location != null) {
         final title = event.title,
             amount = event.amount,
             option = event.valueSelectedState.selectedValue,
-            date = event.dateInString;
+            date = event.dateInString,
+            currency = event.currencyValue;
+        final location = event.location;
+        final latitude = location.lat;
+        final longitude = location.long;
         final document = await firebaseDB.findDocumentExistsByField(
             collectionName: "users",
             dataToMatch: {"id": userID},
@@ -38,8 +43,11 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
           "auto_increment": numOfItems,
           "title": title,
           "amount": amount,
+          "currency": currency,
           "date": date,
           "option": option,
+          "latitude": latitude,
+          "longitude": longitude,
         });
         final data = (await itemAddedDocument.get()).data();
 

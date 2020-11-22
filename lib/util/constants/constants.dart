@@ -21,6 +21,7 @@ const String kauthorizedUserKey = "list of authorized users";
 const String kLastAddedItemOfAuthorizedUserKey =
     "last added item of authorized user key";
 const String kUserDisplayname = "user display name";
+const String kSelectedCurrency = "selected currency";
 const kPureWhite = Colors.white;
 const double kDefaultPadding = 20;
 const double kDefaultValue = 20;

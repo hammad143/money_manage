@@ -1,8 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
+import 'package:location/location.dart' as locationManager;
+import 'package:money_management/model/location_model.dart';
+import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/add_task_view/components/custom_addAmount_btn.dart';
 import 'package:money_management/view/add_task_view/components/custom_dp_btns.dart';
@@ -15,6 +20,9 @@ import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick
 import 'package:money_management/viewmodel/bloc/form_submitted_bloc/check_form_submit_event.dart';
 import 'package:money_management/viewmodel/bloc/form_submitted_bloc/check_form_submit_state.dart';
 import 'package:money_management/viewmodel/bloc/form_submitted_bloc/form_submitted_bloc.dart';
+import 'package:money_management/viewmodel/bloc/location_bloc/location_bloc.dart';
+import 'package:money_management/viewmodel/bloc/location_bloc/location_event.dart';
+import 'package:money_management/viewmodel/bloc/location_bloc/location_state.dart';
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_bloc.dart';
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_state.dart';
 
@@ -34,16 +42,23 @@ class _AddTaskFormState extends State<AddTaskForm> {
   FocusScopeNode _focusScope;
   DropDownSelectChangeState dropDownState;
   bool isOptionSelected;
+  Future<Map<String, dynamic>> currencies;
+  String currencyValue, currencyKey;
+  final currencyBox = Hive.box(kSelectedCurrency);
+  locationManager.PermissionStatus permisisonStatus;
 
   @override
   void initState() {
     super.initState();
+    final locationBloc = BlocProvider.of<LocationBloc>(context);
+    locationBloc.add(LocationEvent());
     _titleController = TextEditingController();
     _amountController = TextEditingController();
     _titleFocusNode = FocusNode(debugLabel: 'TextField');
     _amountFocusNode = FocusNode();
     _bloc = BlocProvider.of<AddAmountInfoBloc>(context);
-    loadCurrenciesFile();
+    currencies = loadCurrenciesFile();
+    currencyKey = currencyBox.get("currency");
   }
 
   @override
@@ -54,10 +69,11 @@ class _AddTaskFormState extends State<AddTaskForm> {
     super.dispose();
   }
 
-  loadCurrenciesFile() async {
+  Future<Map<String, dynamic>> loadCurrenciesFile() async {
     final file = await DefaultAssetBundle.of(context)
         .loadString("assets/currency/currency.json");
-    print("This is file ${file}");
+    final currency = jsonDecode(file);
+    return currency;
   }
 
   _onTextFieldDone([String text, FocusNode node, VoidCallback onDoneCallback]) {
@@ -74,203 +90,254 @@ class _AddTaskFormState extends State<AddTaskForm> {
     return BlocBuilder<CheckFormSubmitBloc, CheckFormSubmitState>(
       builder: (ctx, formCheckstate) => Form(
         key: _formKey,
-        child: Column(
-          children: <Widget>[
-            //Title TextField
-            TextFormField(
-              focusNode: _titleFocusNode,
-              onFieldSubmitted: (value) {
-                _onTextFieldDone(_amountController.text, _amountFocusNode);
-              },
-              maxLength: 300,
-              validator: _titleValidator,
-              controller: _titleController,
-              style: Style.textStyle1.copyWith(color: Colors.black87),
-              textAlignVertical: TextAlignVertical.center,
-              //autovalidateMode: AutovalidateMode.onUserInteraction,
-              autofocus: true,
-              decoration: InputDecoration(
-                hintStyle: TextStyle(
-                    color: Colors.black54,
-                    fontSize: Responsive.textScaleFactor * 4.5),
-                hintText: "Enter a title",
+        child:
+            BlocBuilder<LocationBloc, LocationState>(builder: (context, state) {
+          return Column(
+            children: <Widget>[
+              //Title TextField
+              TextFormField(
+                focusNode: _titleFocusNode,
+                onFieldSubmitted: (value) {
+                  _onTextFieldDone(_amountController.text, _amountFocusNode);
+                },
+                maxLength: 300,
+                validator: _titleValidator,
+                controller: _titleController,
+                style: Style.textStyle1.copyWith(color: Colors.black87),
+                textAlignVertical: TextAlignVertical.center,
+                //autovalidateMode: AutovalidateMode.onUserInteraction,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintStyle: TextStyle(
+                      color: Colors.black54,
+                      fontSize: Responsive.textScaleFactor * 4.5),
+                  hintText: "Enter a title",
+                ),
               ),
-            ),
-            //Spacer
-            SizedBox(height: Responsive.widgetScaleFactor * 4),
-            //Amount TextField
-            TextFormField(
-              validator: _amountValidator,
-              maxLength: 20,
-              focusNode: _amountFocusNode,
-              controller: _amountController,
-              style: Style.textStyle1.copyWith(color: Colors.black87),
-              textAlignVertical: TextAlignVertical.center,
-              keyboardAppearance: Brightness.dark,
-              keyboardType: TextInputType.number,
-              //autovalidateMode: AutovalidateMode.onUserInteraction,
-              onFieldSubmitted: (value) {
-                _onTextFieldDone(_titleController.text, _titleFocusNode);
-              },
-              decoration: InputDecoration(
-                hintStyle: TextStyle(
-                    color: Colors.black54,
-                    fontSize: Responsive.textScaleFactor * 4.5),
-                hintText: "Enter an amount",
-                prefixIconConstraints:
-                    BoxConstraints(minWidth: 23, maxHeight: 20),
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.only(right: 20),
-                  child: Icon(
-                    Icons.attach_money_outlined,
+              //Spacer
+              SizedBox(height: Responsive.widgetScaleFactor * 4),
+              //Amount TextField
+              TextFormField(
+                validator: _amountValidator,
+                maxLength: 20,
+                focusNode: _amountFocusNode,
+                controller: _amountController,
+                style: Style.textStyle1.copyWith(color: Colors.black87),
+                textAlignVertical: TextAlignVertical.center,
+                keyboardAppearance: Brightness.dark,
+                keyboardType: TextInputType.number,
+                //autovalidateMode: AutovalidateMode.onUserInteraction,
+                onFieldSubmitted: (value) {
+                  _onTextFieldDone(_titleController.text, _titleFocusNode);
+                },
+                decoration: InputDecoration(
+                  hintStyle: TextStyle(
+                      color: Colors.black54,
+                      fontSize: Responsive.textScaleFactor * 4.5),
+                  hintText: "Enter an amount",
+                ),
+              ),
+              FutureBuilder<Map<String, dynamic>>(
+                  future: currencies,
+                  builder: (context, snapshot) {
+                    return DropdownButton(
+                      value: currencyKey,
+                      isExpanded: true,
+                      hint: Text("Select a Currency",
+                          style:
+                              Style.textStyle1.copyWith(color: Colors.black54)),
+                      onChanged: (value) {
+                        print("$value on Changed");
+                        currencyKey = value;
+                        currencyValue =
+                            snapshot.data[currencyKey]['symbol_native'];
+                        //currencyValue = snapshot.data[value]['symbol_native'];
+                      },
+                      items: <DropdownMenuItem>[
+                        if (snapshot.hasData)
+                          for (String key in snapshot.data.keys)
+                            DropdownMenuItem(
+                              onTap: () {},
+                              value: key,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    child: Text(
+                                      "${snapshot.data[key]['symbol_native']}",
+                                      style: Style.textStyle1.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.black54),
+                                    ),
+                                  ),
+                                  Flexible(
+                                    child: Text(
+                                      " ${snapshot.data[key]['name']}",
+                                      style: TextStyle(
+                                          color: Colors.black87,
+                                          fontSize:
+                                              Responsive.textScaleFactor * 4),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                      ],
+                    );
+                  }),
+              //Spacer
+              SizedBox(height: Responsive.widgetScaleFactor * 4),
+              //Date Container
+              Container(
+                decoration: const BoxDecoration(
+                    border: Border(
+                  bottom: BorderSide(
+                    width: 1.7,
+                    color: const Color(0xff6324a3),
+                  ),
+                )),
+                child: InkWell(
+                  onTap: () => _onTimeAndDatePickerPressed(context),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      BlocBuilder<DateTimePickBloc, DateTimePickState>(
+                          builder: (ctx, state) {
+                        if (state is DateTimePickInitialState)
+                          timeToString = _onTimeChangeState(state);
+                        else if (state is DateTimePickedState)
+                          timeToString = _onTimeChangeState(state);
+
+                        return Text(timeToString,
+                            style: Style.textStyle1
+                                .copyWith(color: Colors.black54));
+                      }),
+                      Material(
+                        shape: CircleBorder(),
+                        type: MaterialType.transparency,
+                        child: Icon(
+                          Icons.date_range,
+                          color: const Color(0xff6324a3),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
-            //Spacer
-            SizedBox(height: Responsive.widgetScaleFactor * 4),
-            //Date Container
-            Container(
-              decoration: const BoxDecoration(
-                  border: Border(
-                bottom: BorderSide(
-                  width: 1.7,
-                  color: const Color(0xff6324a3),
-                ),
-              )),
-              child: InkWell(
-                onTap: () => _onTimeAndDatePickerPressed(context),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    BlocBuilder<DateTimePickBloc, DateTimePickState>(
-                        builder: (ctx, state) {
-                      if (state is DateTimePickInitialState)
-                        timeToString = _onTimeChangeState(state);
-                      else if (state is DateTimePickedState)
-                        timeToString = _onTimeChangeState(state);
+              //Spacer
+              SizedBox(height: Responsive.widgetScaleFactor * 4),
+              BlocBuilder<DropDownSelectChangeBloc, DropDownSelectChangeState>(
+                  builder: (ctx, state) {
+                bool option;
+                dropDownState = state;
+                print("Check State ${formCheckstate.isFormSubmit}");
+                if (dropDownState != null) isOptionSelected = true;
+                /*else
+                    isOptionSelected = false;*/
 
-                      return Text(timeToString,
-                          style:
-                              Style.textStyle1.copyWith(color: Colors.black54));
-                    }),
-                    Material(
-                      shape: CircleBorder(),
-                      type: MaterialType.transparency,
-                      child: Icon(
-                        Icons.date_range,
-                        color: const Color(0xff6324a3),
+                return Column(
+                  children: [
+                    DropDownBtns(
+                        value: formCheckstate.isFormSubmit
+                            ? dropDownState?.value
+                            : null),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: AnimatedContainer(
+                        height: (isOptionSelected == null || isOptionSelected)
+                            ? 0
+                            : null,
+                        duration: Duration(milliseconds: 500),
+                        child: Text("Option is to be selected",
+                            style: TextStyle(color: Colors.red)),
                       ),
                     ),
                   ],
-                ),
-              ),
-            ),
-            //Spacer
-            SizedBox(height: Responsive.widgetScaleFactor * 4),
-            BlocBuilder<DropDownSelectChangeBloc, DropDownSelectChangeState>(
-                builder: (ctx, state) {
-              bool option;
-              dropDownState = state;
-              print("Check State ${formCheckstate.isFormSubmit}");
-              if (dropDownState != null) isOptionSelected = true;
-              /*else
-                isOptionSelected = false;*/
+                );
+              }),
 
-              return Column(
+              SizedBox(height: Responsive.widgetScaleFactor * 4),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  DropDownBtns(
-                      value: formCheckstate.isFormSubmit
-                          ? dropDownState?.value
-                          : null),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: AnimatedContainer(
-                      height: (isOptionSelected == null || isOptionSelected)
-                          ? 0
-                          : null,
-                      duration: Duration(milliseconds: 500),
-                      child: Text("Option is to be selected",
-                          style: TextStyle(color: Colors.red)),
+                  Text(
+                    "I would like to share my location",
+                    style: Style.textStyle3.copyWith(
+                      color: Colors.black54,
                     ),
                   ),
+                  Switch(
+                      activeColor: const Color(0xff5e10c4),
+                      value: true,
+                      onChanged: (value) {})
                 ],
-              );
-            }),
+              ),
+              SizedBox(height: Responsive.widgetScaleFactor * 4),
+              SizedBox(height: Responsive.widgetScaleFactor * 4),
+              CustomAddAmountBtn(
+                onBtnPressed: () {
+                  LocationModel location;
+                  if (state is LocationAccessedState) location = state.location;
+                  setState(() {
+                    if (isOptionSelected == null) isOptionSelected = false;
+                    if (_formKey.currentState.validate() && isOptionSelected) {
+                      print("Let me check");
+                      currencyBox.put("currency", currencyKey);
+                      _formKey.currentState.save();
+                      _bloc.add(AddAmountInfoEvent(
+                          _titleController.text,
+                          _amountController.text,
+                          timeToString,
+                          dropDownState,
+                          currencyValue,
+                          location));
 
-            SizedBox(height: Responsive.widgetScaleFactor * 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "I would like to share my location",
-                  style: Style.textStyle3.copyWith(
-                    color: Colors.black54,
-                  ),
-                ),
-                Switch(
-                    activeColor: const Color(0xff5e10c4),
-                    value: true,
-                    onChanged: (value) {})
-              ],
-            ),
-            SizedBox(height: Responsive.widgetScaleFactor * 4),
-            SizedBox(height: Responsive.widgetScaleFactor * 4),
-            CustomAddAmountBtn(
-              onBtnPressed: () {
-                setState(() {
-                  if (isOptionSelected == null) isOptionSelected = false;
-                  if (_formKey.currentState.validate() && isOptionSelected) {
-                    print("Let me check");
-                    _formKey.currentState.save();
-                    _bloc.add(AddAmountInfoEvent(_titleController.text,
-                        _amountController.text, timeToString, dropDownState));
-
-                    showDialog(
-                      context: context,
-                      builder: (ctx) {
-                        return AlertDialog(
-                          content: Align(
-                            heightFactor: .5,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 16.0),
-                                  child: CircularProgressIndicator(),
-                                ),
-                                const SizedBox(height: 5),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: const Text(
-                                    "Please wait, Adding your result",
-                                    style:
-                                        const TextStyle(color: Colors.black87),
+                      showDialog(
+                        context: context,
+                        builder: (ctx) {
+                          return AlertDialog(
+                            content: Align(
+                              heightFactor: .5,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16.0),
+                                    child: CircularProgressIndicator(),
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: 5),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: const Text(
+                                      "Please wait, Adding your result",
+                                      style: const TextStyle(
+                                          color: Colors.black87),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    );
+                          );
+                        },
+                      );
 
-                    Timer(Duration(seconds: 5), () {
-                      _titleController.value = TextEditingValue.empty;
-                      _amountController.value = TextEditingValue.empty;
-                      BlocProvider.of<CheckFormSubmitBloc>(context)
-                          .add(CheckFormSubmitEvent(false));
+                      Timer(Duration(seconds: 3), () {
+                        _titleController.value = TextEditingValue.empty;
+                        _amountController.value = TextEditingValue.empty;
+                        BlocProvider.of<CheckFormSubmitBloc>(context)
+                            .add(CheckFormSubmitEvent(false));
 
-                      Navigator.pop(context);
-                    });
-                  }
-                });
-              },
-            ),
-          ],
-        ),
+                        Navigator.pop(context);
+                      });
+                    }
+                  });
+                },
+              ),
+            ],
+          );
+        }),
       ),
     );
   }

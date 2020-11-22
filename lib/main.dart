@@ -17,6 +17,7 @@ import 'package:money_management/viewmodel/bloc/curd_bloc/curd_bloc.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_bloc.dart';
 import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_bloc.dart';
 import 'package:money_management/viewmodel/bloc/form_submitted_bloc/form_submitted_bloc.dart';
+import 'package:money_management/viewmodel/bloc/location_bloc/location_bloc.dart';
 import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize.dart';
 import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_bloc.dart';
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_bloc.dart';
@@ -39,12 +40,18 @@ void main() async {
   await Hive.openBox(kLastAddedItemOfAuthorizedUserKey);
   await Hive.openBox(kUserDisplayname);
   await Hive.openBox(kauthorizedUserKey);
+  await Hive.openBox(kSelectedCurrency);
   await Firebase.initializeApp();
+
   // Notification Init
   await FlutterLocalNotifier.init();
   //Run App
   runApp(MyApp());
 }
+
+/*
+* http://ip-api.com/json/192.142.202.177
+* */
 
 class MyApp extends StatefulWidget {
   @override
@@ -78,6 +85,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (_) => NotifierItemAddedBloc()),
         BlocProvider(create: (_) => AuthorizedUsersBloc()),
         BlocProvider(create: (_) => FetchAddedAmountBloc()),
+        BlocProvider(create: (_) => LocationBloc()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

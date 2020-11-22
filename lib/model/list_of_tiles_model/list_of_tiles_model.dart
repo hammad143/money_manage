@@ -12,14 +12,29 @@ class ListOfTilesModel {
   String dateInString;
   @HiveField(3)
   String option;
+  @HiveField(5)
+  String currency;
+  @HiveField(6)
+  double latitude;
+  @HiveField(7)
+  double longitude;
 
-  ListOfTilesModel({this.title, this.amount, this.dateInString, this.option});
+  ListOfTilesModel(
+      {this.title,
+      this.amount,
+      this.dateInString,
+      this.option,
+      this.latitude,
+      this.longitude});
 
   ListOfTilesModel.fromJSON(Map<String, dynamic> data) {
     this.title = data['title'];
     this.amount = data['amount'];
     this.dateInString = data['date'];
     this.option = data['option'];
+    this.currency = data['currency'];
+    this.latitude = data['latitude'];
+    this.longitude = data['longitude'];
   }
 }
 
