@@ -17,11 +17,15 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
     final googleUserIdBox = Hive.box(kGoogleUserId);
     final userID = googleUserIdBox.get("userID");
     final firebaseDB = FirebaseService();
+
     if (event is AddAmountInfoEvent) {
+      print(
+          "Is it called AddAmountInfo Event ${event.title} ${event.amount} ${event.location} ${event.currencyValue} ${event.dateInString}");
       if (event.title.isNotEmpty &&
           event.amount.isNotEmpty &&
           event.valueSelectedState.selectedValue != null &&
-          event.currencyValue != null && event.location != null) {
+          event.currencyValue != null &&
+          event.location != null) {
         final title = event.title,
             amount = event.amount,
             option = event.valueSelectedState.selectedValue,
@@ -35,8 +39,8 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
             dataToMatch: {"id": userID},
             key1: "id",
             key2: "id");
-        final collectionOfItems = await document.reference.collection("items")
-          ..orderBy('auto_increment');
+        final collectionOfItems = await document.reference.collection("items");
+        print("This is the Collection $collectionOfItems");
         final snapshot = await collectionOfItems.get();
         final numOfItems = snapshot.docs.length + 1;
         final itemAddedDocument = await collectionOfItems.add({

@@ -47,6 +47,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
   final currencyBox = Hive.box(kSelectedCurrency);
   locationManager.PermissionStatus permisisonStatus;
   LocationModel location;
+  LocationState locationState;
 
   @override
   void initState() {
@@ -93,30 +94,49 @@ class _AddTaskFormState extends State<AddTaskForm> {
         key: _formKey,
         child: BlocListener<LocationBloc, LocationState>(
           listener: (context, state) {
-            print("Checking the ----STATE TYPE---- ${state.runtimeType}");
-            if (state is LocationAccessedState)
-              location = state.location;
-            else if (state is LocationErrorState) {
-              print("I'm the Location Alter dialig");
+            locationState = state;
+            print("This is locationState ${state.runtimeType}");
+            if (state is LocationErrorState) {
+              final locationErrorBloc = BlocProvider.of<LocationBloc>(context);
+              locationErrorBloc.add(LocationEvent());
               showDialog(
                   context: context,
                   builder: (ctx) {
                     return AlertDialog(
+                      content: Center(
+                        child: Text("Location must be turned on"),
+                      ),
                       actions: [
                         FlatButton(
-                          onPressed: () {},
-                          child: Text("Turn On Location"),
+                          onPressed: () {
+                            final locationErrorBloc =
+                                BlocProvider.of<LocationBloc>(context);
+                            locationErrorBloc.add(LocationEvent());
+                            Navigator.pop(context);
+                          },
+                          child: Text("Close"),
                         ),
+                        FlatButton(
+                          onPressed: () {
+                            final locationErrorBloc =
+                                BlocProvider.of<LocationBloc>(context);
+                            locationErrorBloc.add(LocationEvent());
+                          },
+                          child: Text("Turn on"),
+                        )
                       ],
-                      content:
-                          Text("Location must be on", style: Style.textStyle3),
                     );
                   });
             }
+
+            //if(state is Location)
           },
           child: Column(
             children: <Widget>[
               //Title TextField
+              RaisedButton(
+                  onPressed: () {},
+                  child: Text("Access Location ${locationState.runtimeType}")),
               TextFormField(
                 focusNode: _titleFocusNode,
                 onFieldSubmitted: (value) {
@@ -162,6 +182,11 @@ class _AddTaskFormState extends State<AddTaskForm> {
               FutureBuilder<Map<String, dynamic>>(
                   future: currencies,
                   builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final currency = currencyBox.get("currency");
+                      currencyValue = snapshot.data[currency]['symbol_native'];
+                    }
+
                     return DropdownButton(
                       value: currencyKey,
                       isExpanded: true,
@@ -173,6 +198,8 @@ class _AddTaskFormState extends State<AddTaskForm> {
                         currencyKey = value;
                         currencyValue =
                             snapshot.data[currencyKey]['symbol_native'];
+                        print("CurrencyValue ${currencyValue}");
+                        currencyBox.put("currency", currencyKey);
                         //currencyValue = snapshot.data[value]['symbol_native'];
                       },
                       items: <DropdownMenuItem>[
@@ -255,7 +282,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
                 print("Check State ${formCheckstate.isFormSubmit}");
                 if (dropDownState != null) isOptionSelected = true;
                 /*else
-                    isOptionSelected = false;*/
+                        isOptionSelected = false;*/
 
                 return Column(
                   children: [
@@ -298,13 +325,16 @@ class _AddTaskFormState extends State<AddTaskForm> {
               SizedBox(height: Responsive.widgetScaleFactor * 4),
               CustomAddAmountBtn(
                 onBtnPressed: () {
-                  LocationModel location;
-                  //if (state is LocationAccessedState) location = state.location;
+                  print("Symbol Of currency ${currencyValue}");
+                  if (locationState is LocationAccessedState)
+                    location =
+                        (locationState as LocationAccessedState).location;
                   setState(() {
                     if (isOptionSelected == null) isOptionSelected = false;
                     if (_formKey.currentState.validate() && isOptionSelected) {
-                      print("Let me check");
+                      print("Let me check ${currencyValue}");
                       currencyBox.put("currency", currencyKey);
+
                       _formKey.currentState.save();
                       _bloc.add(AddAmountInfoEvent(
                           _titleController.text,

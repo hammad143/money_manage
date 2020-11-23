@@ -23,6 +23,6 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
           long: address.coordinates.longitude);
       yield LocationAccessedState(locationModel);
     } else
-      yield LocationErrorState();
+      yield LocationErrorState("Location is to be turned On");
   }
 }

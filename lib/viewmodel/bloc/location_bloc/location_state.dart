@@ -15,8 +15,9 @@ class LocationAccessedState extends LocationState {
 }
 
 class LocationErrorState extends LocationState {
-  LocationErrorState();
+  final String message;
+  LocationErrorState(this.message);
   @override
   // TODO: implement props
-  List<Object> get props => [];
+  List<Object> get props => [message];
 }

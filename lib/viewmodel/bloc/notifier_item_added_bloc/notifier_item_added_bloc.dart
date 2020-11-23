@@ -18,6 +18,7 @@ class NotifierItemAddedBloc
   @override
   Stream<NotifierItemAddedState> mapEventToState(
       NotifierItemAddedEvent event) async* {
+    final currencyBox = Hive.box(kSelectedCurrency);
     final lastItemAddedBox = Hive.box(kLastAddedItemOfAuthorizedUserKey);
 
     final firebaseService = FirebaseService();
@@ -52,7 +53,7 @@ class NotifierItemAddedBloc
           final addresses = await Geocoder.local
               .findAddressesFromCoordinates(Coordinates(lat, long));
           final address = addresses.first;
-
+          final currency = currencyBox.get("currency");
           final notificationChannelDetails =
               notification.AndroidNotificationDetails(
             "my_channel_id",
@@ -63,17 +64,31 @@ class NotifierItemAddedBloc
             enableVibration: true,
             fullScreenIntent: true,
             indeterminate: true,
+            styleInformation: notification.BigTextStyleInformation(
+                "$currency ${lastItem.amount} was ${lastItem.option} due to/for ${lastItem.title} at ${lastItem.dateInString} in\n${address.addressLine}",
+                htmlFormatBigText: true,
+                htmlFormatSummaryText: true,
+                htmlFormatContentTitle: true,
+                htmlFormatContent: true,
+                htmlFormatTitle: true,
+                contentTitle:
+                    "${lastItem.title} in ${address.subLocality}, ${address.locality}",
+                summaryText: "<h1> Added By ${document.data()['name']}</h1>"),
           );
 
           final platformNotification = notification.NotificationDetails(
-              android: notificationChannelDetails);
+            android: notificationChannelDetails,
+          );
           final plugin = FlutterLocalNotifier().plugin;
 
+          notification.BigTextStyleInformation("${lastItem.title}");
+
           plugin.show(
-              0,
-              "${lastItem.title} in ${address.subLocality}, ${address.locality}",
-              "Amt ${lastItem.amount} , Opt ${lastItem.option}: T: ${lastItem.dateInString}",
-              platformNotification);
+            0,
+            "",
+            "Amount ${lastItem.amount} ,  ${lastItem.option}, Time: ${lastItem.dateInString}",
+            platformNotification,
+          );
         } else {
           print("Item Already notified");
         }
