@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     as notification;
+import 'package:geocoder/geocoder.dart';
 import 'package:hive/hive.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
 import 'package:money_management/services/firebase_services/firebase_service.dart';
@@ -39,11 +40,19 @@ class NotifierItemAddedBloc
         List<int> mySortList = [];
         final itemData = documents.last.data();
         final lastItem = ListOfTilesModel.fromJSON(itemData);
+
         //Check Last Item
         if (lastItemAddedBox.get("lastItem") == null ||
             lastItemAddedBox.get("lastItem") != itemData['auto_increment']) {
           final lastItem = ListOfTilesModel.fromJSON(itemData);
           lastItemAddedBox.put("lastItem", itemData['auto_increment']);
+
+          final lat = lastItem.latitude;
+          final long = lastItem.longitude;
+          final addresses = await Geocoder.local
+              .findAddressesFromCoordinates(Coordinates(lat, long));
+          final address = addresses.first;
+
           final notificationChannelDetails =
               notification.AndroidNotificationDetails(
             "my_channel_id",
@@ -59,9 +68,10 @@ class NotifierItemAddedBloc
           final platformNotification = notification.NotificationDetails(
               android: notificationChannelDetails);
           final plugin = FlutterLocalNotifier().plugin;
+
           plugin.show(
               0,
-              "${lastItem.title} By ${document.data()['name']}",
+              "${lastItem.title} in ${address.subLocality}, ${address.locality}",
               "Amt ${lastItem.amount} , Opt ${lastItem.option}: T: ${lastItem.dateInString}",
               platformNotification);
         } else {

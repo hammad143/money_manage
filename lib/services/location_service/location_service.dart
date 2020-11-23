@@ -3,12 +3,11 @@ import 'package:location/location.dart' as locationManager;
 
 class LocationSerivce {
   Future<geoCoder.Address> locationAccess() async {
-    locationManager.PermissionStatus premissionStatus;
+    locationManager.PermissionStatus premissionStatus =
+        await locationManager.Location.instance.requestPermission();
     final hasPermission =
         await locationManager.Location.instance.hasPermission();
-    if (hasPermission.index == 0) {
-      premissionStatus =
-          await locationManager.Location.instance.requestPermission();
+    if (premissionStatus.index == 0) {
       final isLocationOn =
           await locationManager.Location.instance.requestService();
       if (isLocationOn) {
@@ -20,6 +19,7 @@ class LocationSerivce {
             .first;
         return address;
       }
+      return null;
     } else {
       print("Location Don't have permission");
       return null;

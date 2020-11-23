@@ -14,4 +14,9 @@ class LocationAccessedState extends LocationState {
   LocationAccessedState(this.location);
 }
 
-class LocationErrorState extends LocationState {}
+class LocationErrorState extends LocationState {
+  LocationErrorState();
+  @override
+  // TODO: implement props
+  List<Object> get props => [];
+}

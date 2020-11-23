@@ -22,6 +22,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
           lat: address.coordinates.latitude,
           long: address.coordinates.longitude);
       yield LocationAccessedState(locationModel);
-    }
+    } else
+      yield LocationErrorState();
   }
 }

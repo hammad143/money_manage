@@ -46,6 +46,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
   String currencyValue, currencyKey;
   final currencyBox = Hive.box(kSelectedCurrency);
   locationManager.PermissionStatus permisisonStatus;
+  LocationModel location;
 
   @override
   void initState() {
@@ -90,9 +91,30 @@ class _AddTaskFormState extends State<AddTaskForm> {
     return BlocBuilder<CheckFormSubmitBloc, CheckFormSubmitState>(
       builder: (ctx, formCheckstate) => Form(
         key: _formKey,
-        child:
-            BlocBuilder<LocationBloc, LocationState>(builder: (context, state) {
-          return Column(
+        child: BlocListener<LocationBloc, LocationState>(
+          listener: (context, state) {
+            print("Checking the ----STATE TYPE---- ${state.runtimeType}");
+            if (state is LocationAccessedState)
+              location = state.location;
+            else if (state is LocationErrorState) {
+              print("I'm the Location Alter dialig");
+              showDialog(
+                  context: context,
+                  builder: (ctx) {
+                    return AlertDialog(
+                      actions: [
+                        FlatButton(
+                          onPressed: () {},
+                          child: Text("Turn On Location"),
+                        ),
+                      ],
+                      content:
+                          Text("Location must be on", style: Style.textStyle3),
+                    );
+                  });
+            }
+          },
+          child: Column(
             children: <Widget>[
               //Title TextField
               TextFormField(
@@ -277,7 +299,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
               CustomAddAmountBtn(
                 onBtnPressed: () {
                   LocationModel location;
-                  if (state is LocationAccessedState) location = state.location;
+                  //if (state is LocationAccessedState) location = state.location;
                   setState(() {
                     if (isOptionSelected == null) isOptionSelected = false;
                     if (_formKey.currentState.validate() && isOptionSelected) {
@@ -336,8 +358,8 @@ class _AddTaskFormState extends State<AddTaskForm> {
                 },
               ),
             ],
-          );
-        }),
+          ),
+        ),
       ),
     );
   }
