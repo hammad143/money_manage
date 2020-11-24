@@ -21,6 +21,8 @@ import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_add
 import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_event.dart';
 import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_state.dart';
 import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize.dart';
+import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_bloc.dart';
+import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_event.dart';
 import 'package:money_management/viewmodel/components/scroll_notifier.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -40,6 +42,9 @@ class _TaskViewState extends State<TaskView> {
   final _googleIDBox = Hive.box(kGoogleUserId);
   final _key = GlobalKey<ScaffoldState>();
   MakeAuthorizeBloc makeAuthorbloc;
+  final isUserAuthroizedBox = Hive.box(kIsUserAuthroizedKey);
+  final authorizedUserKeyBox = Hive.box(kauthorizedUserKey);
+  NotifierItemAddedBloc notifierBloc;
 
   int index = 0;
   List<ListOfTilesModel> tileViewModel;
@@ -47,6 +52,7 @@ class _TaskViewState extends State<TaskView> {
   @override
   void initState() {
     super.initState();
+
     listScrollController.addListener(() {
       if (listScrollController.positions.isNotEmpty) {
         final scrollExtent = listScrollController.position.pixels;
@@ -63,7 +69,11 @@ class _TaskViewState extends State<TaskView> {
         print("Im the listner on scroll Outside of that");
       }
     });
-    print("Make Authorize Bloc ${makeAuthorbloc}");
+    final isUserAuthorized = isUserAuthroizedBox.get("authorized", defaultValue: false);
+    if(isUserAuthorized) {
+      final key = authorizedUserKeyBox.get("author_key");
+      notifierBloc.add(NotifierItemAddedEvent(key));
+    }
   }
 
   @override

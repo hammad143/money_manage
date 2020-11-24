@@ -25,6 +25,7 @@ import 'package:money_management/viewmodel/bloc/location_bloc/location_event.dar
 import 'package:money_management/viewmodel/bloc/location_bloc/location_state.dart';
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_bloc.dart';
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_state.dart';
+import 'package:money_management/viewmodel/components/static_value_store.dart';
 
 class AddTaskForm extends StatefulWidget {
   const AddTaskForm();
@@ -99,9 +100,12 @@ class _AddTaskFormState extends State<AddTaskForm> {
               locationState = state;
               location = state.location;
               print("This is the Location");
-              //Navigator.pop(context);
-              setState(() {});
-            } else
+              setState(() {
+                StaticValueStore.isLocationOn = true;
+                print("SetState is now called");
+              });
+            } else {
+              StaticValueStore.isLocationOn = false;
               showDialog(
                 context: context,
                 barrierDismissible: false,
@@ -132,6 +136,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
                   ),
                 ),
               );
+            }
           },
           child: Column(
             children: <Widget>[
@@ -311,16 +316,14 @@ class _AddTaskFormState extends State<AddTaskForm> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Your Location is : ${(locationState is LocationAccessedState) ? "On" : "Off"}",
+                    "Your Location is : ${StaticValueStore.isLocationOn ? "On" : "Off"}",
                     style: Style.textStyle3.copyWith(
                       color: Colors.black54,
                     ),
                   ),
                   Switch(
                       activeColor: const Color(0xff5e10c4),
-                      value: (locationState is LocationAccessedState)
-                          ? true
-                          : false,
+                      value: StaticValueStore.isLocationOn,
                       onChanged: (value) {})
                 ],
               ),

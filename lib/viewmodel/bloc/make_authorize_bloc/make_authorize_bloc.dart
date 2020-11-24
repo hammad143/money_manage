@@ -4,10 +4,11 @@ import 'package:money_management/services/firebase_services/firebase_service.dar
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize_event.dart';
 import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize_state.dart';
+import 'package:money_management/viewmodel/components/static_value_store.dart';
 
 class MakeAuthorizeBloc extends Bloc<MakeAuthorizeEvent, MakeAuthorizeState> {
   MakeAuthorizeBloc() : super(MakeAuthorizeInitState());
-
+  bool isAuthorized = false;
   @override
   Stream<MakeAuthorizeState> mapEventToState(MakeAuthorizeEvent event) async* {
     final String authorizeKey = event.authorizedKey;
@@ -25,9 +26,16 @@ class MakeAuthorizeBloc extends Bloc<MakeAuthorizeEvent, MakeAuthorizeState> {
       final snapshotOfItems = await collectionOfItems.get();
       final documentsLength = snapshotOfItems.docs.length;
       print("${documentsLength}");
-      yield MakeAuthorizeSuccessState(snapshot: null);
+      print(
+          "----------Authorized ${isAuthorized} ----------- ${document.data()['name']}  -----");
+
+      yield MakeAuthorizeSuccessState(displayName: document.data()['name']);
+
+      StaticValueStore.isAuthorized = true;
+      //yield MakeAlreadyAuthorizeState();
+
     } else {
-      print("Document Key not found");
+      yield MakeAuthorizeErrorState("Key doesn't exists");
     }
     //final snapshot = collectionOfItems.snapshots();
   }

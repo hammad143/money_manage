@@ -41,6 +41,7 @@ void main() async {
   await Hive.openBox(kUserDisplayname);
   await Hive.openBox(kauthorizedUserKey);
   await Hive.openBox(kSelectedCurrency);
+  await Hive.openBox(kIsUserAuthroizedKey);
   await Firebase.initializeApp();
 
   // Notification Init

@@ -29,6 +29,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
   final _keyTextController = TextEditingController();
   final userDisplayNameBox = Hive.box(kUserDisplayname);
   notification.FlutterLocalNotificationsPlugin plugin;
+  final isUserAuthroizedBox = Hive.box(kIsUserAuthroizedKey);
+  final authorizedUserKeyBox = Hive.box(kauthorizedUserKey);
+
 
   @override
   void initState() {
@@ -100,16 +103,36 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 title: "Authorized By"),*/
             BlocListener<MakeAuthorizeBloc, MakeAuthorizeState>(
               listener: (ctx, state) async {
-                print("I'm the listener");
+
                 if (state is MakeAuthorizeSuccessState) {
+                  print("I'm the listener on MakeAuthorizeSuccessState");
+                  //final notifierBloc = BlocProvider.of<NotifierItemAddedBloc>(ctx);
+                  //notifierBloc.add(NotifierItemAddedEvent(_keyTextController.text));
                   Navigator.pop(context);
+
+                  dialog(message: "You have successfully authorized ${state.displayName}, Whenever an item will be added by ${state.displayName}, You will get notified");
                   final bloc = BlocProvider.of<AuthorizedUsersBloc>(context);
                   final notifierBloc =
                       BlocProvider.of<NotifierItemAddedBloc>(context);
                   bloc.add(AuthorizedUsersEvent(_keyTextController.text));
+                  isUserAuthroizedBox.put("authorized", true);
+                  authorizedUserKeyBox.put("author_key", _keyTextController.text);
                   notifierBloc.add(NotifierItemAddedEvent(
                       _keyTextController.text,
                       flutterLocalNotificationPlugin: plugin));
+                } else if (state is MakeAuthorizeErrorState) {
+                  Navigator.pop(context);
+                  showDialog(
+                      context: context,
+                      builder: (ctx) {
+                        return AlertDialog(
+                          content:
+                              Text("${state.msg}", style: Style.textStyle3),
+                        );
+                      });
+                }else if(state is MakeAlreadyAuthorizeState) {
+                  Navigator.pop(context);
+                  dialog(message: "This user was already attached to the authorized list");
                 }
               },
               child: CustomListTileDrawer(
@@ -178,11 +201,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
           FlatButton(
             child: Text("Authorize"),
             onPressed: () async {
-              final authorizedUserKeyBox = Hive.box(kauthorizedUserKey);
-              final notifierBloc = BlocProvider.of<NotifierItemAddedBloc>(ctx);
-              authorizedUserKeyBox.put("author_key", _keyTextController.text);
+
               makeAuthorbloc.add(MakeAuthorizeEvent(_keyTextController.text));
-              notifierBloc.add(NotifierItemAddedEvent(_keyTextController.text));
             },
           ),
         ],
@@ -191,5 +211,24 @@ class _CustomDrawerState extends State<CustomDrawer> {
         ),
       ),
     );
+  }
+
+  void dialog({String message}) {
+    showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            actions: [
+              FlatButton(
+                  onPressed: () => Navigator.pop(ctx), child: Text("Close")),
+            ],
+            content: Container(
+              child: Text(message,
+                  style: Style.textStyle3.copyWith(
+                      color: Colors.black87,
+                      fontSize: Responsive.textScaleFactor * 4)),
+            ),
+          );
+        });
   }
 }

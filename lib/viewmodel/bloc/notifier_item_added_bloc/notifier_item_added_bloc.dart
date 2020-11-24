@@ -35,9 +35,7 @@ class NotifierItemAddedBloc
           document.reference.collection("items").orderBy('auto_increment');
       snapshot.snapshots().listen((event) async {
         print("I'm the listener on Stream when data is added");
-        print("check if my listner working");
         final documents = event.docs;
-        int greatestNumber = 0;
         List<int> mySortList = [];
         final itemData = documents.last.data();
         final lastItem = ListOfTilesModel.fromJSON(itemData);
@@ -92,7 +90,7 @@ class NotifierItemAddedBloc
         } else {
           print("Item Already notified");
         }
-      }); //Listener
+      }); //Lis
 
     }
   }

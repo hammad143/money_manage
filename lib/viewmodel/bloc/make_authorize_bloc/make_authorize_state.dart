@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 class MakeAuthorizeState extends Equatable {
@@ -8,10 +7,22 @@ class MakeAuthorizeState extends Equatable {
 
 class MakeAuthorizeInitState extends MakeAuthorizeState {}
 
-class MakeAuthorizeErrorState extends MakeAuthorizeState {}
+class MakeAuthorizeErrorState extends MakeAuthorizeState {
+  final String msg;
+
+  MakeAuthorizeErrorState(this.msg);
+
+  @override
+  // TODO: implement props
+  List<Object> get props => [msg];
+}
 
 class MakeAuthorizeSuccessState extends MakeAuthorizeState {
-  final Stream<QuerySnapshot> snapshot;
+  String displayName;
 
-  MakeAuthorizeSuccessState({this.snapshot});
+  MakeAuthorizeSuccessState({this.displayName});
+  @override
+  List<Object> get props => [displayName];
 }
+
+class MakeAlreadyAuthorizeState extends MakeAuthorizeState {}
