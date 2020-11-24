@@ -183,7 +183,9 @@ class _AddTaskFormState extends State<AddTaskForm> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final currency = currencyBox.get("currency");
-                      currencyValue = snapshot.data[currency]['symbol_native'];
+                      if (currency != null)
+                        currencyValue =
+                            snapshot.data[currency]['symbol_native'];
                     }
 
                     return DropdownButton(
