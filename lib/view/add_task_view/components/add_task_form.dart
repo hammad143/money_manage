@@ -47,7 +47,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
   final currencyBox = Hive.box(kSelectedCurrency);
   locationManager.PermissionStatus permisisonStatus;
   LocationModel location;
-  LocationState locationState;
+  LocationAccessedState locationState;
   LocationBloc locationBloc;
 
   @override
@@ -97,8 +97,10 @@ class _AddTaskFormState extends State<AddTaskForm> {
           listener: (context, state) {
             if (state is LocationAccessedState) {
               locationState = state;
-
-              Navigator.pop(context);
+              location = state.location;
+              print("This is the Location");
+              //Navigator.pop(context);
+              setState(() {});
             } else
               showDialog(
                 context: context,
@@ -134,9 +136,6 @@ class _AddTaskFormState extends State<AddTaskForm> {
           child: Column(
             children: <Widget>[
               //Title TextField
-              RaisedButton(
-                  onPressed: () {},
-                  child: Text("Access Location ${locationState.runtimeType}")),
               TextFormField(
                 focusNode: _titleFocusNode,
                 onFieldSubmitted: (value) {
@@ -310,14 +309,16 @@ class _AddTaskFormState extends State<AddTaskForm> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "I would like to share my location",
+                    "Your Location is : ${(locationState is LocationAccessedState) ? "On" : "Off"}",
                     style: Style.textStyle3.copyWith(
                       color: Colors.black54,
                     ),
                   ),
                   Switch(
                       activeColor: const Color(0xff5e10c4),
-                      value: true,
+                      value: (locationState is LocationAccessedState)
+                          ? true
+                          : false,
                       onChanged: (value) {})
                 ],
               ),
@@ -327,8 +328,8 @@ class _AddTaskFormState extends State<AddTaskForm> {
                 onBtnPressed: () {
                   print("Symbol Of currency ${currencyValue}");
                   if (locationState is LocationAccessedState)
-                    location =
-                        (locationState as LocationAccessedState).location;
+                    print("This is my Location ${locationState.location}");
+
                   setState(() {
                     if (isOptionSelected == null) isOptionSelected = false;
                     if (_formKey.currentState.validate() && isOptionSelected) {

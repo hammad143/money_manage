@@ -33,6 +33,7 @@ class _SyncViewState extends State<SyncView> {
     return BlocBuilder<AuthenticateUserBloc, AuthenticateUserState>(
         builder: (ctx, state) {
       if (state is UserLoggedInState) {
+        print("User has been logged in successfully");
         return TaskView();
       } else {
         return Scaffold(

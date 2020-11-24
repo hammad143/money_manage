@@ -8,6 +8,7 @@ import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/authorized_view/authorized_view.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
+import 'package:money_management/view/sync_view.dart';
 import 'package:money_management/view/tasks_view/components/custom_key_alert.dart';
 import 'package:money_management/view/tasks_view/components/custom_listile_drawer.dart';
 import 'package:money_management/view/tasks_view/components/key_insert_alert_box.dart';
@@ -122,17 +123,28 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             /*CustomListTileDrawer(
                 onTap: () {}, icon: Icon(Icons.person_search), title: "Hide"),*/
-            CustomListTileDrawer(
-                onTap: () async {
-                  final _authUserBloc = context.bloc<AuthenticateUserBloc>();
-                  _authUserBloc.add(AuthenticateUserSignOuttEvent());
-                  /*final route =
-                          MaterialPageRoute(builder: (ctx) => SyncView());
-                      Navigator.push(context, route);*/
-                  //setState(() {});
-                },
-                icon: Icon(Icons.login),
-                title: "Sign Out"),
+            BlocListener<AuthenticateUserBloc, AuthenticateUserState>(
+              listener: (context, state) {
+                if (state is UserNotLoggedInState) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (ctx) => SyncView()),
+                    (route) => false,
+                  );
+                }
+              },
+              child: CustomListTileDrawer(
+                  onTap: () async {
+                    final _authUserBloc = context.bloc<AuthenticateUserBloc>();
+                    _authUserBloc.add(AuthenticateUserSignOuttEvent());
+                    /*final route =
+                              MaterialPageRoute(builder: (ctx) => SyncView());
+                          Navigator.push(context, route);*/
+                    //setState(() {});
+                  },
+                  icon: Icon(Icons.login),
+                  title: "Sign Out"),
+            ),
             CustomListTileDrawer(
                 onTap: () async {
                   await SystemNavigator.pop(animated: true);
