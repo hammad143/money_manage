@@ -6,9 +6,7 @@ class LocationEvent extends Equatable {
 }
 
 class LocationErrorEvent extends LocationEvent {
-  final String msg;
-
-  LocationErrorEvent(this.msg);
+  LocationErrorEvent();
   @override
-  List<Object> get props => [msg];
+  List<Object> get props => [];
 }

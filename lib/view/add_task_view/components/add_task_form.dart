@@ -48,11 +48,12 @@ class _AddTaskFormState extends State<AddTaskForm> {
   locationManager.PermissionStatus permisisonStatus;
   LocationModel location;
   LocationState locationState;
+  LocationBloc locationBloc;
 
   @override
   void initState() {
     super.initState();
-    final locationBloc = BlocProvider.of<LocationBloc>(context);
+    locationBloc = BlocProvider.of<LocationBloc>(context);
     locationBloc.add(LocationEvent());
     _titleController = TextEditingController();
     _amountController = TextEditingController();
@@ -94,42 +95,41 @@ class _AddTaskFormState extends State<AddTaskForm> {
         key: _formKey,
         child: BlocListener<LocationBloc, LocationState>(
           listener: (context, state) {
-            locationState = state;
-            print("This is locationState ${state.runtimeType}");
-            if (state is LocationErrorState) {
-              final locationErrorBloc = BlocProvider.of<LocationBloc>(context);
-              locationErrorBloc.add(LocationEvent());
-              showDialog(
-                  context: context,
-                  builder: (ctx) {
-                    return AlertDialog(
-                      content: Center(
-                        child: Text("Location must be turned on"),
-                      ),
-                      actions: [
-                        FlatButton(
-                          onPressed: () {
-                            final locationErrorBloc =
-                                BlocProvider.of<LocationBloc>(context);
-                            locationErrorBloc.add(LocationEvent());
-                            Navigator.pop(context);
-                          },
-                          child: Text("Close"),
-                        ),
-                        FlatButton(
-                          onPressed: () {
-                            final locationErrorBloc =
-                                BlocProvider.of<LocationBloc>(context);
-                            locationErrorBloc.add(LocationEvent());
-                          },
-                          child: Text("Turn on"),
-                        )
-                      ],
-                    );
-                  });
-            }
+            if (state is LocationAccessedState) {
+              locationState = state;
 
-            //if(state is Location)
+              Navigator.pop(context);
+            } else
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                child: WillPopScope(
+                  onWillPop: () async {
+                    if (locationState is LocationAccessedState) {
+                      //Navigator.pop(context);
+                      return true;
+                    } else {
+                      locationBloc.add(LocationEvent());
+                      return false;
+                    }
+                  },
+                  child: AlertDialog(
+                    actions: [
+                      FlatButton(
+                        child: Text("Turn On"),
+                        onPressed: () {
+                          if (locationState is LocationAccessedState)
+                            Navigator.pop(context);
+                          else
+                            locationBloc.add(LocationEvent());
+                        },
+                      ),
+                    ],
+                    title: Text("Location Must Be Turned On",
+                        style: Style.textStyle3),
+                  ),
+                ),
+              );
           },
           child: Column(
             children: <Widget>[
