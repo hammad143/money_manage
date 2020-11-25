@@ -32,7 +32,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
   final isUserAuthroizedBox = Hive.box(kIsUserAuthroizedKey);
   final authorizedUserKeyBox = Hive.box(kauthorizedUserKey);
 
-
   @override
   void initState() {
     super.initState();
@@ -103,20 +102,23 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 title: "Authorized By"),*/
             BlocListener<MakeAuthorizeBloc, MakeAuthorizeState>(
               listener: (ctx, state) async {
-
                 if (state is MakeAuthorizeSuccessState) {
                   print("I'm the listener on MakeAuthorizeSuccessState");
                   //final notifierBloc = BlocProvider.of<NotifierItemAddedBloc>(ctx);
                   //notifierBloc.add(NotifierItemAddedEvent(_keyTextController.text));
                   Navigator.pop(context);
 
-                  dialog(message: "You have successfully authorized ${state.displayName}, Whenever an item will be added by ${state.displayName}, You will get notified");
+                  dialog(
+                      message:
+                          "You have successfully authorized ${state.displayName}, Whenever an item will be added by ${state.displayName}, You will get notified");
                   final bloc = BlocProvider.of<AuthorizedUsersBloc>(context);
                   final notifierBloc =
                       BlocProvider.of<NotifierItemAddedBloc>(context);
                   bloc.add(AuthorizedUsersEvent(_keyTextController.text));
                   isUserAuthroizedBox.put("authorized", true);
-                  authorizedUserKeyBox.put("author_key", _keyTextController.text);
+                  authorizedUserKeyBox.put(
+                      "author_key", _keyTextController.text);
+                  bloc.add(AuthorizedUsersEvent(_keyTextController.text));
                   notifierBloc.add(NotifierItemAddedEvent(
                       _keyTextController.text,
                       flutterLocalNotificationPlugin: plugin));
@@ -130,9 +132,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                               Text("${state.msg}", style: Style.textStyle3),
                         );
                       });
-                }else if(state is MakeAlreadyAuthorizeState) {
+                } else if (state is MakeAlreadyAuthorizeState) {
                   Navigator.pop(context);
-                  dialog(message: "This user was already attached to the authorized list");
+                  dialog(
+                      message:
+                          "This user was already attached to the authorized list");
                 }
               },
               child: CustomListTileDrawer(
@@ -201,7 +205,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
           FlatButton(
             child: Text("Authorize"),
             onPressed: () async {
-
               makeAuthorbloc.add(MakeAuthorizeEvent(_keyTextController.text));
             },
           ),

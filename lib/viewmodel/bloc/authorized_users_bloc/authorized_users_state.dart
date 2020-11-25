@@ -10,8 +10,9 @@ class AuthorizedUsersInitState extends AuthorizedUsersState {}
 
 class AuthorizedUsersSuccessState extends AuthorizedUsersState {
   final List<GoogleUserModel> data;
+  final int totalItems;
 
-  AuthorizedUsersSuccessState({this.data});
+  AuthorizedUsersSuccessState({this.data, this.totalItems});
 
   @override
   // TODO: implement props

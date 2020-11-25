@@ -57,7 +57,8 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
 
         storageBox.add(ListOfTilesModel.fromJSON(data));
         yield AddAmountInfoDone<ListOfTilesModel>(box: storageBox);
-      }
+      } else
+        yield AddAmountInfoError("Item has not been added");
     }
   }
 }

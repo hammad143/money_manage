@@ -2,10 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
-
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
@@ -15,6 +13,7 @@ import 'package:money_management/view/component/custom_drawer/custom_drawer.dart
 import 'package:money_management/view/responsive_setup_view.dart';
 import 'package:money_management/view/sync_view.dart';
 import 'package:money_management/view/tasks_view/components/custom_dismissible_tile.dart';
+import 'package:money_management/view/total_sum_view.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
 import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_bloc.dart';
@@ -24,7 +23,6 @@ import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authori
 import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_bloc.dart';
 import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_event.dart';
 import 'package:money_management/viewmodel/components/scroll_notifier.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class TaskView extends StatefulWidget {
   final GoogleSignIn signIn;
@@ -52,7 +50,7 @@ class _TaskViewState extends State<TaskView> {
   @override
   void initState() {
     super.initState();
-
+    notifierBloc = BlocProvider.of<NotifierItemAddedBloc>(context);
     listScrollController.addListener(() {
       if (listScrollController.positions.isNotEmpty) {
         final scrollExtent = listScrollController.position.pixels;
@@ -69,8 +67,9 @@ class _TaskViewState extends State<TaskView> {
         print("Im the listner on scroll Outside of that");
       }
     });
-    final isUserAuthorized = isUserAuthroizedBox.get("authorized", defaultValue: false);
-    if(isUserAuthorized) {
+    final isUserAuthorized =
+        isUserAuthroizedBox.get("authorized", defaultValue: false);
+    if (isUserAuthorized) {
       final key = authorizedUserKeyBox.get("author_key");
       notifierBloc.add(NotifierItemAddedEvent(key));
     }
@@ -151,10 +150,7 @@ class _TaskViewState extends State<TaskView> {
                               color: Colors.white),
                           onPressed: () async {
                             //Add Somethign here
-
-
-
-
+                            Navigator.push(context, MaterialPageRoute(builder: (ctx) => TotalSumView()));
                           }),
                     ),
                   ),

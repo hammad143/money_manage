@@ -21,3 +21,13 @@ class AddAmountInfoDone<T> extends AddAmountInfoState<T> {
   @override
   List<Object> get props => [box];
 }
+
+class AddAmountInfoError extends AddAmountInfoState<int> {
+  final String message;
+
+  AddAmountInfoError(this.message);
+
+  @override
+  // TODO: implement props
+  List<Object> get props => [message];
+}

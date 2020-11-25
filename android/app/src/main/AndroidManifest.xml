@@ -13,8 +13,8 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="money_management"
-        android:icon="@mipmap/app_icon">
+        android:label="Cash Track"
+        android:icon="@mipmap/cash_track">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

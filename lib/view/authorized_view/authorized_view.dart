@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
@@ -16,7 +14,7 @@ class AuthorizedView extends StatefulWidget {
 
 class _AuthorizedViewState extends State<AuthorizedView> {
   final authorizedUserKeyBox = Hive.box(kauthorizedUserKey);
-  final StreamController streamController = StreamController();
+
   AuthorizedUsersBloc bloc;
   String authorizeUserKey;
   @override
@@ -33,7 +31,6 @@ class _AuthorizedViewState extends State<AuthorizedView> {
 
   @override
   void dispose() {
-    streamController.close();
     super.dispose();
   }
 
@@ -73,6 +70,11 @@ class _AuthorizedViewState extends State<AuthorizedView> {
                                 style: Style.textStyle1),
                             subtitle: Text(listOfUsers[index].email,
                                 style: Style.textStyle2),
+                            trailing: Text(
+                              "Total Items\n${state.totalItems}",
+                              textAlign: TextAlign.center,
+                              style: Style.textStyle2,
+                            ),
                           ),
                         ),
                       );

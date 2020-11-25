@@ -35,6 +35,7 @@ class AuthorizedUsersBloc
       final authorizedItemCollection =
           currentUser.reference.collection("authorized_users");
       final model = GoogleUserModel.fromJson(document.data());
+      int totalItems;
       final authorizedDoc =
           await firebaseService.findDocumentFromCollectionByField(
               collectionReference: authorizedItemCollection,
@@ -50,6 +51,10 @@ class AuthorizedUsersBloc
           "appKey": model.appUserKey,
         });
       } else {
+        final itemCollection = await document.reference.collection("items");
+        final itemCollectionSnaps = await itemCollection.get();
+        totalItems = itemCollectionSnaps.docs.length - 1;
+        print("Check All the items ${itemCollection.path}");
         print("Document Exists of Authorized users");
       }
 
@@ -61,7 +66,7 @@ class AuthorizedUsersBloc
         if (data['id'] != null) list.add(GoogleUserModel.fromJson(data));
       });
       //ListOfAuthorizedUsersWidget(listOfAuthorizedUsers: list);
-      yield AuthorizedUsersSuccessState(data: list);
+      yield AuthorizedUsersSuccessState(data: list, totalItems: totalItems);
     } else
       throw AssertionError("UserID not included into database");
   }
