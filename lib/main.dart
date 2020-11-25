@@ -5,7 +5,9 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:money_management/model/google_user_model/google_user_model.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
+import 'package:money_management/util/boxes/box.dart';
 import 'package:money_management/util/constants/constants.dart';
+import 'package:money_management/util/keys/box_keys.dart';
 import 'package:money_management/util/notifier.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
 import 'package:money_management/view/sync_view.dart';
@@ -26,24 +28,8 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(ListTilesModelNewAdapter());
   Hive.registerAdapter(GoogleUserModelAdapter());
-  await Hive.openBox(kHiveBoxOnBoard);
-  await Hive.openBox(kHiveDataName);
-  await Hive.openBox(kgenerateKey);
-  await Hive.openBox<ListOfTilesModel>(storageKey);
-  await Hive.openBox<int>(counterKey);
-  await Hive.openBox<int>(kGooglerUserCounterKey);
-  await Hive.openBox<bool>(kGoogleAuthKey);
-  await Hive.openBox(kAutoIncrementKey);
-  await Hive.openBox(kNestedIncrementKey);
-  await Hive.openBox(kGoogleUserId);
-  await Hive.openBox<GoogleUserModelAdapter>(kGoogleUserKey);
-  await Hive.openBox(kLastAddedItemOfAuthorizedUserKey);
-  await Hive.openBox(kUserDisplayname);
-  await Hive.openBox(kauthorizedUserKey);
-  await Hive.openBox(kSelectedCurrency);
-  await Hive.openBox(kIsUserAuthroizedKey);
   await Firebase.initializeApp();
-
+  await Boxes().open();
   // Notification Init
   await FlutterLocalNotifier.init();
   //Run App
@@ -54,24 +40,7 @@ void main() async {
 * http://ip-api.com/json/192.142.202.177
 * */
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    //Hive.deleteFromDisk();
-
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -108,30 +77,13 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class MainScreen extends StatefulWidget {
-  @override
-  _MainScreenState createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  AuthenticateUserBloc _authUserbloc;
-  final authGoogleUserBox = Hive.box<bool>(kGoogleAuthKey);
-  @override
-  void initState() {
-    super.initState();
-    _authUserbloc = BlocProvider.of<AuthenticateUserBloc>(context);
-
-    //_authUserbloc.add(AuthenticateUserRequestEvent(GoogleSignIn()));
-  }
-
+class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Responsive.init(context);
 
-    if (authGoogleUserBox.get("isLoggedIn") != null) {
-      return TaskView();
-    } else {
-      return SyncView();
-    }
+    (Boxes.instance.authenticateUserBox.get(BoxKeys.IS_USER_LOGGED_IN) != null)
+        ? TaskView()
+        : SyncView();
   }
 }
