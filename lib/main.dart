@@ -7,7 +7,6 @@ import 'package:money_management/model/google_user_model/google_user_model.dart'
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
 import 'package:money_management/util/boxes/box.dart';
 import 'package:money_management/util/constants/constants.dart';
-import 'package:money_management/util/keys/box_keys.dart';
 import 'package:money_management/util/notifier.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
 import 'package:money_management/view/sync_view.dart';
@@ -29,8 +28,18 @@ void main() async {
   Hive.registerAdapter(ListTilesModelNewAdapter());
   Hive.registerAdapter(GoogleUserModelAdapter());
   await Firebase.initializeApp();
-  await Boxes().open();
+  await Boxes.open(IsUserAuthorizedBox());
+  await Boxes.open(SelectedCurrencyBox());
+  await Boxes.open(UserAuthorizedKeyBox());
+  await Boxes.open(UserDisplayNameBox());
+  await Boxes.open(LastAddedItemKeyBox());
+  await Boxes.open(StoreGoogleUserModelBox<GoogleUserModelAdapter>());
+  await Boxes.open(StoreListTileModelBox<ListOfTilesModel>());
+  await Boxes.open(AuthenticateUserBox<bool>());
+  await Boxes.open(StoreGoogleIDBox());
+  await Boxes.open(GenerateRandomKeyBox());
   // Notification Init
+
   await FlutterLocalNotifier.init();
   //Run App
   runApp(MyApp());
@@ -81,9 +90,10 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Responsive.init(context);
+    final isLoggedIn = AuthenticateUserBox<bool>()
+        .getBox()
+        .get(AuthenticateUserBox.IS_USER_LOGGED_IN, defaultValue: false);
 
-    (Boxes.instance.authenticateUserBox.get(BoxKeys.IS_USER_LOGGED_IN) != null)
-        ? TaskView()
-        : SyncView();
+    return isLoggedIn ? TaskView() : SyncView();
   }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:money_management/services/authenticate_user_service/google_auth_service.dart';
 import 'package:money_management/util/boxes/box.dart';
 import 'package:money_management/util/constants/style.dart';
-import 'package:money_management/util/keys/box_keys.dart';
 import 'package:money_management/view/tasks_view/tasks.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_bloc.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_user_bloc.dart';
@@ -30,10 +30,11 @@ class SyncView extends StatelessWidget {
                   RaisedButton(
                     color: const Color(0xfff25454),
                     onPressed: () {
-                      _authUserbloc.add(AuthenticateUserRequestEvent());
+                      _authUserbloc.add(
+                        AuthenticateUserRequestEvent(GoogleAuthSerivce())
+                      );
                     },
-                    child: Text("Synchronize with Google",
-                        style: Style.textStyle1),
+                    child: Text("Synchronize with Google", style: Style.textStyle1),
                   ),
                 ],
               ),
@@ -45,7 +46,8 @@ class SyncView extends StatelessWidget {
   }
 
   bool isUserLoggedIn() {
-    return Boxes.instance.authenticateUserBox
-        .get(BoxKeys.IS_USER_LOGGED_IN, defaultValue: false);
+    return AuthenticateUserBox<bool>()
+        .getBox()
+        .get(AuthenticateUserBox.IS_USER_LOGGED_IN, defaultValue: false);
   }
 }

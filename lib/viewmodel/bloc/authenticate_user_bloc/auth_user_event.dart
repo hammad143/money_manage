@@ -1,17 +1,15 @@
 import 'package:equatable/equatable.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:money_management/services/authenticate_user_service/authenticate_user_service.dart';
 
 class AuthenticateUserEvent extends Equatable {
-  final GoogleSignIn signIn;
-
-  AuthenticateUserEvent([this.signIn]);
+  AuthenticateUserEvent();
   @override
   List<Object> get props => [];
 }
 
 class AuthenticateUserRequestEvent extends AuthenticateUserEvent {
-  final GoogleSignIn signIn;
-  AuthenticateUserRequestEvent([this.signIn]) : super(signIn);
+  AuthenticateUser authentication;
+  AuthenticateUserRequestEvent(authentication) : super();
 }
 
 class AuthenticateUserSignOuttEvent extends AuthenticateUserEvent {}
