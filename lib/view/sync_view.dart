@@ -31,10 +31,10 @@ class SyncView extends StatelessWidget {
                     color: const Color(0xfff25454),
                     onPressed: () {
                       _authUserbloc.add(
-                        AuthenticateUserRequestEvent(GoogleAuthSerivce())
-                      );
+                          AuthenticateUserRequestEvent(GoogleAuthSerivce()));
                     },
-                    child: Text("Synchronize with Google", style: Style.textStyle1),
+                    child: Text("Synchronize with Google",
+                        style: Style.textStyle1),
                   ),
                 ],
               ),
