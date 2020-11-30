@@ -1,9 +1,14 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:money_management/model/google_user_model/google_user_model.dart';
+import 'package:money_management/services/authenticate_user_service/authenticate_user.dart';
 import 'package:money_management/services/authenticate_user_service/authenticate_user_service.dart';
+import 'package:money_management/services/authenticate_user_service/authenticateable.dart';
+import 'package:money_management/services/authenticate_user_service/google_auth_service.dart';
 import 'package:money_management/services/firebase_services/firebase_service.dart';
 import 'package:money_management/util/boxes/box.dart';
+import 'package:money_management/view/sync_view.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_user_event.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_user_state.dart';
 import 'package:uuid/uuid.dart';
@@ -11,30 +16,39 @@ import 'package:uuid/uuid.dart';
 class AuthenticateUserBloc
     extends Bloc<AuthenticateUserEvent, AuthenticateUserState> {
   final firebaseDB = FirebaseService();
-  AuthenticateUserSerivce userAuthenticate;
+
   AuthenticateUserBox<bool> localAuthenticationCheckBox =
       AuthenticateUserBox<bool>();
+
   GenerateRandomKeyBox generateRandomKeyBox = GenerateRandomKeyBox();
   UserDisplayNameBox userDisplayNameBox = UserDisplayNameBox();
   AutoIncrementIDBox autoIncIDbox = AutoIncrementIDBox();
   StoreGoogleIDBox storeGoogleIDBox = StoreGoogleIDBox();
+  GoogleAuthService _googleAuthService;
 //  GoogleSignIn googleSignIn = GoogleSignIn();
   //final OauthBox = Hive.box<bool>(kGoogleAuthKey);
   //final generateUniqueKeyBox = Hive.box(kgenerateKey);
   AuthenticateUserBloc() : super(UserNotLoggedInState());
 
   @override
-  Stream<AuthenticateUserState> mapEventToState(
-      AuthenticateUserEvent event) async* {
+  Stream<AuthenticateUserState> mapEventToState(event) async* {
     final isLoggedIn = localAuthenticationCheckBox
         .getBox()
         .get(AuthenticateUserBox.IS_USER_LOGGED_IN, defaultValue: false);
+
+    //Event is AuthenticateUserRequestEvent
     if (event is AuthenticateUserRequestEvent) {
       final numOfUsers = await firebaseDB.getNumberOfDocs("users");
-      userAuthenticate = AuthenticateUserSerivce(event.authentication);
-      final authenticatedUser =
-          (await userAuthenticate.authenticate()) ?? false;
-      print("My Authentication value: $authenticatedUser");
+
+      switch (event.authenticationType) {
+        case AuthenticationType.google:
+          _googleAuthService = await GoogleAuthService();
+          final authentication = _googleAuthService.authenticate();
+          break;
+        case AuthenticationType.facebook:
+          break;
+      }
+
 
       //final userLogIn = await googleSignIn.signIn();
       //final googleIdBox = Hive.box(kGoogleUserId);
@@ -43,18 +57,17 @@ class AuthenticateUserBloc
       //final counterBox = Hive.box<int>(counterKey);
       //final autoIncrementIDbox = Hive.box(kAutoIncrementKey);
 
-      if (isLoggedIn) {
+      /*  if (isLoggedIn) {
         if (authenticatedUser) {
-          userDisplayNameBox
-              .getBox()
-              .put(UserDisplayNameBox.DISPLAY_NAME, authenticatedUser);
+          userDisplayNameBox.getBox().put(
+              UserDisplayNameBox.DISPLAY_NAME, authenticatedUser.displayName);
           print("Adding user");
 
           final foundUser = await firebaseDB.findDocumentExistsByField(
               collectionName: "users",
               key1: "id",
               key2: "userID",
-              dataToMatch: {"userID": authenticatedUser});
+              dataToMatch: {"userID": authenticatedUser.id});
           if (foundUser != null) {
             final userIntoJSON = GoogleUserModel.fromJson(foundUser.data());
             generateRandomKeyBox
@@ -65,7 +78,7 @@ class AuthenticateUserBloc
             autoIncIDbox
                 .getBox()
                 .put(AutoIncrementIDBox.AUTO_INCREMENT, numOfUsers + 1);
-            await generateRandomKeyBox
+            generateRandomKeyBox
                 .getBox()
                 .put(GenerateRandomKeyBox.APP_KEY, key);
             print("Number of Users $numOfUsers");
@@ -83,12 +96,12 @@ class AuthenticateUserBloc
                 .collection("authorized_users")
                 .add({});
           }
-
           storeGoogleIDBox
               .getBox()
               .put(StoreGoogleIDBox.ID, authenticatedUser.id);
           localAuthenticationCheckBox
-            ..getBox().put(AuthenticateUserBox.IS_USER_LOGGED_IN, true);
+              .getBox()
+              .put(AuthenticateUserBox.IS_USER_LOGGED_IN, true);
           yield UserLoggedInState();
         }
       }
@@ -99,7 +112,16 @@ class AuthenticateUserBloc
           .delete(AuthenticateUserBox.IS_USER_LOGGED_IN);
       print("User Signout");
       yield UserNotLoggedInState();
-    }
-  } // mapEventToState
-
+    }*/
+    } // mapEventToState
+  }
 }
+/*
+* in SyncView we will pass a subtype of AuthenticateUser in BLOC
+* Event will  authentication of type AuthenticateUser
+* AuthenticateUser auth
+* if(authType equalTo AuthenticationType.google)
+*   event.authentication as GoogleAuthService assignTo auth;
+*   auth.authenticate
+*
+* */

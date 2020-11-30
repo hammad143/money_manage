@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:money_management/services/authenticate_user_service/authenticate_user_service.dart';
+import 'package:money_management/services/authenticate_user_service/authenticateable.dart';
 import 'package:money_management/services/authenticate_user_service/google_auth_service.dart';
 import 'package:money_management/util/boxes/box.dart';
 import 'package:money_management/util/constants/style.dart';
@@ -10,7 +12,7 @@ import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_user
 class SyncView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final _authUserbloc = BlocProvider.of<AuthenticateUserBloc>(context);
+    final  _authUserbloc = BlocProvider.of<AuthenticateUserBloc>(context);
 
     return BlocBuilder<AuthenticateUserBloc, AuthenticateUserState>(
         builder: (ctx, state) {
@@ -30,8 +32,8 @@ class SyncView extends StatelessWidget {
                   RaisedButton(
                     color: const Color(0xfff25454),
                     onPressed: () {
-                      _authUserbloc.add(
-                          AuthenticateUserRequestEvent(GoogleAuthSerivce()));
+                      _authUserbloc.add(AuthenticateUserRequestEvent(
+                          AuthenticationType.google));
                     },
                     child: Text("Synchronize with Google",
                         style: Style.textStyle1),
