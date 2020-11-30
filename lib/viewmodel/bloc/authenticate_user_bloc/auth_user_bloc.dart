@@ -1,17 +1,10 @@
 import 'package:bloc/bloc.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:money_management/model/google_user_model/google_user_model.dart';
-import 'package:money_management/services/authenticate_user_service/authenticate_user.dart';
 import 'package:money_management/services/authenticate_user_service/authenticate_user_service.dart';
-import 'package:money_management/services/authenticate_user_service/authenticateable.dart';
 import 'package:money_management/services/authenticate_user_service/google_auth_service.dart';
 import 'package:money_management/services/firebase_services/firebase_service.dart';
 import 'package:money_management/util/boxes/box.dart';
-import 'package:money_management/view/sync_view.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_user_event.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_user_state.dart';
-import 'package:uuid/uuid.dart';
 
 class AuthenticateUserBloc
     extends Bloc<AuthenticateUserEvent, AuthenticateUserState> {
@@ -48,7 +41,6 @@ class AuthenticateUserBloc
         case AuthenticationType.facebook:
           break;
       }
-
 
       //final userLogIn = await googleSignIn.signIn();
       //final googleIdBox = Hive.box(kGoogleUserId);

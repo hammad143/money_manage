@@ -1,6 +1,5 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:money_management/services/authenticate_user_service/authenticate_user.dart';
-import 'package:money_management/services/authenticate_user_service/authenticate_user_service.dart';
 
 class GoogleAuthService
     implements AuthenticateUser<Future<GoogleSignInAccount>> {

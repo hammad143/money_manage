@@ -1,5 +1,4 @@
 import 'package:money_management/services/authenticate_user_service/authenticate_user.dart';
-import 'package:money_management/services/authenticate_user_service/authenticateable.dart';
 
 class AuthenticateUserService<T> {
   //final AuthenticateAble authenticateAble;
@@ -9,15 +8,13 @@ class AuthenticateUserService<T> {
   AuthenticateUserService(this.authUser);
 
   Future<T> authenticate() async {
-     user = await authUser.authenticate();
+    user = await authUser.authenticate();
     return user;
   }
 
   signOut() {
     //authenticationService.signOut();
   }
-
-
 }
 
 enum AuthenticationType {

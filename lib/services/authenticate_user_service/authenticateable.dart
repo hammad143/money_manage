@@ -6,7 +6,8 @@ abstract class AuthenticateAble<T> {
   T checkType();
 }
 
-class GoogleServiceAuthAble implements AuthenticateAble<Future<GoogleSignInAccount>> {
+class GoogleServiceAuthAble
+    implements AuthenticateAble<Future<GoogleSignInAccount>> {
   @override
   Future<GoogleSignInAccount> type;
 
