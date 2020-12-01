@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:money_management/model/user_adding_model/google_user_adding_model.dart';
+import 'package:money_management/model/user_adding_model/user_adding_model.dart';
 import 'package:money_management/services/authenticate_user_service/authenticate_user.dart';
 import 'package:money_management/services/authenticate_user_service/authenticateable.dart';
 import 'package:money_management/services/authenticate_user_service/google_auth_service.dart';
@@ -11,15 +12,15 @@ import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_user
 class AuthenticateUserBloc
     extends Bloc<AuthenticateUserEvent, AuthenticateUserState> {
   final firebaseDB = FirebaseService();
-
   AuthenticateUserBox<bool> localAuthenticationCheckBox =
       AuthenticateUserBox<bool>();
 
   GenerateRandomKeyBox generateRandomKeyBox = GenerateRandomKeyBox();
   UserDisplayNameBox userDisplayNameBox = UserDisplayNameBox();
   AutoIncrementIDBox autoIncIDbox = AutoIncrementIDBox();
-  StoreGoogleIDBox storeGoogleIDBox = StoreGoogleIDBox();
-  GoogleAuthService _googleAuthService;
+  StoreUserIDBox storeUserIDBox = StoreUserIDBox();
+  UserAddingModel _userModel;
+  bool isUserLoggedIn = false;
 //  GoogleSignIn googleSignIn = GoogleSignIn();
   //final OauthBox = Hive.box<bool>(kGoogleAuthKey);
   //final generateUniqueKeyBox = Hive.box(kgenerateKey);
@@ -39,22 +40,38 @@ class AuthenticateUserBloc
       //authAble.
       switch (authAble.runtimeType) {
         case GoogleAuthService:
-          final googleAuth = (authAble as GoogleAuthService);
-          final user = await googleAuth.authenticate();
-          final googleService = GoogleFirebaseService();
-          final googleUser = GoogleUserAddingModel.toMap(user);
-          await googleService.addUser(googleUser);
+          final googleAuthentication = (authAble as GoogleAuthService);
+          final authenticatedUser = await googleAuthentication.authenticate();
+          print("Auth User ------- ${authenticatedUser.id} -----------------");
+          if (authenticatedUser != null) {
+            isUserLoggedIn = true;
+            _userModel = GoogleUserAddingModel.toMap(authenticatedUser);
+            final user = await GoogleFirebaseService().addUser(_userModel);
+            final userQuerySnap = await user.get();
+            _userModel = GoogleUserAddingModel.toJSON(userQuerySnap.data());
+            print(
+                "This is all my Data ${_userModel.uniqueKey}, ${_userModel.userID}, ${_userModel.name}");
+            generateRandomKeyBox
+                .getBox()
+                .put(GenerateRandomKeyBox.APP_KEY, _userModel.uniqueKey);
+          }
           break;
       }
 
-      //final userLogIn = await googleSignIn.signIn();
+      if (isUserLoggedIn) {
+        storeUserIDBox.getBox().put(StoreUserIDBox.ID, _userModel.userID);
+        userDisplayNameBox
+            .getBox()
+            .put(UserDisplayNameBox.DISPLAY_NAME, _userModel.name);
+        generateRandomKeyBox.getBox().get(GenerateRandomKeyBox.APP_KEY);
+      }
       //final googleIdBox = Hive.box(kGoogleUserId);
       //final isUserLoggedInBox = Hive.box<bool>(kGoogleAuthKey);
       //final userDisplayNameBox = Hive.box(kUserDisplayname);
       //final counterBox = Hive.box<int>(counterKey);
       //final autoIncrementIDbox = Hive.box(kAutoIncrementKey);
 
-      /*  if (isLoggedIn) {
+      /*  if (isUserLoggedIn) {
         if (authenticatedUser) {
           userDisplayNameBox.getBox().put(
               UserDisplayNameBox.DISPLAY_NAME, authenticatedUser.displayName);

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:firebase/firestore.dart';
 import 'package:money_management/model/user_adding_model/google_user_adding_model.dart';
 import 'package:money_management/model/user_adding_model/user_adding_model.dart';
+import 'package:uuid/uuid.dart';
 
 class FirebaseService {
   CollectionReference getCollectionIfExists(String collectionName) {
@@ -75,27 +76,29 @@ class FirebaseService {
   }
 }
 
-abstract class FBService {
+abstract class FBService<T> {
   final CollectionReference userCollection = null;
 
-  addUser<T>(UserAddingModel model);
+  T addUser(UserAddingModel model);
 
   deleteUser();
 
-  Future<UserAddingModel> findUser(UserAddingModel model);
+  T findUser(UserAddingModel model);
   List findUsers<T>();
 }
 
-class GoogleFirebaseService implements FBService {
+class GoogleFirebaseService implements FBService<Future<DocumentReference>> {
   @override
   CollectionReference get userCollection =>
       FirebaseFirestore.instance.collection("users");
   @override
-  addUser<T>(UserAddingModel model) async {
-    final userExistsModel = findUser(model);
-    DocumentReference documentReference;
-    if (userExistsModel == null) {
+  Future<DocumentReference> addUser(UserAddingModel model) async {
+    DocumentReference documentReference = null; //await findUser(model);
+    if (documentReference == null) {
+      model.uniqueKey = Uuid().v4();
       documentReference = await userCollection.add(model.mapped);
+      documentReference.collection("items").add({});
+      documentReference.collection("authorizedUsers").add({});
       return documentReference;
     } else
       print("User Exists already");
@@ -103,16 +106,16 @@ class GoogleFirebaseService implements FBService {
   }
 
   @override
-  Future<UserAddingModel> findUser(UserAddingModel model) async {
+  Future<DocumentReference> findUser(UserAddingModel model) async {
     final userJSON = GoogleUserAddingModel.toJSON(model.mapped);
     final snapshot = await userCollection.get();
-    bool userFound;
     try {
-      final u = snapshot.docs.firstWhere((element) {
+      final user = snapshot.docs.firstWhere((element) {
         final data = element.data();
-        return data['id'] == userJSON.id;
+        return data['id'] == userJSON.userID;
       });
-      return model;
+
+      return user.reference;
     } catch (error) {
       print("User was not found");
       return null;

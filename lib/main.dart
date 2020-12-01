@@ -36,7 +36,7 @@ void main() async {
   await Boxes.open(StoreGoogleUserModelBox<GoogleUserModelAdapter>());
   await Boxes.open(StoreListTileModelBox<ListOfTilesModel>());
   await Boxes.open(AuthenticateUserBox<bool>());
-  await Boxes.open(StoreGoogleIDBox());
+  await Boxes.open(StoreUserIDBox());
   await Boxes.open(GenerateRandomKeyBox());
   // Notification Init
 

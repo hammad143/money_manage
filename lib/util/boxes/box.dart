@@ -49,7 +49,7 @@ class AuthenticateUserBox<T> extends Boxes<T> {
   String key = kGoogleAuthKey;
 }
 
-class StoreGoogleIDBox<T> extends Boxes<T> {
+class StoreUserIDBox<T> extends Boxes<T> {
   static const ID = "userID";
   @override
   String key = kGoogleUserId;
