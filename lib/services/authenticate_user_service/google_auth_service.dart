@@ -6,14 +6,12 @@ class GoogleAuthService
   final GoogleSignIn _googleAuthentication = GoogleSignIn();
   @override
   Future<GoogleSignInAccount> authenticate() async {
-    final isLoggedIn = await _googleAuthentication.isSignedIn();
-    GoogleSignInAccount user;
-    if (isLoggedIn)
-      user = _googleAuthentication.currentUser;
-    else
-      user = await _googleAuthentication.signIn();
+    //final isSignedIn = await _googleAuthentication.isSignedIn();
+    final user = await _googleAuthentication.signIn();
     return user;
   }
+
+  Future<GoogleSignInAccount> _authenticate() async {}
 
   @override
   Future<bool> signOut() async {

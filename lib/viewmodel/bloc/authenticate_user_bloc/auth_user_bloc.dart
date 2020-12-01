@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
-import 'package:money_management/services/authenticate_user_service/authenticate_user_service.dart';
+import 'package:money_management/model/user_adding_model/google_user_adding_model.dart';
+import 'package:money_management/services/authenticate_user_service/authenticate_user.dart';
+import 'package:money_management/services/authenticate_user_service/authenticateable.dart';
 import 'package:money_management/services/authenticate_user_service/google_auth_service.dart';
 import 'package:money_management/services/firebase_services/firebase_service.dart';
 import 'package:money_management/util/boxes/box.dart';
@@ -32,13 +34,16 @@ class AuthenticateUserBloc
     //Event is AuthenticateUserRequestEvent
     if (event is AuthenticateUserRequestEvent) {
       final numOfUsers = await firebaseDB.getNumberOfDocs("users");
-
-      switch (event.authenticationType) {
-        case AuthenticationType.google:
-          _googleAuthService = await GoogleAuthService();
-          final authentication = _googleAuthService.authenticate();
-          break;
-        case AuthenticationType.facebook:
+      AuthenticateUser authAble =
+          AuthAble().checkType(event.authenticationType);
+      //authAble.
+      switch (authAble.runtimeType) {
+        case GoogleAuthService:
+          final googleAuth = (authAble as GoogleAuthService);
+          final user = await googleAuth.authenticate();
+          final googleService = GoogleFirebaseService();
+          final googleUser = GoogleUserAddingModel.toMap(user);
+          await googleService.addUser(googleUser);
           break;
       }
 

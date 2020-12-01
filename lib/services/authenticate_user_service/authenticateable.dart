@@ -1,19 +1,22 @@
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:money_management/services/authenticate_user_service/authenticate_user.dart';
+import 'package:money_management/services/authenticate_user_service/authenticate_user_service.dart';
 import 'package:money_management/services/authenticate_user_service/google_auth_service.dart';
 
-abstract class AuthenticateAble<T> {
-  T type;
-  T checkType();
+abstract class AuthenticateAble {
+  checkType(AuthenticationType type);
 }
 
-class GoogleServiceAuthAble
-    implements AuthenticateAble<Future<GoogleSignInAccount>> {
+class AuthAble implements AuthenticateAble {
   @override
-  Future<GoogleSignInAccount> type;
-
-  @override
-  Future<GoogleSignInAccount> checkType() async {
-    final auth = await GoogleAuthService().authenticate();
-    return auth;
+  AuthenticateUser checkType(AuthenticationType type) {
+    switch (type) {
+      case AuthenticationType.google:
+        return GoogleAuthService();
+        break;
+      case AuthenticationType.facebook:
+        break;
+    }
+    //final auth = await GoogleAuthService().authenticate();
+    //return auth;
   }
 }

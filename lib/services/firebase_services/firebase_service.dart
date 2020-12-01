@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:firebase/firestore.dart';
+import 'package:money_management/model/user_adding_model/google_user_adding_model.dart';
+import 'package:money_management/model/user_adding_model/user_adding_model.dart';
 
 class FirebaseService {
   CollectionReference getCollectionIfExists(String collectionName) {
@@ -69,5 +72,59 @@ class FirebaseService {
   Future<int> getNumberOfDocs(String collectionName) async {
     final querySnapshot = await getCollectionIfExists(collectionName).get();
     return querySnapshot.docs.length;
+  }
+}
+
+abstract class FBService {
+  final CollectionReference userCollection = null;
+
+  addUser<T>(UserAddingModel model);
+
+  deleteUser();
+
+  Future<UserAddingModel> findUser(UserAddingModel model);
+  List findUsers<T>();
+}
+
+class GoogleFirebaseService implements FBService {
+  @override
+  CollectionReference get userCollection =>
+      FirebaseFirestore.instance.collection("users");
+  @override
+  addUser<T>(UserAddingModel model) async {
+    final userExistsModel = findUser(model);
+    DocumentReference documentReference;
+    if (userExistsModel == null) {
+      documentReference = await userCollection.add(model.mapped);
+      return documentReference;
+    } else
+      print("User Exists already");
+    return documentReference;
+  }
+
+  @override
+  Future<UserAddingModel> findUser(UserAddingModel model) async {
+    final userJSON = GoogleUserAddingModel.toJSON(model.mapped);
+    final snapshot = await userCollection.get();
+    bool userFound;
+    try {
+      final u = snapshot.docs.firstWhere((element) {
+        final data = element.data();
+        return data['id'] == userJSON.id;
+      });
+      return model;
+    } catch (error) {
+      print("User was not found");
+      return null;
+    }
+  }
+
+  @override
+  deleteUser() {}
+
+  @override
+  List findUsers<T>() {
+    // TODO: implement findUsers
+    throw UnimplementedError();
   }
 }

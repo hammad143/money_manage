@@ -4,11 +4,10 @@ class AuthenticateUserService<T> {
   //final AuthenticateAble authenticateAble;
   //final AuthenticationType authType;
   final AuthenticateUser<T> authUser;
-  T user;
   AuthenticateUserService(this.authUser);
 
-  Future<T> authenticate() async {
-    user = await authUser.authenticate();
+  T authenticate() {
+    final user = authUser.authenticate();
     return user;
   }
 
