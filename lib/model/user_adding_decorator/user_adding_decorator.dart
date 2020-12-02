@@ -8,20 +8,24 @@ abstract class UserAddingDecorator implements UserAddingModel {
       : this._addingModel = addingModel;
 
   @override
-  Map<String, dynamic> toMap();
+  Map<String, dynamic> toMap() {
+    return _addingModel.toMap();
+  }
 }
 
-class UserMapUpdateDecorator implements UserAddingDecorator {
+class UserMapUpdateDecorator extends UserAddingDecorator {
   @override
   final UserAddingModel _addingModel;
   final int totalDocs;
 
   UserMapUpdateDecorator(UserAddingModel addingModel, this.totalDocs)
-      : this._addingModel = addingModel;
+      : this._addingModel = addingModel,
+        super(addingModel);
 
   @override
   Map<String, dynamic> toMap() {
-    final map = _addingModel.toMap();
+    final map = super.toMap();
+
     map.addAll({"uniqueKey": Uuid().v4(), "auto_inc_id": totalDocs});
     return map;
   }

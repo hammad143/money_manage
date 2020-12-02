@@ -93,6 +93,7 @@ class GoogleFirebaseService implements FBService<Future<DocumentReference>> {
   @override
   CollectionReference get userCollection =>
       FirebaseFirestore.instance.collection("users");
+
   @override
   Future<DocumentReference> addUser(UserAddingModel model) async {
     final totalUsers = await QueryFirebase(userCollection).totalUsers();
@@ -113,12 +114,11 @@ class GoogleFirebaseService implements FBService<Future<DocumentReference>> {
     final userJSON = GoogleUserAddingModel.toJSON(model.toMap());
     final snapshot = await userCollection.get();
     try {
-      final user = snapshot.docs.firstWhere((element) {
-        final data = element.data();
-        return data['id'] == userJSON.userID;
-      });
-
+      final user = snapshot.docs.firstWhere((element) =>
+        element.data()['id'] == userJSON.userID
+      );
       return user.reference;
+
     } catch (error) {
       print("User was not found");
       return null;
