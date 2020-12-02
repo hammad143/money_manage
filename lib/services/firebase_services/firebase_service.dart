@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:money_management/model/user_adding_decorator/user_adding_decorator.dart';
 //import 'package:firebase/firestore.dart';
 import 'package:money_management/model/user_adding_model/google_user_adding_model.dart';
 import 'package:money_management/model/user_adding_model/user_adding_model.dart';
-import 'package:uuid/uuid.dart';
 
 class FirebaseService {
   CollectionReference getCollectionIfExists(String collectionName) {
@@ -88,15 +88,18 @@ abstract class FBService<T> {
 }
 
 class GoogleFirebaseService implements FBService<Future<DocumentReference>> {
+  //QueryFirebase _queryFirebase;
+
   @override
   CollectionReference get userCollection =>
       FirebaseFirestore.instance.collection("users");
   @override
   Future<DocumentReference> addUser(UserAddingModel model) async {
-    DocumentReference documentReference = null; //await findUser(model);
+    final totalUsers = await QueryFirebase(userCollection).totalUsers();
+    DocumentReference documentReference = await findUser(model);
     if (documentReference == null) {
-      model.uniqueKey = Uuid().v4();
-      documentReference = await userCollection.add(model.mapped);
+      model = UserMapUpdateDecorator(model, totalUsers);
+      documentReference = await userCollection.add(model.toMap());
       documentReference.collection("items").add({});
       documentReference.collection("authorizedUsers").add({});
       return documentReference;
@@ -107,7 +110,7 @@ class GoogleFirebaseService implements FBService<Future<DocumentReference>> {
 
   @override
   Future<DocumentReference> findUser(UserAddingModel model) async {
-    final userJSON = GoogleUserAddingModel.toJSON(model.mapped);
+    final userJSON = GoogleUserAddingModel.toJSON(model.toMap());
     final snapshot = await userCollection.get();
     try {
       final user = snapshot.docs.firstWhere((element) {
@@ -126,8 +129,16 @@ class GoogleFirebaseService implements FBService<Future<DocumentReference>> {
   deleteUser() {}
 
   @override
-  List findUsers<T>() {
-    // TODO: implement findUsers
-    throw UnimplementedError();
+  List findUsers<T>() {}
+}
+
+class QueryFirebase {
+  final CollectionReference collection;
+
+  QueryFirebase(this.collection);
+
+  Future<int> totalUsers() async {
+    final snapshot = await collection.get();
+    return snapshot.docs.length + 1;
   }
 }

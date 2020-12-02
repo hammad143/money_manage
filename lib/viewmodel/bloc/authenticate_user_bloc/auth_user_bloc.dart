@@ -49,11 +49,6 @@ class AuthenticateUserBloc
             final user = await GoogleFirebaseService().addUser(_userModel);
             final userQuerySnap = await user.get();
             _userModel = GoogleUserAddingModel.toJSON(userQuerySnap.data());
-            print(
-                "This is all my Data ${_userModel.uniqueKey}, ${_userModel.userID}, ${_userModel.name}");
-            generateRandomKeyBox
-                .getBox()
-                .put(GenerateRandomKeyBox.APP_KEY, _userModel.uniqueKey);
           }
           break;
       }
@@ -63,7 +58,9 @@ class AuthenticateUserBloc
         userDisplayNameBox
             .getBox()
             .put(UserDisplayNameBox.DISPLAY_NAME, _userModel.name);
-        generateRandomKeyBox.getBox().get(GenerateRandomKeyBox.APP_KEY);
+        generateRandomKeyBox
+            .getBox()
+            .put(GenerateRandomKeyBox.APP_KEY, _userModel.uniqueKey);
       }
       //final googleIdBox = Hive.box(kGoogleUserId);
       //final isUserLoggedInBox = Hive.box<bool>(kGoogleAuthKey);
