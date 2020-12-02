@@ -114,11 +114,9 @@ class GoogleFirebaseService implements FBService<Future<DocumentReference>> {
     final userJSON = GoogleUserAddingModel.toJSON(model.toMap());
     final snapshot = await userCollection.get();
     try {
-      final user = snapshot.docs.firstWhere((element) =>
-        element.data()['id'] == userJSON.userID
-      );
+      final user = snapshot.docs
+          .firstWhere((element) => element.data()['id'] == userJSON.userID);
       return user.reference;
-
     } catch (error) {
       print("User was not found");
       return null;
