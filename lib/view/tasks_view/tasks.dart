@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
+import 'package:money_management/util/boxes_facade/boxes_facade.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/add_task_view/add_task_view.dart';
@@ -36,12 +37,12 @@ class _TaskViewState extends State<TaskView> {
   GlobalKey<ScaffoldState> _drawerKey = GlobalKey<ScaffoldState>();
   final _scrollController = ScrollController();
   final listScrollController = ScrollController();
-  final _authGoogleUserBox = Hive.box<bool>(kGoogleAuthKey);
+  //final _authGoogleUserBox = Hive.box<bool>(kGoogleAuthKey);
   final _googleIDBox = Hive.box(kGoogleUserId);
   final _key = GlobalKey<ScaffoldState>();
-
-  final isUserAuthroizedBox = Hive.box(kIsUserAuthroizedKey);
-  final authorizedUserKeyBox = Hive.box(kauthorizedUserKey);
+  final boxesFacade = BoxesFacade();
+  //final isUserAuthroizedBox = Hive.box(kIsUserAuthroizedKey);
+  //final authorizedUserKeyBox = Hive.box(kauthorizedUserKey);
   NotifierItemAddedBloc notifierBloc;
   MakeAuthorizeBloc makeAuthorbloc;
   int index = 0;
@@ -51,7 +52,7 @@ class _TaskViewState extends State<TaskView> {
   void initState() {
     super.initState();
     notifierBloc = BlocProvider.of<NotifierItemAddedBloc>(context);
-    listScrollController.addListener(() {
+   /* listScrollController.addListener(() {
       if (listScrollController.positions.isNotEmpty) {
         final scrollExtent = listScrollController.position.pixels;
         final maxScrollPosition = listScrollController.position.maxScrollExtent;
@@ -66,18 +67,16 @@ class _TaskViewState extends State<TaskView> {
         fetchBloc.add(FetchAddedItemsEvent());
         print("Im the listner on scroll Outside of that");
       }
-    });
-    final isUserAuthorized =
-        isUserAuthroizedBox.get("authorized", defaultValue: false);
-    if (isUserAuthorized) {
-      final key = authorizedUserKeyBox.get("author_key");
-      notifierBloc.add(NotifierItemAddedEvent(key));
-    }
+    });*/
+
+        final userAuthorizedBox = boxesFacade.getIsUserAuthorized();
+        final bool isUserLoggedIn = userAuthorizedBox.getBox().get(userAuthorizedBox.key, defaultValue: false);
   }
 
   @override
   void dispose() {
     listScrollController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -103,8 +102,8 @@ class _TaskViewState extends State<TaskView> {
   @override
   Widget build(BuildContext context) {
     Responsive.init(context);
-
-    if (_authGoogleUserBox.get("isLoggedIn") == null)
+    final localAuthenticaitonBox = boxesFacade.getLocalAuthenticationBox<bool>();
+    if (localAuthenticaitonBox.getBox().get(localAuthenticaitonBox.key) == null)
       return SyncView();
     else
       return Scaffold(
