@@ -30,5 +30,4 @@ class ItemAddingService implements FBService {
   @override
   // TODO: implement userCollection
   CollectionReference get userCollection => throw UnimplementedError();
- 
 }

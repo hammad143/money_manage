@@ -26,8 +26,7 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
           event.valueSelectedState.selectedValue != null &&
           event.currencyValue != null &&
           event.location != null) {
-
-       /* final title = event.title,
+        /* final title = event.title,
             amount = event.amount,
             option = event.valueSelectedState.selectedValue,
             date = event.dateInString,
