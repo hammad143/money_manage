@@ -2,11 +2,16 @@ import 'package:hive/hive.dart';
 import 'package:money_management/util/boxes/box.dart';
 
 class BoxesFacade {
-  String _localAuthKey, _isUserAuthorizedKey, _userKey;
+  String _localAuthKey,
+      _isUserAuthorizedKey,
+      _userKey,
+      _userUniqueKey,
+      _userDisplayNameKey,
+      _randomGenerateKey;
 
   Box<T> getLocalAuthenticationBox<T>() {
     Boxes<T> localAuthenticationCheckBox = AuthenticateUserBox<T>();
-    _localAuthKey = localAuthenticationCheckBox.key;
+    _localAuthKey = localAuthenticationCheckBox.valueKey;
 
     return localAuthenticationCheckBox.getBox();
   }
@@ -23,7 +28,28 @@ class BoxesFacade {
     return userAuthorizedKeyBox.getBox();
   }
 
+  Box<T> getUserUniqueKeyBox<T>() {
+    Boxes<T> box = StoreUserIDBox<T>();
+    _userUniqueKey = box.key;
+    return box.getBox();
+  }
+
+  Box<T> getUserDisplayName<T>() {
+    Boxes<T> displayNameBox = UserDisplayNameBox<T>();
+    _userDisplayNameKey = displayNameBox.key;
+    return displayNameBox.getBox();
+  }
+
+  Box<T> getRandomGenerateKeyBox<T>() {
+    Boxes<T> box = GenerateRandomKeyBox<T>();
+    _randomGenerateKey = box.key;
+    return box.getBox();
+  }
+
   get localAuthenticationKey => _localAuthKey;
   get isUserAuthorizedKey => _isUserAuthorizedKey;
   get userKey => _userKey;
+  get userUniqueKey => _userUniqueKey;
+  get userDisplayNameKey => _userDisplayNameKey;
+  get randomGenerateKey => _randomGenerateKey;
 }

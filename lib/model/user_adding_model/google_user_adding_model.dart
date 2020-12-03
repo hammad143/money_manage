@@ -1,4 +1,5 @@
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:money_management/model/user_adding_model/model.dart';
 import 'package:money_management/model/user_adding_model/user_adding_model.dart';
 
 class GoogleUserAddingModel implements UserAddingModel {
@@ -63,5 +64,19 @@ class GoogleUserAddingModel implements UserAddingModel {
       /*"auto_inc_id": auto_inc_id,
       "uniqueKey": this.uniqueKey,*/
     };
+  }
+
+  @override
+  T toJson<T extends Model>(Map<String, dynamic> json) {
+    try {
+      this.userID = json['id'];
+      this.email = json['email'];
+      this.name = json['name'];
+      this.photoUrl = json['photoUrl'];
+      return this as Model;
+    } catch (error) {
+      print("Type Casting Failed");
+      return null;
+    }
   }
 }

@@ -18,11 +18,9 @@ import 'package:money_management/view/total_sum_view.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
 import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_bloc.dart';
-import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_event.dart';
 import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_state.dart';
 import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize.dart';
 import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_bloc.dart';
-import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_event.dart';
 import 'package:money_management/viewmodel/components/scroll_notifier.dart';
 
 class TaskView extends StatefulWidget {
@@ -52,7 +50,7 @@ class _TaskViewState extends State<TaskView> {
   void initState() {
     super.initState();
     notifierBloc = BlocProvider.of<NotifierItemAddedBloc>(context);
-   /* listScrollController.addListener(() {
+    /* listScrollController.addListener(() {
       if (listScrollController.positions.isNotEmpty) {
         final scrollExtent = listScrollController.position.pixels;
         final maxScrollPosition = listScrollController.position.maxScrollExtent;
@@ -69,7 +67,9 @@ class _TaskViewState extends State<TaskView> {
       }
     });*/
 
-        final bool isUserLoggedIn = boxesFacade.getIsUserAuthorized<bool>().get(boxesFacade.isUserAuthorizedKey, defaultValue: false);
+    final bool isUserLoggedIn = boxesFacade
+        .getIsUserAuthorized()
+        .get(boxesFacade.isUserAuthorizedKey, defaultValue: false);
   }
 
   @override
@@ -102,7 +102,10 @@ class _TaskViewState extends State<TaskView> {
   Widget build(BuildContext context) {
     Responsive.init(context);
 
-    if (boxesFacade.getLocalAuthenticationBox<bool>().get(boxesFacade.localAuthenticationKey.key) == null)
+    if (boxesFacade
+            .getLocalAuthenticationBox<bool>()
+            .get(boxesFacade.localAuthenticationKey) ==
+        null)
       return SyncView();
     else
       return Scaffold(

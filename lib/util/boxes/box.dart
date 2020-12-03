@@ -2,6 +2,7 @@ import 'package:hive/hive.dart';
 import 'package:money_management/util/constants/constants.dart';
 
 abstract class Boxes<T> {
+  String valueKey;
   String key;
   T type;
   static void open<T>(Boxes<T> box) async {
@@ -12,63 +13,78 @@ abstract class Boxes<T> {
 }
 
 class IsUserAuthorizedBox<T> extends Boxes<T> {
+  static const String IS_AUTHORRIZED_KEY = "is authorized user";
   @override
-  String key = kIsUserAuthroizedKey;
+  String get valueKey => IS_AUTHORRIZED_KEY;
+  @override
+  String get key => kIsUserAuthroizedKey;
 }
 
 class SelectedCurrencyBox<T> extends Boxes<T> {
   @override
-  String key = kSelectedCurrency;
+  String get key => kSelectedCurrency;
 }
 
 class UserAuthorizedKeyBox<T> extends Boxes<T> {
+  static const String USER_AUTH_KEY = "user authorized";
   @override
-  String key = kauthorizedUserKey;
+  // TODO: implement valueKey
+  String get valueKey => USER_AUTH_KEY;
+  @override
+  String get key => kauthorizedUserKey;
 }
 
 class UserDisplayNameBox<T> extends Boxes<T> {
   static const DISPLAY_NAME = "displayName";
   @override
-  String key = kUserDisplayname;
+  String get valueKey => DISPLAY_NAME;
+  @override
+  String get key => kUserDisplayname;
 }
 
 class LastAddedItemKeyBox<T> extends Boxes<T> {
   @override
-  String key = kLastAddedItemOfAuthorizedUserKey;
+  String get key => kLastAddedItemOfAuthorizedUserKey;
 }
 
 class StoreGoogleUserModelBox<T> extends Boxes {
   @override
-  String key = kGoogleUserKey;
+  String get key => kGoogleUserKey;
 }
 
 class AuthenticateUserBox<T> extends Boxes<T> {
   static const IS_USER_LOGGED_IN = "isLoggedIn";
-
   @override
-  String key = kGoogleAuthKey;
+  String get valueKey => IS_USER_LOGGED_IN;
+  @override
+  String get key => kGoogleAuthKey;
 }
 
 class StoreUserIDBox<T> extends Boxes<T> {
   static const ID = "userID";
   @override
-  String key = kGoogleUserId;
+  String get valueKey => ID;
+  @override
+  String get key => kGoogleUserId;
 }
 
 class GenerateRandomKeyBox<T> extends Boxes<T> {
   static const APP_KEY = "appKey";
   @override
-  String key = kgenerateKey;
+  String valueKey = APP_KEY;
+  @override
+  String get key => kgenerateKey;
 }
 
 class StoreListTileModelBox<T> extends Boxes<T> {
   @override
-  String key = storageKey;
+  String get key => storageKey;
 }
 
 class AutoIncrementIDBox<T> extends Boxes<T> {
   static const AUTO_INCREMENT = "auto_increment";
-
   @override
-  String key = kAutoIncrementKey;
+  String get valueKey => AUTO_INCREMENT;
+  @override
+  String get key => kAutoIncrementKey;
 }

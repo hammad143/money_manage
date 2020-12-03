@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:money_management/model/google_user_model/google_user_model.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
 import 'package:money_management/util/boxes/box.dart';
+import 'package:money_management/util/boxes_facade/boxes_facade.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/notifier.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
@@ -90,10 +91,11 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Responsive.init(context);
-    final isLoggedIn = AuthenticateUserBox<bool>()
-        .getBox()
-        .get(AuthenticateUserBox.IS_USER_LOGGED_IN, defaultValue: false);
+    final boxFacade = BoxesFacade();
+    final isLoggedIn = boxFacade
+        .getLocalAuthenticationBox<bool>()
+        .get(boxFacade.localAuthenticationKey, defaultValue: false);
 
-    return isLoggedIn ? TaskView() : SyncView();
+    return isLoggedIn ?  SyncView() : TaskView() ;
   }
 }

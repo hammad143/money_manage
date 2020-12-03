@@ -6,6 +6,7 @@ import 'package:money_management/services/authenticate_user_service/authenticate
 import 'package:money_management/services/authenticate_user_service/google_auth_service.dart';
 import 'package:money_management/services/firebase_services/firebase_service.dart';
 import 'package:money_management/util/boxes/box.dart';
+import 'package:money_management/util/boxes_facade/boxes_facade.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_user_event.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_user_state.dart';
 
@@ -14,11 +15,7 @@ class AuthenticateUserBloc
   final firebaseDB = FirebaseService();
   AuthenticateUserBox<bool> localAuthenticationCheckBox =
       AuthenticateUserBox<bool>();
-
-  GenerateRandomKeyBox generateRandomKeyBox = GenerateRandomKeyBox();
-  UserDisplayNameBox userDisplayNameBox = UserDisplayNameBox();
-  AutoIncrementIDBox autoIncIDbox = AutoIncrementIDBox();
-  StoreUserIDBox storeUserIDBox = StoreUserIDBox();
+  final BoxesFacade _boxesFacade = BoxesFacade();
   UserAddingModel _userModel;
   bool isUserLoggedIn = false;
 //  GoogleSignIn googleSignIn = GoogleSignIn();
@@ -46,7 +43,7 @@ class AuthenticateUserBloc
           if (authenticatedUser != null) {
             isUserLoggedIn = true;
             _userModel = GoogleUserAddingModel.toMap(authenticatedUser);
-            final user = await GoogleFirebaseService().addUser(_userModel);
+            final user = await GoogleFirebaseService().addDoc(_userModel);
             final userQuerySnap = await user.get();
             _userModel = GoogleUserAddingModel.toJSON(userQuerySnap.data());
           }
@@ -54,16 +51,22 @@ class AuthenticateUserBloc
       }
 
       if (isUserLoggedIn) {
-        storeUserIDBox.getBox().put(StoreUserIDBox.ID, _userModel.userID);
-        localAuthenticationCheckBox
-            .getBox()
-            .put(AuthenticateUserBox.IS_USER_LOGGED_IN, isUserLoggedIn);
-        userDisplayNameBox
-            .getBox()
-            .put(UserDisplayNameBox.DISPLAY_NAME, _userModel.name);
-        generateRandomKeyBox
-            .getBox()
-            .put(GenerateRandomKeyBox.APP_KEY, _userModel.uniqueKey);
+        _boxesFacade
+            .getUserUniqueKeyBox()
+            .put(_boxesFacade.userUniqueKey, _userModel.userID);
+        _boxesFacade
+            .getLocalAuthenticationBox<bool>()
+            .put(_boxesFacade.localAuthenticationKey, isUserLoggedIn);
+        _boxesFacade
+            .getUserDisplayName()
+            .put(_boxesFacade.userDisplayNameKey, _userModel.name);
+        _boxesFacade
+            .getRandomGenerateKeyBox()
+            .put(_boxesFacade.randomGenerateKey, _userModel.uniqueKey);
+        //storeUserIDBox.getBox().put(StoreUserIDBox.ID, _userModel.userID);
+        //localAuthenticationCheckBox .getBox() .put(AuthenticateUserBox.IS_USER_LOGGED_IN, isUserLoggedIn);
+        //userDisplayNameBox .getBox() .put(UserDisplayNameBox.DISPLAY_NAME, _userModel.name);
+        //generateRandomKeyBox .getBox() .put(GenerateRandomKeyBox.APP_KEY, _userModel.uniqueKey);
         print("####### User Logged In #########");
         yield UserLoggedInState();
       } else {

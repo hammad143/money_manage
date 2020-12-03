@@ -1,12 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:money_management/jose/firebase_services/firebase_service.dart';
-import 'package:money_management/model/user_adding_model/user_adding_model.dart';
+import 'package:money_management/model/user_adding_model/model.dart';
+import 'package:money_management/services/firebase_services/firebase_service.dart';
+import 'package:money_management/util/boxes_facade/boxes_facade.dart';
 
 class ItemAddingService implements FBService {
+  BoxesFacade boxesFacade = BoxesFacade();
+
   @override
-  addDoc(UserAddingModel model) {
-    // TODO: implement addDoc
-    throw UnimplementedError();
+  addDoc(Model model) async {
+    //final itemModel = model as ItemsAddingModel;
+    final map = model.toMap();
+    print("|||||||||||| ${model.toMap()} |||||||||||||||");
+    final snap = await collection.get();
+    final uniqueIdBox = boxesFacade.getUserUniqueKeyBox();
+
+    try {
+      final user = snap.docs.firstWhere((element) {
+        final data = element.data();
+        final id = uniqueIdBox.get(boxesFacade.userUniqueKey);
+        return id == data['id'];
+      });
+      user.reference.collection("items").add(model.toMap());
+    } catch (error) {
+      print("User was not added");
+      return null;
+    }
   }
 
   @override
@@ -16,10 +34,7 @@ class ItemAddingService implements FBService {
   }
 
   @override
-  findDoc(UserAddingModel model) {
-    // TODO: implement findDoc
-    throw UnimplementedError();
-  }
+  findDoc(Model model) {}
 
   @override
   List findDocs<T>() {
@@ -28,6 +43,6 @@ class ItemAddingService implements FBService {
   }
 
   @override
-  // TODO: implement userCollection
-  CollectionReference get userCollection => throw UnimplementedError();
+  CollectionReference get collection =>
+      FirebaseFirestore.instance.collection("users");
 }

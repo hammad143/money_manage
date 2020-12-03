@@ -1,3 +1,4 @@
+import 'package:money_management/model/user_adding_model/model.dart';
 import 'package:money_management/model/user_adding_model/user_adding_model.dart';
 import 'package:uuid/uuid.dart';
 
@@ -29,6 +30,9 @@ class UserMapUpdateDecorator extends UserAddingDecorator {
     map.addAll({"uniqueKey": Uuid().v4(), "auto_inc_id": totalDocs});
     return map;
   }
+
+  @override
+  T toJson<T extends Model>(Map<String, dynamic> map) {}
 
   @override
   String name;

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_facebook_login/flutter_facebook_login.dart' as facebook;
 import 'package:money_management/services/authenticate_user_service/authenticate_user_service.dart';
 import 'package:money_management/util/boxes/box.dart';
 import 'package:money_management/util/responsive_and_text_pkg.dart';
 import 'package:money_management/view/tasks_view/tasks.dart';
+import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
+import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_event.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_bloc.dart';
 
 class SyncView extends StatelessWidget {
@@ -58,18 +59,10 @@ class SyncView extends StatelessWidget {
                       child: RaisedButton(
                         color: const Color(0xff3b569d),
                         onPressed: () async {
-                          final x = [
-                            'user_birthday',
-                            'email',
-                            'user_friends',
-                            'user_gender',
-                            'user_link',
-                            'user_photos',
-                            'user_posts',
-                          ];
-                          final facebookLogin = facebook.FacebookLogin();
-                          final z = await facebookLogin.logIn(x);
-                          print("z ${z.accessToken} ${z.accessToken}");
+                          BlocProvider.of<AddAmountInfoBloc>(context).add(
+                            AddAmountInfoEvent("Mason Brian", "200",
+                                "20/20/2020", null, "\$200", null),
+                          );
                         },
                         child: Container(
                           height: Responsive.widgetScaleFactor * 8,

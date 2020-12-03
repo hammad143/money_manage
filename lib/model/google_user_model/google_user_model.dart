@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:money_management/model/model.dart';
+import 'package:money_management/model/user_adding_model/model.dart';
 
 part 'google_user_model.g.dart';
 
@@ -26,10 +26,9 @@ class GoogleUserModel extends Model {
       this.displayName,
       this.photoUrl,
       this.id,
-      this.appUserKey})
-      : super(fields);
+      this.appUserKey});
 
-  GoogleUserModel.fromJson(this.fields) : super(fields) {
+  GoogleUserModel.fromJson(this.fields) {
     this.id = BigInt.parse(fields['id']);
     this.email = fields['email'];
     this.photoUrl = fields['photoUrl'];
@@ -42,4 +41,10 @@ class GoogleUserModel extends Model {
   String toString() {
     return "$displayName $email $photoUrl $appUserKey";
   }
+
+  @override
+  Map<String, dynamic> toMap() {}
+
+  @override
+  T toJson<T extends Model>(Map<String, dynamic> map) {}
 }

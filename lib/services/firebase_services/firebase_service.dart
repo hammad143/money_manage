@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:money_management/model/user_adding_decorator/user_adding_decorator.dart';
 //import 'package:firebase/firestore.dart';
 import 'package:money_management/model/user_adding_model/google_user_adding_model.dart';
+import 'package:money_management/model/user_adding_model/model.dart';
 import 'package:money_management/model/user_adding_model/user_adding_model.dart';
 
 class FirebaseService {
@@ -77,30 +78,31 @@ class FirebaseService {
 }
 
 abstract class FBService<T> {
-  final CollectionReference userCollection = null;
+  final CollectionReference collection = null;
 
-  T addUser(UserAddingModel model);
+  T addDoc(Model model);
 
-  deleteUser();
+  deleteDoc();
 
-  T findUser(UserAddingModel model);
-  List findUsers<T>();
+  T findDoc(UserAddingModel model);
+  List findDocs<T>();
 }
 
 class GoogleFirebaseService implements FBService<Future<DocumentReference>> {
   //QueryFirebase _queryFirebase;
 
   @override
-  CollectionReference get userCollection =>
+  CollectionReference get collection =>
       FirebaseFirestore.instance.collection("users");
 
   @override
-  Future<DocumentReference> addUser(UserAddingModel model) async {
-    final totalUsers = await QueryFirebase(userCollection).totalUsers();
-    DocumentReference documentReference = await findUser(model);
+  Future<DocumentReference> addDoc(Model userModel) async {
+    UserAddingModel model = (userModel as UserAddingModel);
+    final totalUsers = await QueryFirebase(collection).totalUsers();
+    DocumentReference documentReference = await findDoc(model);
     if (documentReference == null) {
       model = UserMapUpdateDecorator(model, totalUsers);
-      documentReference = await userCollection.add(model.toMap());
+      documentReference = await collection.add(model.toMap());
       documentReference.collection("items").add({});
       documentReference.collection("authorizedUsers").add({});
       return documentReference;
@@ -110,9 +112,9 @@ class GoogleFirebaseService implements FBService<Future<DocumentReference>> {
   }
 
   @override
-  Future<DocumentReference> findUser(UserAddingModel model) async {
+  Future<DocumentReference> findDoc(UserAddingModel model) async {
     final userJSON = GoogleUserAddingModel.toJSON(model.toMap());
-    final snapshot = await userCollection.get();
+    final snapshot = await collection.get();
     try {
       final user = snapshot.docs
           .firstWhere((element) => element.data()['id'] == userJSON.userID);
@@ -124,10 +126,10 @@ class GoogleFirebaseService implements FBService<Future<DocumentReference>> {
   }
 
   @override
-  deleteUser() {}
+  deleteDoc() {}
 
   @override
-  List findUsers<T>() {}
+  List findDocs<T>() {}
 }
 
 class QueryFirebase {
