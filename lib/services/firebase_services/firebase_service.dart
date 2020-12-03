@@ -105,8 +105,8 @@ class GoogleFirebaseService implements FBService<Future<DocumentReference>> {
       documentReference.collection("authorizedUsers").add({});
       return documentReference;
     } else
-      print("User Exists already");
-    return documentReference;
+      //print("User Exists already");
+      return documentReference;
   }
 
   @override
@@ -118,7 +118,7 @@ class GoogleFirebaseService implements FBService<Future<DocumentReference>> {
           .firstWhere((element) => element.data()['id'] == userJSON.userID);
       return user.reference;
     } catch (error) {
-      print("User was not found");
+      //print("User was not found");
       return null;
     }
   }

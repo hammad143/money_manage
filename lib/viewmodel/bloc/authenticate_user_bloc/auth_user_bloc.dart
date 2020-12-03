@@ -55,12 +55,19 @@ class AuthenticateUserBloc
 
       if (isUserLoggedIn) {
         storeUserIDBox.getBox().put(StoreUserIDBox.ID, _userModel.userID);
+        localAuthenticationCheckBox
+            .getBox()
+            .put(AuthenticateUserBox.IS_USER_LOGGED_IN, isUserLoggedIn);
         userDisplayNameBox
             .getBox()
             .put(UserDisplayNameBox.DISPLAY_NAME, _userModel.name);
         generateRandomKeyBox
             .getBox()
             .put(GenerateRandomKeyBox.APP_KEY, _userModel.uniqueKey);
+        print("####### User Logged In #########");
+        yield UserLoggedInState();
+      } else {
+        print("####### User is not logged In #########");
       }
       //final googleIdBox = Hive.box(kGoogleUserId);
       //final isUserLoggedInBox = Hive.box<bool>(kGoogleAuthKey);

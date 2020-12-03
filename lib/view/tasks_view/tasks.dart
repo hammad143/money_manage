@@ -39,11 +39,11 @@ class _TaskViewState extends State<TaskView> {
   final _authGoogleUserBox = Hive.box<bool>(kGoogleAuthKey);
   final _googleIDBox = Hive.box(kGoogleUserId);
   final _key = GlobalKey<ScaffoldState>();
-  MakeAuthorizeBloc makeAuthorbloc;
+
   final isUserAuthroizedBox = Hive.box(kIsUserAuthroizedKey);
   final authorizedUserKeyBox = Hive.box(kauthorizedUserKey);
   NotifierItemAddedBloc notifierBloc;
-
+  MakeAuthorizeBloc makeAuthorbloc;
   int index = 0;
   List<ListOfTilesModel> tileViewModel;
 
@@ -150,7 +150,10 @@ class _TaskViewState extends State<TaskView> {
                               color: Colors.white),
                           onPressed: () async {
                             //Add Somethign here
-                            Navigator.push(context, MaterialPageRoute(builder: (ctx) => TotalSumView()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (ctx) => TotalSumView()));
                           }),
                     ),
                   ),
