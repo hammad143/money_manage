@@ -69,8 +69,7 @@ class _TaskViewState extends State<TaskView> {
       }
     });*/
 
-        final userAuthorizedBox = boxesFacade.getIsUserAuthorized();
-        final bool isUserLoggedIn = userAuthorizedBox.getBox().get(userAuthorizedBox.key, defaultValue: false);
+        final bool isUserLoggedIn = boxesFacade.getIsUserAuthorized<bool>().get(boxesFacade.isUserAuthorizedKey, defaultValue: false);
   }
 
   @override
@@ -102,8 +101,8 @@ class _TaskViewState extends State<TaskView> {
   @override
   Widget build(BuildContext context) {
     Responsive.init(context);
-    final localAuthenticaitonBox = boxesFacade.getLocalAuthenticationBox<bool>();
-    if (localAuthenticaitonBox.getBox().get(localAuthenticaitonBox.key) == null)
+
+    if (boxesFacade.getLocalAuthenticationBox<bool>().get(boxesFacade.localAuthenticationKey.key) == null)
       return SyncView();
     else
       return Scaffold(

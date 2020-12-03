@@ -26,7 +26,8 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
           event.valueSelectedState.selectedValue != null &&
           event.currencyValue != null &&
           event.location != null) {
-        final title = event.title,
+
+       /* final title = event.title,
             amount = event.amount,
             option = event.valueSelectedState.selectedValue,
             date = event.dateInString,
@@ -55,7 +56,7 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
         });
         final data = (await itemAddedDocument.get()).data();
 
-        storageBox.add(ListOfTilesModel.fromJSON(data));
+        storageBox.add(ListOfTilesModel.fromJSON(data));*/
         yield AddAmountInfoDone<ListOfTilesModel>(box: storageBox);
       } else
         yield AddAmountInfoError("Item has not been added");

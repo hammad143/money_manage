@@ -1,25 +1,26 @@
+import 'package:hive/hive.dart';
 import 'package:money_management/util/boxes/box.dart';
 
 class BoxesFacade {
   String _localAuthKey, _isUserAuthorizedKey, _userKey;
 
-  Boxes<T> getLocalAuthenticationBox<T>() {
+  Box<T> getLocalAuthenticationBox<T>() {
     Boxes<T> localAuthenticationCheckBox = AuthenticateUserBox<T>();
     _localAuthKey = localAuthenticationCheckBox.key;
 
-    return localAuthenticationCheckBox;
+    return localAuthenticationCheckBox.getBox();
   }
 
-  Boxes<T> getIsUserAuthorized<T>() {
+  Box<T> getIsUserAuthorized<T>() {
     Boxes<T> isUserAuthorizedBox = IsUserAuthorizedBox<T>();
     _isUserAuthorizedKey = isUserAuthorizedBox.key;
-    return isUserAuthorizedBox;
+    return isUserAuthorizedBox.getBox();
   }
 
-  Boxes<T> getUserAuthorizedKeyBox<T>() {
+  Box<T> getUserAuthorizedKeyBox<T>() {
     Boxes<T> userAuthorizedKeyBox = UserAuthorizedKeyBox<T>();
     _userKey = userAuthorizedKeyBox.key;
-    return userAuthorizedKeyBox;
+    return userAuthorizedKeyBox.getBox();
   }
 
   get localAuthenticationKey => _localAuthKey;
