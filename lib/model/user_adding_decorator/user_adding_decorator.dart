@@ -1,27 +1,25 @@
 import 'package:money_management/model/user_adding_model/model.dart';
-import 'package:money_management/model/user_adding_model/user_adding_model.dart';
 import 'package:uuid/uuid.dart';
 
-abstract class UserAddingDecorator implements UserAddingModel {
-  final UserAddingModel _addingModel;
+abstract class DocAddingDecorator implements Model {
+  final Model _model;
 
-  UserAddingDecorator(UserAddingModel addingModel)
-      : this._addingModel = addingModel;
+  DocAddingDecorator(Model model) : this._model = model;
 
   @override
   Map<String, dynamic> toMap() {
-    return _addingModel.toMap();
+    return _model.toMap();
   }
 }
 
-class UserMapUpdateDecorator extends UserAddingDecorator {
+class UserMapUpdateDecorator extends DocAddingDecorator {
   @override
-  final UserAddingModel _addingModel;
+  final Model _model;
   final int totalDocs;
 
-  UserMapUpdateDecorator(UserAddingModel addingModel, this.totalDocs)
-      : this._addingModel = addingModel,
-        super(addingModel);
+  UserMapUpdateDecorator(Model model, this.totalDocs)
+      : this._model = model,
+        super(model);
 
   @override
   Map<String, dynamic> toMap() {
@@ -34,12 +32,29 @@ class UserMapUpdateDecorator extends UserAddingDecorator {
   @override
   T toJson<T extends Model>(Map<String, dynamic> map) {}
 
-  @override
+/*  @override
   String name;
 
   @override
   String uniqueKey;
 
   @override
-  String userID;
+  String userID;*/
+}
+
+class ItemAddingDecorator extends DocAddingDecorator {
+  final int _totalDocs;
+  ItemAddingDecorator(Model model, int totalDocs)
+      : this._totalDocs = totalDocs,
+        super(model);
+
+  @override
+  Map<String, dynamic> toMap() {
+    final map = super.toMap();
+    map.addAll({"auto_inc_item": _totalDocs});
+    return map;
+  }
+
+  @override
+  T toJson<T extends Model>(Map<String, dynamic> map) {}
 }

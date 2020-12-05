@@ -1,33 +1,27 @@
 import 'package:equatable/equatable.dart';
-import 'package:hive/hive.dart';
+import 'package:money_management/model/tiles_item_model/item_model.dart';
 
-class AddAmountInfoState<T> extends Equatable {
-  final Box<T> box;
-
-  AddAmountInfoState({this.box});
+class AddAmountInfoState extends Equatable {
+  AddAmountInfoState();
   @override
   List<Object> get props => [];
 }
 
-class AddAmountInfoInitialState<T> extends AddAmountInfoState<T> {
-  final Box<T> box;
-  AddAmountInfoInitialState({this.box}) : super(box: box);
-}
+class AddAmountInfoInitialState extends AddAmountInfoState {}
 
-class AddAmountInfoDone<T> extends AddAmountInfoState<T> {
-  final Box<T> box;
+class AddAmountInfoDone<T> extends AddAmountInfoState {
+  final ItemsAddingModel model;
 
-  AddAmountInfoDone({this.box});
+  AddAmountInfoDone(this.model);
   @override
-  List<Object> get props => [box];
+  List<Object> get props => [model];
 }
 
-class AddAmountInfoError extends AddAmountInfoState<int> {
+class AddAmountInfoError extends AddAmountInfoState {
   final String message;
 
   AddAmountInfoError(this.message);
 
   @override
-  // TODO: implement props
   List<Object> get props => [message];
 }

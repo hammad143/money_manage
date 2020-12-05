@@ -96,8 +96,8 @@ class GoogleFirebaseService implements FBService<Future<DocumentReference>> {
       FirebaseFirestore.instance.collection("users");
 
   @override
-  Future<DocumentReference> addDoc(Model userModel) async {
-    UserAddingModel model = (userModel as UserAddingModel);
+  Future<DocumentReference> addDoc(Model model) async {
+    //UserAddingModel model = (userModel as UserAddingModel);
     final totalUsers = await QueryFirebase(collection).totalUsers();
     DocumentReference documentReference = await findDoc(model);
     if (documentReference == null) {
