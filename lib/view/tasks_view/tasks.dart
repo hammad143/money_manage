@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
 import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
+import 'package:money_management/model/tiles_item_model/item_model.dart';
 import 'package:money_management/util/boxes_facade/boxes_facade.dart';
 import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
@@ -13,15 +14,14 @@ import 'package:money_management/view/component/custom_appbar/custom_appbar_grad
 import 'package:money_management/view/component/custom_drawer/custom_drawer.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
 import 'package:money_management/view/sync_view.dart';
-import 'package:money_management/view/tasks_view/components/custom_dismissible_tile.dart';
 import 'package:money_management/view/total_sum_view.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
+import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_event.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
 import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_bloc.dart';
 import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_state.dart';
 import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize.dart';
 import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_bloc.dart';
-import 'package:money_management/viewmodel/components/scroll_notifier.dart';
 
 class TaskView extends StatefulWidget {
   final GoogleSignIn signIn;
@@ -45,11 +45,13 @@ class _TaskViewState extends State<TaskView> {
   MakeAuthorizeBloc makeAuthorbloc;
   int index = 0;
   List<ListOfTilesModel> tileViewModel;
-
+  Box<ItemsAddingModel> itemAddingBox;
   @override
   void initState() {
     super.initState();
     notifierBloc = BlocProvider.of<NotifierItemAddedBloc>(context);
+    BlocProvider.of<AddAmountInfoBloc>(context)
+        .add(AddAmountInfoInitialEvent());
     /* listScrollController.addListener(() {
       if (listScrollController.positions.isNotEmpty) {
         final scrollExtent = listScrollController.position.pixels;
@@ -70,6 +72,7 @@ class _TaskViewState extends State<TaskView> {
     final bool isUserLoggedIn = boxesFacade
         .getIsUserAuthorized()
         .get(boxesFacade.isUserAuthorizedKey, defaultValue: false);
+    itemAddingBox = boxesFacade.getListItemBox<ItemsAddingModel>();
   }
 
   @override
@@ -92,9 +95,13 @@ class _TaskViewState extends State<TaskView> {
     return ListView.builder(
         controller: listScrollController,
         physics: BouncingScrollPhysics(),
-        itemCount: data.length,
+        itemCount: itemAddingBox.length,
         itemBuilder: (_, index) {
-          return CustomDismissibleTile(tileViewModel: data, index: index);
+          return Center(
+            child: Text(
+                "${itemAddingBox.getAt((itemAddingBox.length - 1) - (index)).title}"),
+          );
+          //return CustomDismissibleTile(tileViewModel: data, index: index);
         });
   }
 
@@ -167,10 +174,7 @@ class _TaskViewState extends State<TaskView> {
                   Scrollbar(
                     child: BlocBuilder<AddAmountInfoBloc, AddAmountInfoState>(
                         builder: (ctx, state) {
-                      if (state is AddAmountInfoInitialState ||
-                          state is AddAmountInfoDone)
-                        ScrollNotifier(listScrollController).scrollNotifier();
-
+                      if (state is AddAmountInfoInitialState) {}
                       return BlocBuilder<FetchAddedAmountBloc,
                           FetchAddedItemsState>(builder: (ctx, state) {
                         return Center(
@@ -189,7 +193,8 @@ class _TaskViewState extends State<TaskView> {
                                     return Container(
                                         child: Text("Nothing Found"));
                                 } else
-                                  return CircularProgressIndicator();
+                                  return itemBuilder(null);
+                                //return CircularProgressIndicator();
                               }),
                         );
                       });

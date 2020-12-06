@@ -7,6 +7,8 @@ class AddDataEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class AddAmountInfoInitialEvent extends AddDataEvent {}
+
 class AddAmountInfoEvent extends AddDataEvent {
   final String title, amount, dateInString, currencyValue;
   DropDownSelectChangeState valueSelectedState;

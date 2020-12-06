@@ -18,13 +18,15 @@ class ListTilesModelNewAdapter extends TypeAdapter<ListOfTilesModel> {
       amount: fields[1] as String,
       dateInString: fields[2] as String,
       option: fields[3] as String,
-    );
+      latitude: fields[6] as double,
+      longitude: fields[7] as double,
+    )..currency = fields[5] as String;
   }
 
   @override
   void write(BinaryWriter writer, ListOfTilesModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.title)
       ..writeByte(1)
@@ -32,7 +34,13 @@ class ListTilesModelNewAdapter extends TypeAdapter<ListOfTilesModel> {
       ..writeByte(2)
       ..write(obj.dateInString)
       ..writeByte(3)
-      ..write(obj.option);
+      ..write(obj.option)
+      ..writeByte(5)
+      ..write(obj.currency)
+      ..writeByte(6)
+      ..write(obj.latitude)
+      ..writeByte(7)
+      ..write(obj.longitude);
   }
 
   @override

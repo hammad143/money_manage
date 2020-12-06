@@ -7,7 +7,14 @@ class BoxesFacade {
       _userKey,
       _userUniqueKey,
       _userDisplayNameKey,
-      _randomGenerateKey;
+      _randomGenerateKey,
+      _itemListItemKey;
+
+  Box<T> getListItemBox<T>() {
+    Boxes<T> box = StoreListTileModelBox();
+    _itemListItemKey = box.valueKey;
+    return box.getBox();
+  }
 
   Box<T> getLocalAuthenticationBox<T>() {
     Boxes<T> localAuthenticationCheckBox = AuthenticateUserBox<T>();
@@ -52,4 +59,5 @@ class BoxesFacade {
   get userUniqueKey => _userUniqueKey;
   get userDisplayNameKey => _userDisplayNameKey;
   get randomGenerateKey => _randomGenerateKey;
+  get itemListItemKey => _itemListItemKey;
 }

@@ -14,6 +14,7 @@ class GoogleUserModelAdapter extends TypeAdapter<GoogleUserModel> {
       for (var i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return GoogleUserModel(
+      fields: (fields[6] as Map)?.cast<String, dynamic>(),
       email: fields[0] as String,
       displayName: fields[1] as String,
       photoUrl: fields[2] as String,
@@ -25,7 +26,7 @@ class GoogleUserModelAdapter extends TypeAdapter<GoogleUserModel> {
   @override
   void write(BinaryWriter writer, GoogleUserModel obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.email)
       ..writeByte(1)
@@ -37,7 +38,9 @@ class GoogleUserModelAdapter extends TypeAdapter<GoogleUserModel> {
       ..writeByte(4)
       ..write(obj.appUserKey)
       ..writeByte(5)
-      ..write(obj.autoInc);
+      ..write(obj.autoInc)
+      ..writeByte(6)
+      ..write(obj.fields);
   }
 
   @override

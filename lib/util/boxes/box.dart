@@ -77,6 +77,10 @@ class GenerateRandomKeyBox<T> extends Boxes<T> {
 }
 
 class StoreListTileModelBox<T> extends Boxes<T> {
+  static const ITEM_KEY = "item added key";
+
+  @override
+  String get valueKey => ITEM_KEY;
   @override
   String get key => storageKey;
 }

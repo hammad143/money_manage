@@ -85,7 +85,8 @@ abstract class FBService<T> {
   deleteDoc();
 
   T findDoc(UserAddingModel model);
-  List findDocs<T>();
+  List findDocs();
+  Future<List<Model>> getDocs();
 }
 
 class GoogleFirebaseService implements FBService<Future<DocumentReference>> {
@@ -129,7 +130,13 @@ class GoogleFirebaseService implements FBService<Future<DocumentReference>> {
   deleteDoc() {}
 
   @override
-  List findDocs<T>() {}
+  findDocs() {}
+
+  @override
+  Future<List<Model>> getDocs() {
+    // TODO: implement getDocs
+    throw UnimplementedError();
+  }
 }
 
 class QueryFirebase {

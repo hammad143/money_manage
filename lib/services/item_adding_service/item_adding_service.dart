@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:money_management/model/tiles_item_model/item_model.dart';
 import 'package:money_management/model/user_adding_decorator/user_adding_decorator.dart';
 import 'package:money_management/model/user_adding_model/model.dart';
+import 'package:money_management/services/firebase_services/all_docs_fetchable.dart';
 import 'package:money_management/services/firebase_services/firebase_service.dart';
 import 'package:money_management/util/boxes_facade/boxes_facade.dart';
 
@@ -46,7 +47,7 @@ class ItemAddingService implements FBService<Future<Model>> {
   Future<ItemsAddingModel> findDoc(Model model) {}
 
   @override
-  List findDocs<T>() {
+  List findDocs() {
     // TODO: implement findDocs
     throw UnimplementedError();
   }
@@ -54,4 +55,28 @@ class ItemAddingService implements FBService<Future<Model>> {
   @override
   CollectionReference get collection =>
       FirebaseFirestore.instance.collection("users");
+  @override
+  Future<List<Model>> getDocs() async {
+    List<Model> m = <Model>[];
+    AllDocsFetchAble docsFetchAble = FetchAllDocsOfItems();
+    final userID =
+        boxesFacade.getUserUniqueKeyBox().get(boxesFacade.userUniqueKey);
+    if (userID != null) {
+      try {
+        _itemCollection = await docsFetchAble.findCollection(
+            collection, "id", userID, "items");
+        final docs = await docsFetchAble.fetchDocs(_itemCollection);
+        docs.forEach((element) {
+          m.add(ItemsAddingModel.toJSON(element.data()));
+        });
+        return m;
+      } catch (error) {
+        print("USER IS NOT FOUND FOR ITEM");
+        return null;
+      }
+    } else {
+      print("USER WAS NOT LOGGED IN");
+      return m;
+    }
+  }
 }

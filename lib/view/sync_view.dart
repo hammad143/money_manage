@@ -9,7 +9,19 @@ import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
 import 'package:money_management/viewmodel/bloc/authenticate_user_bloc/auth_bloc.dart';
 
-class SyncView extends StatelessWidget {
+class SyncView extends StatefulWidget {
+  @override
+  _SyncViewState createState() => _SyncViewState();
+}
+
+class _SyncViewState extends State<SyncView> {
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<AddAmountInfoBloc>(context)
+        .add(AddAmountInfoInitialEvent());
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthenticateUserBloc, AuthenticateUserState>(
@@ -65,7 +77,7 @@ class SyncView extends StatelessWidget {
                           color: const Color(0xff3b569d),
                           onPressed: () async {
                             BlocProvider.of<AddAmountInfoBloc>(context).add(
-                              AddAmountInfoEvent("Mason Brian", "200",
+                              AddAmountInfoEvent("Aliyah Brian", "200",
                                   "20/20/2020", null, "\$200", null),
                             );
                           },

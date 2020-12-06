@@ -7,16 +7,7 @@ import 'package:money_management/view/add_task_view/components/add_task_form.dar
 import 'package:money_management/view/component/custom_appbar/custom_appbar_gradient.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
 
-class AddTaskView extends StatefulWidget {
-  @override
-  _AddTaskViewState createState() => _AddTaskViewState();
-}
-
-class _AddTaskViewState extends State<AddTaskView> {
-  @override
-  void initState() {
-    super.initState();
-  }
+class AddTaskView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {

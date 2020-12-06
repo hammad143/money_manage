@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:money_management/model/google_user_model/google_user_model.dart';
-import 'package:money_management/model/list_of_tiles_model/list_of_tiles_model.dart';
+import 'package:money_management/model/tiles_item_model/item_model.dart';
 import 'package:money_management/util/boxes/box.dart';
 import 'package:money_management/util/boxes_facade/boxes_facade.dart';
 import 'package:money_management/util/constants/constants.dart';
@@ -26,8 +26,9 @@ import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown
 
 void main() async {
   await Hive.initFlutter();
-  Hive.registerAdapter(ListTilesModelNewAdapter());
+  //Hive.registerAdapter(ListTilesModelNewAdapter());
   Hive.registerAdapter(GoogleUserModelAdapter());
+  Hive.registerAdapter(ItemAddingModelAdapter());
   await Firebase.initializeApp();
   await Boxes.open(IsUserAuthorizedBox());
   await Boxes.open(SelectedCurrencyBox());
@@ -35,7 +36,7 @@ void main() async {
   await Boxes.open(UserDisplayNameBox());
   await Boxes.open(LastAddedItemKeyBox());
   await Boxes.open(StoreGoogleUserModelBox<GoogleUserModelAdapter>());
-  await Boxes.open(StoreListTileModelBox<ListOfTilesModel>());
+  await Boxes.open(StoreListTileModelBox<ItemsAddingModel>());
   await Boxes.open(AuthenticateUserBox<bool>());
   await Boxes.open(StoreUserIDBox());
   await Boxes.open(GenerateRandomKeyBox());
@@ -96,6 +97,6 @@ class MainScreen extends StatelessWidget {
         .getLocalAuthenticationBox<bool>()
         .get(boxFacade.localAuthenticationKey, defaultValue: false);
 
-    return isLoggedIn ?  SyncView() : TaskView() ;
+    return isLoggedIn ? TaskView() : SyncView();
   }
 }
