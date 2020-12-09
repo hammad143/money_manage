@@ -60,7 +60,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
     _amountFocusNode = FocusNode();
     _bloc = BlocProvider.of<AddAmountInfoBloc>(context);
     currencies = loadCurrenciesFile();
-    currencyKey = currencyBox.get("currency");
+    //currencyKey = currencyBox.get("currency");
   }
 
   @override
@@ -350,7 +350,14 @@ class _AddTaskFormState extends State<AddTaskForm> {
                 CustomAddAmountBtn(
                   onBtnPressed: () {
                     print("Symbol Of currency ${currencyValue}");
-
+                    _bloc.add(AddAmountInfoEvent(
+                      _titleController.text,
+                      _amountController.text,
+                      timeToString,
+                      dropDownState,
+                      currencyValue,
+                      StaticValueStore.location,
+                    ));
                     setState(() {
                       if (isOptionSelected == null) isOptionSelected = false;
                       if (_formKey.currentState.validate() &&

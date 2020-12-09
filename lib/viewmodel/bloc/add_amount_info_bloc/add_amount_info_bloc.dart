@@ -9,6 +9,7 @@ import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_
 class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
   AddAmountInfoBloc() : super(AddAmountInfoInitialState());
   final FBService _firebaseService = ItemAddingService();
+  final List<ItemsAddingModel> _itemModel = [];
 
   @override
   Stream<AddAmountInfoState> mapEventToState(AddDataEvent event) async* {
@@ -23,10 +24,22 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
       final itemAddingBox = _boxFacade.getListItemBox<ItemsAddingModel>();
       final list = await _firebaseService.getDocs();
       print("${itemAddingBox.length} and ${list.length}");
+      if (itemAddingBox.isNotEmpty) {
+        for (int i = 0; i < itemAddingBox.length; i++) {
+          if (itemAddingBox.containsKey(i)) {
+            final item = itemAddingBox.getAt(i);
+            _itemModel.add(item);
+          } else {
+            _itemModel.add(list[i]);
+          }
+          yield AddAmountInfoInitialState(_itemModel);
+          //_firebaseService.findDoc(model)
+        }
+      }
       if (list.length != itemAddingBox.length) {
         for (int i = 0; i < list.length; i++) {
-          print("-----ADDING ITEM NOW ---------------");
-          if (list[i] != itemAddingBox.getAt(i)) itemAddingBox.add(list[i]);
+          print("-----ADDING ITEM ${list[i]} NOW ---------------");
+          if (!itemAddingBox.containsKey(i)) itemAddingBox.add(list[i]);
         }
       } else {
         print("LIST IS EMPTY @@@@@ AND NOT MATCHED");
@@ -47,8 +60,10 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
             event.currencyValue,
             0.255555,
             0.26666);
-        itemModel = await _firebaseService.addDoc(itemModel);
-        yield AddAmountInfoDone(itemModel);
+        final item = await _firebaseService.addDoc(itemModel);
+        _itemModel.add(item);
+        print("Added an Item");
+        yield AddAmountInfoDone(_itemModel);
         /* final title = event.title,
             amount = event.amount,
             option = event.valueSelectedState.selectedValue,

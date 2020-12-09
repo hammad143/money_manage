@@ -18,8 +18,6 @@ import 'package:money_management/view/total_sum_view.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_event.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
-import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_bloc.dart';
-import 'package:money_management/viewmodel/bloc/fetch_added_items_bloc/fetch_added_items_state.dart';
 import 'package:money_management/viewmodel/bloc/make_authorize_bloc/make_authorize.dart';
 import 'package:money_management/viewmodel/bloc/notifier_item_added_bloc/notifier_item_added_bloc.dart';
 
@@ -52,22 +50,6 @@ class _TaskViewState extends State<TaskView> {
     notifierBloc = BlocProvider.of<NotifierItemAddedBloc>(context);
     BlocProvider.of<AddAmountInfoBloc>(context)
         .add(AddAmountInfoInitialEvent());
-    /* listScrollController.addListener(() {
-      if (listScrollController.positions.isNotEmpty) {
-        final scrollExtent = listScrollController.position.pixels;
-        final maxScrollPosition = listScrollController.position.maxScrollExtent;
-        print("Scroll Edge ${listScrollController.position.atEdge}");
-        if (listScrollController.position.atEdge) {
-          final fetchBloc = BlocProvider.of<FetchAddedAmountBloc>(context);
-          fetchBloc.add(FetchAddedItemsEvent());
-          print("Im the listner on scroll");
-        }
-      } else {
-        final fetchBloc = BlocProvider.of<FetchAddedAmountBloc>(context);
-        fetchBloc.add(FetchAddedItemsEvent());
-        print("Im the listner on scroll Outside of that");
-      }
-    });*/
 
     final bool isUserLoggedIn = boxesFacade
         .getIsUserAuthorized()
@@ -91,15 +73,14 @@ class _TaskViewState extends State<TaskView> {
     );
   }
 
-  Widget itemBuilder(List<ListOfTilesModel> data) {
+  Widget itemBuilder(List<ItemsAddingModel> items) {
     return ListView.builder(
         controller: listScrollController,
         physics: BouncingScrollPhysics(),
-        itemCount: itemAddingBox.length,
+        itemCount: items.length,
         itemBuilder: (_, index) {
           return Center(
-            child: Text(
-                "${itemAddingBox.getAt((itemAddingBox.length - 1) - (index)).title}"),
+            child: Text("${items[index].title}, ${items[index].amount}"),
           );
           //return CustomDismissibleTile(tileViewModel: data, index: index);
         });
@@ -174,32 +155,21 @@ class _TaskViewState extends State<TaskView> {
                   Scrollbar(
                     child: BlocBuilder<AddAmountInfoBloc, AddAmountInfoState>(
                         builder: (ctx, state) {
-                      if (state is AddAmountInfoInitialState) {}
-                      return BlocBuilder<FetchAddedAmountBloc,
-                          FetchAddedItemsState>(builder: (ctx, state) {
-                        return Center(
-                          child: FutureBuilder<List<ListOfTilesModel>>(
-                              future: (state is FetchAddedItemSuccessState)
-                                  ? state.data
-                                  : null,
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  /*listScrollController.animateTo(-20,
-                                      duration: Duration(milliseconds: 300),
-                                      curve: Curves.bounceInOut);*/
-                                  if (snapshot.data.isNotEmpty)
-                                    return itemBuilder(snapshot.data);
-                                  else
-                                    return Container(
-                                        child: Text("Nothing Found"));
-                                } else
-                                  return itemBuilder(null);
-                                //return CircularProgressIndicator();
-                              }),
-                        );
-                      });
+                      if (state is AddAmountInfoError)
+                        return Center(child: CircularProgressIndicator());
+                      else
+                        return Center(child: itemBuilder(state.model)
+                            //return CircularProgressIndicator();
+                            );
                     }),
                   ),
+                  RaisedButton(
+                      onPressed: () {
+                        BlocProvider.of<AddAmountInfoBloc>(context).add(
+                            AddAmountInfoEvent("Malik Riaz", "200",
+                                "20/10/2021/", null, "3.55", null));
+                      },
+                      child: Text("Click")),
                   //RemainingAmountContainer()
                 ],
               ),

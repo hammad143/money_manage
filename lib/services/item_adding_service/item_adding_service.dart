@@ -12,17 +12,14 @@ class ItemAddingService implements FBService<Future<Model>> {
 
   @override
   Future<Model> addDoc(Model model) async {
-    final snap = await collection.get();
     final uniqueIdBox = boxesFacade.getUserUniqueKeyBox();
-    try {
-      final user = snap.docs.firstWhere((element) {
-        final data = element.data();
-        final id = uniqueIdBox.get(boxesFacade.userUniqueKey);
-        return id == data['id'];
-      });
+    final id = uniqueIdBox.get(boxesFacade.userUniqueKey);
+    AllDocsFetchAble itemFetchAble = FetchAllDocsOfItems();
 
-      _itemCollection = user.reference.collection("items");
-      final totalItem = await totalDoc(_itemCollection);
+    try {
+      _itemCollection =
+          await itemFetchAble.findCollection(collection, "id", id, "items");
+      final totalItem = (await itemFetchAble.fetchDocs(_itemCollection)).length;
       final updatedModel = ItemAddingDecorator(model, totalItem);
       await _itemCollection.add(updatedModel.toMap());
       return model;
