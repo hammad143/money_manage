@@ -21,6 +21,10 @@ class IsUserAuthorizedBox<T> extends Boxes<T> {
 }
 
 class SelectedCurrencyBox<T> extends Boxes<T> {
+  static final CURRENCY_KEY = "selected currency";
+  @override
+  // TODO: implement valueKey
+  String get valueKey => CURRENCY_KEY;
   @override
   String get key => kSelectedCurrency;
 }

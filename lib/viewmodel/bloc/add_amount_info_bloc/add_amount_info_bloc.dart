@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:hive/hive.dart';
 import 'package:money_management/model/tiles_item_model/item_model.dart';
 import 'package:money_management/services/firebase_services/firebase_service.dart';
 import 'package:money_management/services/item_adding_service/item_adding_service.dart';
@@ -9,40 +10,28 @@ import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_
 class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
   AddAmountInfoBloc() : super(AddAmountInfoInitialState());
   final FBService _firebaseService = ItemAddingService();
-  final List<ItemsAddingModel> _itemModel = [];
+  List<ItemsAddingModel> _itemModel = [];
+  BoxesFacade _boxFacade = BoxesFacade();
+  Box<ItemsAddingModel> get itemAddingBox =>
+      _boxFacade.getListItemBox<ItemsAddingModel>();
 
   @override
   Stream<AddAmountInfoState> mapEventToState(AddDataEvent event) async* {
-    BoxesFacade _boxFacade = BoxesFacade();
-    /*//final box = Hive.box(kHiveDataName);
-    final storageBox = Hive.box<ListOfTilesModel>(storageKey);
-    final googleUserIdBox = Hive.box(kGoogleUserId);
-    final userID = googleUserIdBox.get("userID");
-    final firebaseDB = FirebaseService();*/
-
     if (event is AddAmountInfoInitialEvent) {
-      final itemAddingBox = _boxFacade.getListItemBox<ItemsAddingModel>();
       final list = await _firebaseService.getDocs();
-      print("${itemAddingBox.length} and ${list.length}");
-      if (itemAddingBox.isNotEmpty) {
-        for (int i = 0; i < itemAddingBox.length; i++) {
-          if (itemAddingBox.containsKey(i)) {
-            final item = itemAddingBox.getAt(i);
-            _itemModel.add(item);
-          } else {
-            _itemModel.add(list[i]);
-          }
-          yield AddAmountInfoInitialState(_itemModel);
-          //_firebaseService.findDoc(model)
-        }
-      }
-      if (list.length != itemAddingBox.length) {
-        for (int i = 0; i < list.length; i++) {
-          print("-----ADDING ITEM ${list[i]} NOW ---------------");
-          if (!itemAddingBox.containsKey(i)) itemAddingBox.add(list[i]);
-        }
+      if (list.length == itemAddingBox.length) {
+        print("Length is same ");
+        _itemModel = itemAddingBox.values.toList();
+        yield AddAmountInfoInitialState(_itemModel);
       } else {
-        print("LIST IS EMPTY @@@@@ AND NOT MATCHED");
+        for (int i = 0; i < list.length; i++) {
+          if (!itemAddingBox.containsKey(i)) {
+            print("Item is being Added now!!!!!!!!!!!!");
+            itemAddingBox.add(list[i]);
+          }
+        }
+        _itemModel = itemAddingBox.values.toList();
+        yield AddAmountInfoInitialState(_itemModel);
       }
     } else if (event is AddAmountInfoEvent) {
       if (0 ==
@@ -61,47 +50,18 @@ class AddAmountInfoBloc extends Bloc<AddDataEvent, AddAmountInfoState> {
             0.255555,
             0.26666);
         final item = await _firebaseService.addDoc(itemModel);
-        _itemModel.add(item);
+        itemAddingBox.add(item);
         print("Added an Item");
+        _itemModel = itemAddingBox.values.toList();
         yield AddAmountInfoDone(_itemModel);
-        /* final title = event.title,
-            amount = event.amount,
-            option = event.valueSelectedState.selectedValue,
-            date = event.dateInString,
-            currency = event.currencyValue;
-        final location = event.location;
-        final latitude = location.lat;
-        final longitude = location.long;
-        final document = await firebaseDB.findDocumentExistsByField(
-            collectionName: "users",
-            dataToMatch: {"id": userID},
-            key1: "id",
-            key2: "id");
-        final collectionOfItems = await document.reference.collection("items");
-        print("This is the Collection $collectionOfItems");
-        final snapshot = await collectionOfItems.get();
-        final numOfItems = snapshot.docs.length + 1;
-        final itemAddedDocument = await collectionOfItems.add({
-          "auto_increment": numOfItems,
-          "title": title,
-          "amount": amount,
-          "currency": currency,
-          "date": date,
-          "option": option,
-          "latitude": latitude,
-          "longitude": longitude,
-        });
-        final data = (await itemAddedDocument.get()).data();
-
-        storageBox.add(ListOfTilesModel.fromJSON(data));*/
-        //yield AddAmountInfoDone<ListOfTilesModel>(box: storageBox);
       }
     } else
       yield AddAmountInfoError("Item has not been added");
   }
 }
 /*
-* Box with the key of Storage
-* that box will have a List object
-*
+* on init event occurs fetch documents
+* get all documents length
+* if documents length matches to box length, return currentBox
+* else add last added item  to the currentBox
 * */
