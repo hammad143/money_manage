@@ -5,17 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
-import 'package:location/location.dart' as locationManager;
-import 'package:money_management/model/location_model.dart';
 import 'package:money_management/util/boxes_facade/boxes_facade.dart';
-import 'package:money_management/util/constants/constants.dart';
 import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/add_task_view/components/custom_addAmount_btn.dart';
 import 'package:money_management/view/add_task_view/components/custom_dp_btns.dart';
+import 'package:money_management/view/add_task_view/components/custom_text_field.dart';
 import 'package:money_management/view/responsive_setup_view.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_bloc.dart';
-import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_event.dart';
 import 'package:money_management/viewmodel/bloc/add_amount_info_bloc/add_amount_info_state.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_bloc.dart';
 import 'package:money_management/viewmodel/bloc/datetime_pick_bloc/datetime_pick_event.dart';
@@ -37,15 +33,14 @@ class AddTaskForm extends StatefulWidget {
 class _AddTaskFormState extends State<AddTaskForm> {
   final _formKey = GlobalKey<FormState>();
   final BoxesFacade _boxesFacade = BoxesFacade();
-  bool isItemSelected;
-  String timeToString;
+  bool isItemSelected, isOptionSelected;
+  String timeToString, currencyValue, currencyKey;
   TextEditingController _titleController, _amountController;
   FocusNode _titleFocusNode, _amountFocusNode;
   FocusScopeNode _focusScope;
   DropDownSelectChangeState dropDownState;
-  bool isOptionSelected;
   Future<Map<String, dynamic>> currencies;
-  String currencyValue, currencyKey;
+
   //final currencyBox = Hive.box(kSelectedCurrency);
   //locationManager.PermissionStatus permisisonStatus;
   LocationBloc locationBloc;
@@ -60,15 +55,22 @@ class _AddTaskFormState extends State<AddTaskForm> {
     _titleFocusNode = FocusNode();
     _amountFocusNode = FocusNode();
     currencies = loadCurrenciesFile();
-    currencyKey = _boxesFacade.getCurrencyBox().get(_boxesFacade.selectedCurrencyKey);
+    currencyKey =
+        _boxesFacade.getCurrencyBox().get(_boxesFacade.selectedCurrencyKey);
+  }
 
+  @override
+  void didChangeDependencies() {
+    _focusScope = FocusScope.of(context);
+    super.didChangeDependencies();
   }
 
   @override
   void dispose() {
     _titleController.dispose();
     _amountController.dispose();
-    //_focusScope.dispose();
+    _titleFocusNode.dispose();
+    _amountFocusNode.dispose();
     super.dispose();
   }
 
@@ -89,7 +91,7 @@ class _AddTaskFormState extends State<AddTaskForm> {
 
   @override
   Widget build(BuildContext context) {
-    _focusScope = FocusScope.of(context);
+    //_focusScope = FocusScope.of(context);
     //StaticValueStore.location = null;
     return BlocBuilder<CheckFormSubmitBloc, CheckFormSubmitState>(
         builder: (ctx, formCheckstate) {
@@ -118,48 +120,32 @@ class _AddTaskFormState extends State<AddTaskForm> {
           child: Column(
             children: <Widget>[
               //Title TextField
-              TextFormField(
+              CustomTextFormField(
+                onFormSubmit: (value) =>
+                    _onTextFieldDone(_amountController.text, _amountFocusNode),
                 focusNode: _titleFocusNode,
-                onFieldSubmitted: (value) {
-                  _onTextFieldDone(_amountController.text, _amountFocusNode);
-                },
-                maxLength: 300,
-                validator: _titleValidator,
                 controller: _titleController,
-                style: Style.textStyle1.copyWith(color: Colors.black87),
-                textAlignVertical: TextAlignVertical.center,
-                //autovalidateMode: AutovalidateMode.onUserInteraction,
-                autofocus: true,
-                decoration: InputDecoration(
-                  hintStyle: TextStyle(
-                      color: Colors.black54,
-                      fontSize: Responsive.textScaleFactor * 4.5),
-                  hintText: "Enter a title",
-                ),
+                validator: _titleValidator,
+                maxLength: 300,
+                autoFocus: true,
+                hintText: "Enter a title",
               ),
+
               //Spacer
-              SizedBox(height: Responsive.widgetScaleFactor * 4),
+              SizedBox(height: Responsive.widgetScaleFactor * 0),
               //Amount TextField
-              TextFormField(
-                validator: _amountValidator,
-                maxLength: 20,
+              CustomTextFormField(
+                onFormSubmit: (value) =>
+                    _onTextFieldDone(_titleController.text, _titleFocusNode),
                 focusNode: _amountFocusNode,
                 controller: _amountController,
-                style: Style.textStyle1.copyWith(color: Colors.black87),
-                textAlignVertical: TextAlignVertical.center,
-                keyboardAppearance: Brightness.dark,
+                validator: _amountValidator,
+                maxLength: 20,
+                autoFocus: true,
+                hintText: "Enter an amount",
                 keyboardType: TextInputType.number,
-                //autovalidateMode: AutovalidateMode.onUserInteraction,
-                onFieldSubmitted: (value) {
-                  _onTextFieldDone(_titleController.text, _titleFocusNode);
-                },
-                decoration: InputDecoration(
-                  hintStyle: TextStyle(
-                      color: Colors.black54,
-                      fontSize: Responsive.textScaleFactor * 4.5),
-                  hintText: "Enter an amount",
-                ),
               ),
+
               FutureBuilder<Map<String, dynamic>>(
                   future: currencies,
                   builder: (context, snapshot) {
@@ -182,7 +168,8 @@ class _AddTaskFormState extends State<AddTaskForm> {
                         currencyValue =
                             snapshot.data[currencyKey]['symbol_native'];
                         print("CurrencyValue ${currencyValue}");
-                        _boxesFacade.getCurrencyBox().put(_boxesFacade.selectedCurrencyKey, currencyValue);
+                        _boxesFacade.getCurrencyBox().put(
+                            _boxesFacade.selectedCurrencyKey, currencyValue);
                         //currencyValue = snapshot.data[value]['symbol_native'];
                       },
                       items: <DropdownMenuItem>[
@@ -306,21 +293,17 @@ class _AddTaskFormState extends State<AddTaskForm> {
               ),
               SizedBox(height: Responsive.widgetScaleFactor * 4),
               SizedBox(height: Responsive.widgetScaleFactor * 4),
-              CustomAddAmountBtn(
-                onBtnPressed: () {
+              CustomAddAmountBtn(onBtnPressed: () {
+                Timer(Duration(seconds: 3), () {
+                  _titleController.value = TextEditingValue.empty;
+                  _amountController.value = TextEditingValue.empty;
+                  BlocProvider.of<CheckFormSubmitBloc>(context)
+                      .add(CheckFormSubmitEvent(false));
 
-                      Timer(Duration(seconds: 3), () {
-                        _titleController.value = TextEditingValue.empty;
-                        _amountController.value = TextEditingValue.empty;
-                        BlocProvider.of<CheckFormSubmitBloc>(context)
-                            .add(CheckFormSubmitEvent(false));
-
-                        Navigator.pop(context);
-                      });
-                    }
-
-
-              )],
+                  Navigator.pop(context);
+                });
+              })
+            ],
           ),
         ),
       );
