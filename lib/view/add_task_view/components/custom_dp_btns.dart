@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:money_management/util/constants/style.dart';
-import 'package:money_management/viewmodel/bloc/form_submitted_bloc/check_form_submit_event.dart';
-import 'package:money_management/viewmodel/bloc/form_submitted_bloc/form_submitted_bloc.dart';
-import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_bloc.dart';
-import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_event.dart';
 
 class DropDownBtns extends StatelessWidget {
   final String hintTitle;
@@ -37,7 +32,7 @@ class DropDownBtns extends StatelessWidget {
         BlocProvider.of<CheckFormSubmitBloc>(context)
             .add(CheckFormSubmitEvent(true));*/
 
-      onTap:onTap,
+      onTap: onTap,
       items: [
         DropdownMenuItem(
           value: 0,
