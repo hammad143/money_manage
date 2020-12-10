@@ -11,7 +11,15 @@ abstract class Boxes<T> {
 
   Box<T> getBox() => Hive.box<T>(key);
 }
-
+class CurrencyStoreBox<T> extends Boxes<T> {
+  static const String CURRENCIES = "currencies";
+  @override
+  // TODO: implement valueKey
+  String get valueKey => CURRENCIES;
+  @override
+  // TODO: implement key
+  String get key => kCurrenciesKey;
+}
 class IsUserAuthorizedBox<T> extends Boxes<T> {
   static const String IS_AUTHORRIZED_KEY = "is authorized user";
   @override

@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
 import 'package:money_management/util/boxes_facade/boxes_facade.dart';
 import 'package:money_management/util/constants/style.dart';
 import 'package:money_management/view/add_task_view/components/custom_addAmount_btn.dart';
@@ -21,6 +22,7 @@ import 'package:money_management/viewmodel/bloc/form_submitted_bloc/check_form_s
 import 'package:money_management/viewmodel/bloc/form_submitted_bloc/form_submitted_bloc.dart';
 import 'package:money_management/viewmodel/bloc/location_bloc/location_bloc.dart';
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_bloc.dart';
+import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_event.dart';
 import 'package:money_management/viewmodel/bloc/on_dropdown_change_bloc/dropdown_select_change_state.dart';
 import 'package:money_management/viewmodel/components/static_value_store.dart';
 
@@ -34,13 +36,15 @@ class _AddTaskFormState extends State<AddTaskForm> {
   final _formKey = GlobalKey<FormState>();
   final BoxesFacade _boxesFacade = BoxesFacade();
   bool isItemSelected, isOptionSelected;
+  int _itemChangeValue;
   String timeToString, currencyValue, currencyKey;
   TextEditingController _titleController, _amountController;
   FocusNode _titleFocusNode, _amountFocusNode;
   FocusScopeNode _focusScope;
   DropDownSelectChangeState dropDownState;
-  Future<Map<String, dynamic>> currencies;
-
+  Future<Map<dynamic, dynamic>> currencies;
+  Map<String, dynamic> allCurrencies;
+  Box allCurrencyBox;
   //final currencyBox = Hive.box(kSelectedCurrency);
   //locationManager.PermissionStatus permisisonStatus;
   LocationBloc locationBloc;
@@ -54,6 +58,9 @@ class _AddTaskFormState extends State<AddTaskForm> {
     _amountController = TextEditingController();
     _titleFocusNode = FocusNode();
     _amountFocusNode = FocusNode();
+    allCurrencyBox = _boxesFacade.getAllCurrenciesBox();
+    //allCurrencies = allCurrencyBox.get(_boxesFacade.allCurrenciesKey);
+    //if(allCurrencies == null)
     currencies = loadCurrenciesFile();
     currencyKey =
         _boxesFacade.getCurrencyBox().get(_boxesFacade.selectedCurrencyKey);
@@ -74,12 +81,21 @@ class _AddTaskFormState extends State<AddTaskForm> {
     super.dispose();
   }
 
-  Future<Map<String, dynamic>> loadCurrenciesFile() async {
+  Future<Map<dynamic, dynamic>> loadCurrenciesFile() async {
+    dynamic parsedData;
     final data = await DefaultAssetBundle.of(context)
         .loadString("assets/currency/currency.json");
-    final parsedData = await compute(jsonDecode, data);
-    print("Data parsed into Seprate Thread $parsedData");
-    return parsedData;
+    final allCurrencies = allCurrencyBox.get(_boxesFacade.allCurrenciesKey);
+    if (allCurrencies == null) {
+      parsedData = await compute(jsonDecode, data);
+      //print();
+
+      allCurrencyBox.put(_boxesFacade.allCurrenciesKey, parsedData);
+      return (parsedData);
+    } else {
+      //print("This is my Else Map : ${allCurrencies}");
+      return (allCurrencies);
+    }
   }
 
   _onTextFieldDone([String text, FocusNode node, VoidCallback onDoneCallback]) {
@@ -146,16 +162,19 @@ class _AddTaskFormState extends State<AddTaskForm> {
                 keyboardType: TextInputType.number,
               ),
 
-              FutureBuilder<Map<String, dynamic>>(
-                  future: currencies,
+              FutureBuilder<Map<dynamic, dynamic>>(
+                  future: loadCurrenciesFile(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      //final currency = currencyBox.get("currency");
+                      print("Has DAta now ${snapshot.data.runtimeType}");
+                      final currency = _boxesFacade
+                          .getCurrencyBox()
+                          .get(_boxesFacade.selectedCurrencyKey);
                       if (currencyKey != null)
                         currencyValue =
                             snapshot.data[currencyKey]['symbol_native'];
                     }
-
+                    print("${snapshot.data}!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     return DropdownButton(
                       value: currencyKey,
                       isExpanded: true,
@@ -247,19 +266,25 @@ class _AddTaskFormState extends State<AddTaskForm> {
               SizedBox(height: Responsive.widgetScaleFactor * 4),
               BlocBuilder<DropDownSelectChangeBloc, DropDownSelectChangeState>(
                   builder: (ctx, state) {
-                bool option;
-                dropDownState = state;
-                print("Check State ${formCheckstate.isFormSubmit}");
-                if (dropDownState != null) isOptionSelected = true;
-                /*else
-                          isOptionSelected = false;*/
-
                 return Column(
                   children: [
                     DropDownBtns(
+                      onItemChange: (value) =>
+                          BlocProvider.of<DropDownSelectChangeBloc>(ctx)
+                              .add(DropDownSelectChangeEvent(value)),
+                      onTap: () {},
+                      value: state?.value,
+                      hintTitle: "Select an Option",
+                      items: [
+                        DropdownMenuItem(child: Text("Receive"), value: 0),
+                        DropdownMenuItem(child: Text("Spent"), value: 1),
+                        DropdownMenuItem(child: Text("Lost"), value: 2),
+                      ],
+                    ),
+                    /* DropDownBtns(
                         value: formCheckstate.isFormSubmit
                             ? dropDownState?.value
-                            : null),
+                            : null),*/
                     Align(
                       alignment: Alignment.centerLeft,
                       child: AnimatedContainer(

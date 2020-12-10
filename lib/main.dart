@@ -40,6 +40,7 @@ void main() async {
   await Boxes.open(AuthenticateUserBox<bool>());
   await Boxes.open(StoreUserIDBox());
   await Boxes.open(GenerateRandomKeyBox());
+  await Boxes.open(CurrencyStoreBox());
   // Notification Init
 
   await FlutterLocalNotifier.init();

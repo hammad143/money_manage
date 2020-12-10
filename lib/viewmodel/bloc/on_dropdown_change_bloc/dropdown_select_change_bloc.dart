@@ -8,6 +8,7 @@ class DropDownSelectChangeBloc
   @override
   Stream<DropDownSelectChangeState> mapEventToState(
       DropDownSelectChangeEvent event) async* {
+    print("Event State change: ${event} ${event.value}");
     if (event.value != null) yield DropDownSelectedValue(event.value);
   }
 }

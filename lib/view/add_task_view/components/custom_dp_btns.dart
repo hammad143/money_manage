@@ -5,7 +5,7 @@ class DropDownBtns extends StatelessWidget {
   final String hintTitle;
   final int value;
   final bool isFormSubmitted;
-  final Function(int) onItemChange;
+  final Function(dynamic) onItemChange;
   final VoidCallback onTap;
   final List<DropdownMenuItem> items;
   const DropDownBtns({
@@ -23,17 +23,19 @@ class DropDownBtns extends StatelessWidget {
     return DropdownButton(
       isExpanded: true,
       //isDense: false,
+
       style: Style.textStyle3,
       value: value,
       hint: Text("$hintTitle"),
-      onChanged: (value) => onItemChange,
+      onChanged: onItemChange,
       /*  BlocProvider.of<DropDownSelectChangeBloc>(context)
             .add(DropDownSelectChangeEvent(value));
         BlocProvider.of<CheckFormSubmitBloc>(context)
             .add(CheckFormSubmitEvent(true));*/
 
       onTap: onTap,
-      items: [
+      items:
+          items, /*[
         DropdownMenuItem(
           value: 0,
           child: Text("Spent"),
@@ -49,7 +51,7 @@ class DropDownBtns extends StatelessWidget {
           child: Text("Lost"),
           onTap: () {},
         ),
-      ],
+      ],*/
     );
   }
 }

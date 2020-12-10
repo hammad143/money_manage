@@ -9,7 +9,8 @@ class BoxesFacade {
       _userDisplayNameKey,
       _randomGenerateKey,
       _itemListItemKey,
-      _selectedCurrencyKey;
+      _selectedCurrencyKey,
+      _allCurrenciesKey;
 
   Box<T> getListItemBox<T>() {
     Boxes<T> box = StoreListTileModelBox();
@@ -56,16 +57,23 @@ class BoxesFacade {
 
   Box<T> getCurrencyBox<T>() {
     final Boxes<T> box = SelectedCurrencyBox<T>();
+    _allCurrenciesKey = box.valueKey;
+    return box.getBox();
+  }
+
+  Box<T> getAllCurrenciesBox<T>() {
+    final Boxes<T> box = CurrencyStoreBox<T>();
     _selectedCurrencyKey = box.valueKey;
     return box.getBox();
   }
 
-  get localAuthenticationKey => _localAuthKey;
-  get isUserAuthorizedKey => _isUserAuthorizedKey;
-  get userKey => _userKey;
-  get userUniqueKey => _userUniqueKey;
-  get userDisplayNameKey => _userDisplayNameKey;
-  get randomGenerateKey => _randomGenerateKey;
-  get itemListItemKey => _itemListItemKey;
-  get selectedCurrencyKey => _selectedCurrencyKey;
+  String get localAuthenticationKey => _localAuthKey;
+  String get isUserAuthorizedKey => _isUserAuthorizedKey;
+  String get userKey => _userKey;
+  String get userUniqueKey => _userUniqueKey;
+  String get userDisplayNameKey => _userDisplayNameKey;
+  String get randomGenerateKey => _randomGenerateKey;
+  String get itemListItemKey => _itemListItemKey;
+  String get selectedCurrencyKey => _selectedCurrencyKey;
+  String get allCurrenciesKey => _allCurrenciesKey;
 }
